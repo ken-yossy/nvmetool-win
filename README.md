@@ -1,7 +1,8 @@
-# Sample program of accessing NVMe device using Windows' inbox NVMe driver
+# nvmetool-win: Sample program of accessing NVMe device using Windows' inbox NVMe driver
 
 ## Abstract
 This software demonstrates that issuing some NVMe commands from userland to NVMe device using Windows inbox NVMe driver (stornvme.sys)[1].
+
 Specification that this software refered to is NVMe 1.3d[2].
 
 ## Supported commands (Admin Command Set)
@@ -53,36 +54,46 @@ SLBA = 0, NLB = 1
 ### Dataset Management (Opcode = 09h)
 
 Only with Deallocate bit.
+
 LBA region to be deallocated is SLBA = 0, NLB = 1
 
 ## Caution
 "Write" and "Dataset Management (Deallocate)" command to LBA 0 of devices under management by file systems (e.g. FAT, NTFS) will corrupt your system.
+
 These commands should be issued with highest care.
+
 "Read" command does not have such a side effect... :-) 
 
 ## Environment / Requirements
 Confirmed on the following software environment:
 
 * Operating system and device driver
- * Windows 10 Professional 64bit (Version 1809, Build 17763.475)
- * stornvme.sys (version 10.0.17763.404, WinBuild 160101.0800)
+  * Windows 10 Professional 64bit (Version 1809, Build 17763.475)
+  * stornvme.sys (version 10.0.17763.404, WinBuild 160101.0800)
 * Developping environment
- * Microsoft Visual Studio Community 2017 (Version 15.9.11)
-  * Microsoft Visual C++ 2017
-  * Windows Driver Kit (10.0.17740.1000)
+  * Microsoft Visual Studio Community 2017 (Version 15.9.11)
+    * Microsoft Visual C++ 2017
+    * Windows Driver Kit (10.0.17740.1000)
 
 An NVMe drive that supports Dataset Management command is also needed.
+
 Supporting Dataset Management command can be checked by bit 2 of "Optional NVM Command Support (ONCS)" field in Identify Controller Data Structure.
+
 If the bit is set to 1, the controller support Dataset Management command.
+
 For further information, see "5.15.3 Identify Controller data structure (CNS 01h)" in the NVMe specification[2]. 
 
 An NVMe drive that return fixed data pattern for reading deallocated logical block is recommended for checking the result of deallocation.
+
 It can be checked by bit 2:0 of "Deallocate Logical Block Features (DLFEAT)" field in Identify Namespace Data Structure.
+
 If it is 001b, the drive returns all bytes cleared to 00h for reading deallocated logical block.
+
 If it is 010b, the drive returns all bytes set to FFh for reading deallocated logical block.
+
 For further information, see "5.15.2 Identify Namespace data structure (CNS 00h)" in the NVMe specification[2]. 
 
-## TODO
+## Future Works
 * Try other commands, LIDs, FIDs, and CNSs in the NVMe specification
 * Enable to issue Read / Write / Dataset Management (Deallocate) command with arbitrary SLBA and NLB
 * Discovery of storage devices in the system
@@ -93,7 +104,11 @@ This software is released under the MIT License and Microsoft Public License (MS
 
 ## Reference
 [1] Microsoft, "Working with NVMe drives", https://docs.microsoft.com/en-us/windows/desktop/fileio/working-with-nvme-devices, Retrieved May 14, 2019
+
 [2] NVM Express, "NVM Express\[TM\] Base Specification", Revision 1.3d, March 20, 2019
+
 [3] Microsoft, "SCSI Pass-Through Interface Tool", https://github.com/microsoft/Windows-driver-samples/tree/master/storage/tools/spti, Retrieved May 14, 2019.
+
 [4] Mark E. Russinovich, et al., "Windows Internals, Part 2", 6th Edition, October 2012, Microsoft Press, ISBN: 978-0735665873
+
 [5] Microsoft, "IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES IOCTL", https://docs.microsoft.com/ja-jp/windows/desktop/api/winioctl/ni-winioctl-ioctl_storage_manage_data_set_attributes, Retrieved May 14, 2019
