@@ -1,5 +1,7 @@
 # nvmetool-win: Sample program of accessing NVMe device using Windows' inbox NVMe driver
 
+_Codes are to be added in a few days..._
+
 ## Abstract
 This software demonstrates that issuing some NVMe commands from userland to NVMe device using Windows inbox NVMe driver (stornvme.sys)[1].
 
@@ -103,12 +105,12 @@ For further information, see "5.15.2 Identify Namespace data structure (CNS 00h)
 This software is released under the MIT License and Microsoft Public License (MS-PL), see LICENSE.
 
 ## Reference
-[1] Microsoft, "Working with NVMe drives", https://docs.microsoft.com/en-us/windows/desktop/fileio/working-with-nvme-devices, Retrieved May 14, 2019
+[1] Microsoft, _"Working with NVMe drives"_, https://docs.microsoft.com/en-us/windows/desktop/fileio/working-with-nvme-devices, Retrieved May 14, 2019
 
-[2] NVM Express, "NVM Express\[TM\] Base Specification", Revision 1.3d, March 20, 2019
+[2] NVM Express, _"NVM Express\[TM\] Base Specification"_, Revision 1.3d, March 20, 2019
 
-[3] Microsoft, "SCSI Pass-Through Interface Tool", https://github.com/microsoft/Windows-driver-samples/tree/master/storage/tools/spti, Retrieved May 14, 2019.
+[3] Microsoft, _"SCSI Pass-Through Interface Tool"_, https://github.com/microsoft/Windows-driver-samples/tree/master/storage/tools/spti, Retrieved May 14, 2019.
 
-[4] Mark E. Russinovich, et al., "Windows Internals, Part 2", 6th Edition, October 2012, Microsoft Press, ISBN: 978-0735665873
+[4] Mark E. Russinovich, et al., _"Windows Internals, Part 2"_, 6th Edition, October 2012, Microsoft Press, ISBN: 978-0735665873
 
-[5] Microsoft, "IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES IOCTL", https://docs.microsoft.com/ja-jp/windows/desktop/api/winioctl/ni-winioctl-ioctl_storage_manage_data_set_attributes, Retrieved May 14, 2019
+[5] Microsoft, _"IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES IOCTL"_, https://docs.microsoft.com/ja-jp/windows/desktop/api/winioctl/ni-winioctl-ioctl_storage_manage_data_set_attributes, Retrieved May 14, 2019
