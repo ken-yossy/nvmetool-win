@@ -400,7 +400,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice, int _iVerboseLevel)
 	protocolData->ProtocolType = ProtocolTypeNvme;
 	protocolData->DataType = NVMeDataTypeLogPage;
 	protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_COMMAND_EFFECTS;
-	protocolData->ProtocolDataRequestSubValue = 0;
+	protocolData->ProtocolDataRequestSubValue = NVME_NAMESPACE_ALL;
 	protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
 	protocolData->ProtocolDataLength = sizeof(NVME_COMMAND_EFFECTS_LOG);
 

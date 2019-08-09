@@ -58,7 +58,7 @@ error_exit:
 	return strDest;
 }
 
-void printASCII(const char* _strLabel, const char* _strData)
+void printASCII(const char* _strLabel, const char* _strData, bool _bNewLine)
 {
 	printf("%s", _strLabel);
 	size_t len = strlen(_strData);
@@ -70,7 +70,7 @@ void printASCII(const char* _strLabel, const char* _strData)
 		}
 		printf("%c", _strData[i]);
 	}
-	printf("\n");
+	if ( _bNewLine ) printf("\n");
 }
 
 //

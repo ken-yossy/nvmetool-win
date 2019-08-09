@@ -12,7 +12,8 @@
 #include "NVMeGetFeatures.h"
 #include "NVMeUtils.h"
 
-NVME_IDENTIFY_CONTROLLER_DATA13 g_stController;
+NVME_IDENTIFY_CONTROLLER_DATA g_stController;
+uint32_t g_uiRevision; // revision that this controller conforms to; format is same as VER field
 
 void vPrintUsage(char* _strProgName)
 {
@@ -72,7 +73,7 @@ int main(int _argc, char* _argv[])
     }
 
     fprintf(stderr, "[I] Getting controller identify data succeeded.\n\n");
-    vPrintControllerBasicData();
+    g_uiRevision = uiPrintControllerBasicData();
 
     while (!bFinished)
     {

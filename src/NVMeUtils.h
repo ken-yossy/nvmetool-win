@@ -12,7 +12,7 @@ enum {
 };
 
 char* strConvertUTF8toMultiByte(const char* _str);
-void printASCII(const char* _strLabel, const char* _strData);
+void printASCII(const char* _strLabel, const char* _strData, bool _bWithNewLine);
 int eGetCommandFromConsole(void);
 int iGetConsoleInputHex(const char* _strPrompt, char* _strInput);
 char cGetConsoleInput(const char* _strPrompt, char* _strInput);
