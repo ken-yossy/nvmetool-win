@@ -1,11 +1,9 @@
 # nvmetool-win: Sample program of accessing NVMe device using Windows' inbox NVMe driver
 
-_Codes are to be added in a few days..._
-
 ## Abstract
 This software demonstrates that issuing some NVMe commands from userland to NVMe device using Windows inbox NVMe driver (stornvme.sys)[1].
 
-Specification that this software refered to is NVMe 1.3d[2].
+Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4[6] (only Identify Controller Data Structure).
 
 ## Supported commands (Admin Command Set)
 
@@ -95,6 +93,12 @@ If it is 010b, the drive returns all bytes set to FFh for reading deallocated lo
 
 For further information, see "5.15.2 Identify Namespace data structure (CNS 00h)" in the NVMe specification[2]. 
 
+## To build and run program
+
+1. Double click `NVMeTool.sln` to start Visual Studio
+1. Build program with _Build_ -> _Build Solution_ (or Control+Shift+B)
+1. Run program (F5)
+
 ## Future Works
 * Try other commands, LIDs, FIDs, and CNSs in the NVMe specification
 * Enable to issue Read / Write / Dataset Management (Deallocate) command with arbitrary SLBA and NLB
@@ -114,3 +118,5 @@ This software is released under the MIT License and Microsoft Public License (MS
 [4] Mark E. Russinovich, et al., _"Windows Internals, Part 2"_, 6th Edition, October 2012, Microsoft Press, ISBN: 978-0735665873
 
 [5] Microsoft, _"IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES IOCTL"_, https://docs.microsoft.com/ja-jp/windows/desktop/api/winioctl/ni-winioctl-ioctl_storage_manage_data_set_attributes, Retrieved May 14, 2019
+
+[6] NVM Express, _"NVM Express\[TM\] Base Specification"_, Revision 1.4, June 10, 2019
