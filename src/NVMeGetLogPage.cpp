@@ -41,7 +41,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 		cCmd = cGetConsoleInput("\n# Get Log Page - SMART / Health Information (Log Identifier 02h), Press 'y' to continue\n", strCmd);
 		if (cCmd == 'y')
 		{
-			iResult = iNVMeGetSMART(_hDevice);
+			iResult = iNVMeGetSMART(_hDevice, true);
 		}
 		break;
 

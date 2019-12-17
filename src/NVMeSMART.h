@@ -54,4 +54,6 @@ typedef struct {
 
 } NVME_HEALTH_INFO_LOG13, *PNVME_HEALTH_INFO_LOG13;
 
-int iNVMeGetSMART(HANDLE _hDevice);
+extern NVME_HEALTH_INFO_LOG13 g_stSMARTLog;
+
+int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint);

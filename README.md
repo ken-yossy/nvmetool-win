@@ -5,6 +5,9 @@ This software demonstrates that issuing some NVMe commands from userland to NVMe
 
 Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4[6] (only Identify Controller Data Structure).
 
+## ChangeLog
+See Changelog.md
+
 ## Supported commands (Admin Command Set)
 
 ### Identify (Opcode = 06h)
@@ -45,7 +48,7 @@ Dataset Management command (Deallocate) is issued with `IOCTL_STORAGE_MANAGE_DAT
 
 ### Read (Opcode = 02h)
 
-Starting Logical Block Address (SLBA) = 0, Number of Logical Blocks (NLB = 1)
+Starting Logical Block Address (SLBA) = 0, Number of Logical Blocks (NLB) = 1
 
 ### Write (Opcode = 01h)
 
@@ -68,12 +71,12 @@ These commands should be issued with highest care.
 Confirmed on the following software environment:
 
 * Operating system and device driver
-  * Windows 10 Professional 64bit (Version 1809, Build 17763.475)
-  * stornvme.sys (version 10.0.17763.404, WinBuild 160101.0800)
+  * Windows 10 Professional 64bit (Version 1909, Build 18363.535)
+  * stornvme.sys (version 10.0.18362.1, WinBuild 160101.0800)
 * Developping environment
-  * Microsoft Visual Studio Community 2017 (Version 15.9.11)
-    * Microsoft Visual C++ 2017
-    * Windows Driver Kit (10.0.17740.1000)
+  * Microsoft Visual Studio Community 2019 (Version 16.4.1)
+    * Microsoft Visual C++ 2019
+    * Windows Driver Kit (10.0.18346.1000)
 
 An NVMe drive that supports Dataset Management command is also needed.
 

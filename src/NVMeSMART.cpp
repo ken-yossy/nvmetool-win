@@ -227,7 +227,7 @@ static void s_vPrintNVMeSMARTLog(PNVME_HEALTH_INFO_LOG13 _pData)
 	printf("[I] Total Time For Thermal Management Temperature 2: %d (seconds)\n", _pData->TMT2TotalTime);
 }
 
-int iNVMeGetSMART(HANDLE _hDevice)
+int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
 {
 	int     iResult = -1;
 	PVOID   buffer = NULL;
@@ -298,8 +298,10 @@ int iNVMeGetSMART(HANDLE _hDevice)
 		goto error_exit;
 	}
 
-	// Command Support and Effect Log Data 
-	s_vPrintNVMeSMARTLog((PNVME_HEALTH_INFO_LOG13)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
+	// Command Support and Effect Log Data
+	if ( _bPrint ) s_vPrintNVMeSMARTLog((PNVME_HEALTH_INFO_LOG13)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
+
+	memcpy_s((void*)(&g_stSMARTLog), sizeof(NVME_HEALTH_INFO_LOG13), (uint8_t*)protocolData + protocolData->ProtocolDataOffset, sizeof(NVME_HEALTH_INFO_LOG13));
 	iResult = 0; // succeeded;
 
 error_exit:
