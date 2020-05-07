@@ -88,7 +88,7 @@ char cGetConsoleInput(const char* _strPrompt, char* _strInput)
 }
 
 //
-// @return					integer value converted from stdin
+// @return					integer value (in hex) converted from stdin
 // @arg _strPrompt	[in]	prompt string to be displayed to user
 // @arg _strInput	[out]	user input from stdin
 //
@@ -100,6 +100,25 @@ int iGetConsoleInputHex(const char* _strPrompt, char* _strInput)
 
 	int iRet = 0;
 	if (sscanf_s(_strInput, "%x", &iRet) != 1)
+	{
+		fprintf(stderr, "[E] Something wrong in getting input.\n\n");
+	}
+	return iRet;
+}
+
+//
+// @return					integer value (in decimal) converted from stdin
+// @arg _strPrompt	[in]	prompt string to be displayed to user
+// @arg _strInput	[out]	user input from stdin
+//
+int iGetConsoleInputDec(const char* _strPrompt, char* _strInput)
+{
+	fprintf(stderr, "%s\n", _strPrompt);
+	fprintf(stderr, "> ");
+	fgets(_strInput, 128, stdin);
+
+	int iRet = 0;
+	if (sscanf_s(_strInput, "%d", &iRet) != 1)
 	{
 		fprintf(stderr, "[E] Something wrong in getting input.\n\n");
 	}
@@ -120,6 +139,7 @@ int eGetCommandFromConsole(void)
 		"#  - l: Get Log Page\n"
 		"#  - i: Identify\n"
 		"#  - g: Get Feature\n"
+		"#  - s: Get Feature\n"
 		"#\n"
 		"#  press 'q' to quit program\n",
 		strCmd);
@@ -171,6 +191,11 @@ int eGetCommandFromConsole(void)
 	case 'g':
 	case 'G':
 		iMajorCmd = CMD_TYPE_GET_FEATURE;
+		break;
+
+	case 's':
+	case 'S':
+		iMajorCmd = CMD_TYPE_SET_FEATURE;
 		break;
 
 	default:

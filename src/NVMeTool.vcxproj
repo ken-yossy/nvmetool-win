@@ -109,6 +109,7 @@
       <LanguageStandard>
       </LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DisableSpecificWarnings>26812</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,6 +162,8 @@
     <ClInclude Include="NVMeCommandSupportedAndEffects.h" />
     <ClInclude Include="NVMeDeallocate.h" />
     <ClInclude Include="NVMeErrorInformation.h" />
+    <ClInclude Include="NVMeFeaturesHCTM.h" />
+    <ClInclude Include="NVMeFeaturesVWC.h" />
     <ClInclude Include="NVMeGetLogPage.h" />
     <ClInclude Include="NVMeIdentify.h" />
     <ClInclude Include="NVMeIdentifyController.h" />
@@ -170,6 +173,7 @@
     <ClInclude Include="NVMeIdentifyNamespace.h" />
     <ClInclude Include="NVMeSCSIPassThrough.h" />
     <ClInclude Include="NVMeGetFeatures.h" />
+    <ClInclude Include="NVMeSetFeatures.h" />
     <ClInclude Include="NVMeSMART.h" />
     <ClInclude Include="NVMeUtils.h" />
     <ClInclude Include="WinFunc.h" />
@@ -178,6 +182,8 @@
     <ClCompile Include="NVMeCommandSupportedAndEffects.cpp" />
     <ClCompile Include="NVMeDeallocate.cpp" />
     <ClCompile Include="NVMeErrorInformation.cpp" />
+    <ClCompile Include="NVMeFeaturesHCTM.cpp" />
+    <ClCompile Include="NVMeFeaturesVWC.cpp" />
     <ClCompile Include="NVMeGetLogPage.cpp" />
     <ClCompile Include="NVMeIdentify.cpp" />
     <ClCompile Include="NVMeIdentifyController.cpp" />
@@ -186,6 +192,7 @@
     <ClCompile Include="NVMeIdentifyController14.cpp" />
     <ClCompile Include="NVMeIdentifyNamespace.cpp" />
     <ClCompile Include="NVMeGetFeatures.cpp" />
+    <ClCompile Include="NVMeSetFeatures.cpp" />
     <ClCompile Include="NVMeSMART.cpp" />
     <ClCompile Include="NVMeTool.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

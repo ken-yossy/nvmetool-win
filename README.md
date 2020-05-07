@@ -5,9 +5,6 @@ This software demonstrates that issuing some NVMe commands from userland to NVMe
 
 Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4[6] (only Identify Controller Data Structure).
 
-## ChangeLog
-See Changelog.md
-
 ## Supported commands (Admin Command Set)
 
 ### Identify (Opcode = 06h)
@@ -21,7 +18,7 @@ See Changelog.md
 
 | Log Identifier | Description                   | Note |
 | -------------: | :---------------------------- |:-----|
-|            01h | Error Information             |      |
+|            01h | Error Information             | number of entries to be retrieved from devices depends on the value "ELPE" in Identify Controller data |
 |            02h | SMART / Health Information    |      |
 |            05h | Command Supported and Effects |      |
 

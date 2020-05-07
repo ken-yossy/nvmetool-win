@@ -2,6 +2,7 @@
 #include <iostream>
 #include <nvme.h>
 #include "NVMeUtils.h"
+#include "NVMeIdentifyController.h"
 #include "NVMeErrorInformation.h"
 
 static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG13 _pData, int _iLogNo)
@@ -89,7 +90,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
 	// Allocate buffer for use.
 	bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
 		+ sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-		+ sizeof(NVME_ERROR_INFO_LOG13) * 256;
+		+ sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1);
 	buffer = malloc(bufferLength);
 
 	if (buffer == NULL)
@@ -112,7 +113,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
 	protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_ERROR_INFO;
 	protocolData->ProtocolDataRequestSubValue = 0;
 	protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-	protocolData->ProtocolDataLength = sizeof(NVME_ERROR_INFO_LOG13) * 256;
+	protocolData->ProtocolDataLength = sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1);
 
 	// Send request down.  
 	iResult = iIssueDeviceIoControl(_hDevice,
@@ -140,7 +141,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
 	protocolData = &protocolDataDescr->ProtocolSpecificData;
 
 	if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-		(protocolData->ProtocolDataLength < sizeof(NVME_ERROR_INFO_LOG13) * 256)) {
+		(protocolData->ProtocolDataLength < sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1))) {
 		printf("[E] NVMeGetErrorInformation: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
@@ -148,7 +149,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
 
 	{
 		PNVME_ERROR_INFO_LOG13 aLog = (PNVME_ERROR_INFO_LOG13)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
-		for (int i = 0; i < 256; i++)
+		for (int i = 0; i < (g_stController.ELPE + 1); i++)
 		{
 			s_vPrintNVMeErrorInformation(aLog, i);
 			aLog++;

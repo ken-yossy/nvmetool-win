@@ -63,6 +63,15 @@
     <ClInclude Include="NVMeIdentifyController12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NVMeFeaturesHCTM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NVMeSetFeatures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NVMeFeaturesVWC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinFunc.cpp">
@@ -111,6 +120,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NVMeIdentifyController12.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeFeaturesHCTM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeSetFeatures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeFeaturesVWC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

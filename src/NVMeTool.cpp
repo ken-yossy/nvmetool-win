@@ -10,8 +10,11 @@
 #include "NVMeIdentifyController.h"
 #include "NVMeGetLogPage.h"
 #include "NVMeGetFeatures.h"
+#include "NVMeSetFeatures.h"
 #include "NVMeSMART.h"
 #include "NVMeUtils.h"
+
+#pragma warning(disable:6301)
 
 NVME_IDENTIFY_CONTROLLER_DATA g_stController;
 NVME_HEALTH_INFO_LOG13 g_stSMARTLog;
@@ -72,6 +75,7 @@ int main(int _argc, char* _argv[])
     iResult = iNVMeIdentifyController(hDevice);
     if (iResult)
     {
+        fprintf(stderr, "[E] Getting controller identify data failed, stop.\n\n");
         return iResult;
     }
 
@@ -82,6 +86,7 @@ int main(int _argc, char* _argv[])
     iResult = iNVMeGetSMART(hDevice, false);
     if (iResult)
     {
+        fprintf(stderr, "[E] Getting SMART/Health information data failed, stop.\n\n");
         return iResult;
     }
 
@@ -110,6 +115,10 @@ int main(int _argc, char* _argv[])
 
         case CMD_TYPE_GET_LOG_PAGE:
             iResult = iNVMeGetLogPage(hDevice);
+            break;
+
+        case CMD_TYPE_SET_FEATURE:
+            iResult = iNVMeSetFeatures(hDevice);
             break;
 
         case CMD_TYPE_GET_FEATURE:
