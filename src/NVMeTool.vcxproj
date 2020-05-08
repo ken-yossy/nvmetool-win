@@ -164,6 +164,7 @@
     <ClInclude Include="NVMeErrorInformation.h" />
     <ClInclude Include="NVMeFeaturesHCTM.h" />
     <ClInclude Include="NVMeFeaturesVWC.h" />
+    <ClInclude Include="NVMeFwSlotInformation.h" />
     <ClInclude Include="NVMeGetLogPage.h" />
     <ClInclude Include="NVMeIdentify.h" />
     <ClInclude Include="NVMeIdentifyController.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="NVMeErrorInformation.cpp" />
     <ClCompile Include="NVMeFeaturesHCTM.cpp" />
     <ClCompile Include="NVMeFeaturesVWC.cpp" />
+    <ClCompile Include="NVMeFwSlotInformation.cpp" />
     <ClCompile Include="NVMeGetLogPage.cpp" />
     <ClCompile Include="NVMeIdentify.cpp" />
     <ClCompile Include="NVMeIdentifyController.cpp" />

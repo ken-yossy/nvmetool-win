@@ -20,6 +20,7 @@ Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4[6] (onl
 | -------------: | :---------------------------- |:-----|
 |            01h | Error Information             | number of entries to be retrieved from devices depends on the value "ELPE" in Identify Controller data |
 |            02h | SMART / Health Information    |      |
+|            03h | Firmware Slot Information     |      |
 |            05h | Command Supported and Effects |      |
 
 ### Get Features (Opcode = 0Ah)
