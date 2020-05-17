@@ -47,7 +47,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
 		printf("\tbit [      0] 0 = The namespace does not support thin provisioning.\n");
 	}
 
-	printf("[M] Number of LBA Formats (NLBAF): %d\n", _pNSData->NLBAF);
+	printf("[M] Number of LBA Formats (NLBAF): %d (means %d)\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
 
 	printf("[M] Formatted LBA Size (FLBAS):\n");
 	if (_pNSData->FLBAS.MetadataInExtendedDataLBA)
@@ -347,7 +347,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
 	printf("\tbyte [  2:  0] %02X%02X%02X (Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority)\n",
 		_pNSData->EUI64[0], _pNSData->EUI64[1], _pNSData->EUI64[2]); // Bytes [122:120] (3 byte, 24 bit = Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority
 
-	for (int i = 0; i < _pNSData->NLBAF; i++)
+	for (int i = 0; i < ( _pNSData->NLBAF + 1 ); i++)
 	{
 		if (i == 0)
 		{
