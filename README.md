@@ -15,12 +15,12 @@ Table 1. Command matrix (Admin Command Set)
 | ---------: | :---------------------------|:--------------------------------|:------------------|
 |        00h | Delete I/O Submission Queue | --                              | 1                 |
 |        01h | Create I/O Submission Queue | --                              | 1                 |
-|        02h | Get Log Page                | See Table 2                     |                   |
+|        02h | Get Log Page                | See Table 4                     |                   |
 |        04h | Delete I/O Completion Queue | --                              | 1                 |
 |        05h | Create I/O Completion Queue | --                              | 1                 |
 |        06h | Identify                    | See Table 3                     |                   |
 |        08h | Abort                       | --                              | 1                 |
-|        09h | Set Features                | See Table 4                     |                   |
+|        09h | Set Features                | See Table 5                     |                   |
 |        0Ah | Get Features                | See Table 5                     |                   |
 |        0Ch | Asynchronous Event Request  | --                              | 1                 |
 |        0Dh | Namespace Management        |                                 | 2                 |
@@ -148,31 +148,42 @@ FID 82h and 83h are seemed to be unable to issue, because commands related to Re
 
 ### Read command
 Read command is issued via SCSI Pass-through[3].
+
 Issue Read command with Starting Logical Block Address (SLBA) = 0 and Number of Logical Blocks (NLB) = 1.
 
 ### Write command
 Write command is issued via SCSI Pass-through[3].
+
 Issue Write command with SLBA = 0, NLB = 1, and data is "DEADBEEF".
 
 ### Dataset Management command
-Dataset Management command is issued via SCSI Pass-through[3] with `IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES` [4][5].
-Only with Deallocate bit is set.
+Dataset Management command is issued via SCSI Pass-through[3] with `IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES` [4][5] (only Deallocate bit is set).
+
 LBA region to be deallocated is SLBA = 0 and NLB = 1 (Sector 0).
 
 An NVMe drive that supports Dataset Management command is also needed.
+
 Supporting Dataset Management command can be checked by bit 2 of "Optional NVM Command Support (ONCS)" field in Identify Controller Data Structure.
+
 If the bit is set to 1, the controller support Dataset Management command.
+
 For further information, see "5.15.3 Identify Controller data structure (CNS 01h)" in the NVMe specification[2]. 
 
 An NVMe drive that return fixed data pattern for reading deallocated logical block is recommended for checking the result of deallocation.
+
 It can be checked by bit 2:0 of "Deallocate Logical Block Features (DLFEAT)" field in Identify Namespace Data Structure.
+
 If it is 001b, the drive returns all bytes cleared to 00h for reading deallocated logical block.
+
 If it is 010b, the drive returns all bytes set to FFh for reading deallocated logical block.
+
 For further information, see "5.15.2 Identify Namespace data structure (CNS 00h)" in the NVMe specification[2]. 
 
 ## Caution
 "Write" and "Dataset Management (Deallocate)" command to LBA 0 of devices under management by file systems (e.g. FAT, NTFS) will corrupt your system.
+
 These commands should be issued with highest care.
+
 "Read" command does not have such a side effect... :-) 
 
 ## Environment / Requirements
