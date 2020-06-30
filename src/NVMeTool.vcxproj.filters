@@ -75,6 +75,9 @@
     <ClInclude Include="NVMeFwSlotInformation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NVMeDeviceSelftestLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinFunc.cpp">
@@ -135,6 +138,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NVMeFwSlotInformation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeDeviceSelftestLog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

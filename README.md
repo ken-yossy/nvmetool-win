@@ -99,7 +99,7 @@ Table 4. Log Identifier (LID)
 |        02h | SMART / Health Information     | x                      | CNTID = 0, NSID = 0xFFFFFFFh |
 |        03h | Firmware Slot Information      | x                      |      |
 |        05h | Command Supported and Effects  | x                      |      |
-|        06h | Device Self-test               |                        |      |
+|        06h | Device Self-test               | x                      | Need to support Device Self-test command |
 |        07h | Telemetry Host-initiated       |                        |      |
 |        08h | Telemetry Controller-initiated |                        |      |
 | 09h -- 6Fh | _Reserved_                     | --                     |      |

@@ -8,6 +8,7 @@
 #include "NVMeCommandSupportedAndEffects.h"
 #include "NVMeErrorInformation.h"
 #include "NVMeFwSlotInformation.h"
+#include "NVMeDeviceSelftestLog.h"
 
 int iNVMeGetLogPage(HANDLE _hDevice)
 {
@@ -25,8 +26,13 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         "\n#     %02Xh = SMART / Health Information"
         "\n#     %02Xh = Firmware Slot Information"
         "\n#     %02Xh = Command Supported and Effects"
+        "\n#     %02Xh = Device Self-test"
         "\n",
-        LOG_ID_ERROR_INFORMATION, LOG_ID_SMART, LOG_ID_FIRMWARE_SLOT_INFORMATION, LOG_ID_COMMAND_SUPPORTED_AND_EFFECTS);
+        LOG_ID_ERROR_INFORMATION,
+        LOG_ID_SMART,
+        LOG_ID_FIRMWARE_SLOT_INFORMATION,
+        LOG_ID_COMMAND_SUPPORTED_AND_EFFECTS,
+        LOG_ID_DEVICE_SELF_TEST);
 
     int iLId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iLId)
@@ -60,6 +66,14 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             iResult = iNVMeGetCommandSupportedAndEffects(_hDevice, 1);
+        }
+        break;
+
+    case LOG_ID_DEVICE_SELF_TEST:
+        cCmd = cGetConsoleInput("\n# Get Log Page - Device Self-test (Log Identifier 06h), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = iNVMeGetDeviceSelftestLog(_hDevice);
         }
         break;
 

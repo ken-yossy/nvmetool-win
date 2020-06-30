@@ -161,6 +161,7 @@
     <ClInclude Include="..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\nvme.h" />
     <ClInclude Include="NVMeCommandSupportedAndEffects.h" />
     <ClInclude Include="NVMeDeallocate.h" />
+    <ClInclude Include="NVMeDeviceSelftestLog.h" />
     <ClInclude Include="NVMeErrorInformation.h" />
     <ClInclude Include="NVMeFeaturesHCTM.h" />
     <ClInclude Include="NVMeFeaturesVWC.h" />
@@ -182,6 +183,7 @@
   <ItemGroup>
     <ClCompile Include="NVMeCommandSupportedAndEffects.cpp" />
     <ClCompile Include="NVMeDeallocate.cpp" />
+    <ClCompile Include="NVMeDeviceSelftestLog.cpp" />
     <ClCompile Include="NVMeErrorInformation.cpp" />
     <ClCompile Include="NVMeFeaturesHCTM.cpp" />
     <ClCompile Include="NVMeFeaturesVWC.cpp" />
