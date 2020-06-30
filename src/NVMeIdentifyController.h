@@ -9,7 +9,7 @@
 #include "NVMeIdentifyController14.h"
 
 extern NVME_IDENTIFY_CONTROLLER_DATA g_stController;
-    
+
 int iNVMeIdentifyController(HANDLE _hDevice);
 uint32_t uiPrintControllerBasicData(void);
 void vPrintNVMeIdentifyControllerData(void);

@@ -25,29 +25,29 @@ void vPrintUsage(char* _strProgName)
 {
     char strShortProgName[1024];
 
-	errno_t err = strncpy_s(strShortProgName, 1024, _strProgName, strlen(_strProgName));
-	if (err)
-	{
-		fprintf(stderr, "[E] Error occurred in strncpy_s(); errno = %d\n", err);
-		return;
-	}
+    errno_t err = strncpy_s(strShortProgName, 1024, _strProgName, strlen(_strProgName));
+    if (err)
+    {
+        fprintf(stderr, "[E] Error occurred in strncpy_s(); errno = %d\n", err);
+        return;
+    }
 
-	char* cPtr = strShortProgName;
-	char* tmpPtr = strShortProgName;
-	while (tmpPtr != NULL)
-	{
-		tmpPtr += 1;
-		cPtr = tmpPtr;
-		tmpPtr = strchr(cPtr, '\\');
-	}
+    char* cPtr = strShortProgName;
+    char* tmpPtr = strShortProgName;
+    while (tmpPtr != NULL)
+    {
+        tmpPtr += 1;
+        cPtr = tmpPtr;
+        tmpPtr = strchr(cPtr, '\\');
+    }
 
-	// cPtr holds the last occurrence of '\'
-	fprintf(stderr, "%s: Sample Utility tool for NVMe drive.\n\n", cPtr);
-	fprintf(stderr, "Usage:\n");
-	fprintf(stderr, "  > %s <physical-drive-no>\n\n", cPtr);
-	fprintf(stderr, "Argument:\n");
-	fprintf(stderr, "  <physical-drive-no>: physical number of drive to be accessed\n");
-	fprintf(stderr, "    (you can be confirm it with \"Disk Management\" in Control Panel)\n\n");
+    // cPtr holds the last occurrence of '\'
+    fprintf(stderr, "%s: Sample Utility tool for NVMe drive.\n\n", cPtr);
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "  > %s <physical-drive-no>\n\n", cPtr);
+    fprintf(stderr, "Argument:\n");
+    fprintf(stderr, "  <physical-drive-no>: physical number of drive to be accessed\n");
+    fprintf(stderr, "    (you can be confirm it with \"Disk Management\" in Control Panel)\n\n");
 }
 
 int main(int _argc, char* _argv[])
@@ -55,7 +55,7 @@ int main(int _argc, char* _argv[])
     int     iResult = -1;
     bool    bFinished = false;
     HANDLE  hDevice = NULL;
- 
+
     if (_argc != 2)
     {
         vPrintUsage(_argv[0]);

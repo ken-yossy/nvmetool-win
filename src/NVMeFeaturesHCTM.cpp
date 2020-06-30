@@ -111,7 +111,6 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
             printf("\n[I] Process aborted\n");
             return false;
         }
-
     }
 
     if (!(iTMT1 < iTMT2))
@@ -136,7 +135,7 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
         NVME_CDW10_SET_FEATURES cdw10;
         NVME_CDW11_FEATURE_HCTM cdw11;
 
-        cdw10.FID  = FEATURE_ID_HOST_CONTROLLED_THREMAL_MANAGEMENT;
+        cdw10.FID  = FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT;
         cdw10.SV = 0; // temporary
         cdw11.TMT1 = iTMT1;
         cdw11.TMT2 = iTMT2;

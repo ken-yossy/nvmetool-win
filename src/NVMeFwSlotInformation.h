@@ -12,7 +12,7 @@ typedef struct {
             UCHAR   PendingActivateSlot : 3;
             UCHAR   Reserved1 : 1;
         } DUMMYSTRUCTNAME;
-    
+
         BYTE AsByte;
     } AFI;
 
