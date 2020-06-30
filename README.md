@@ -199,7 +199,7 @@ Confirmed on the following software environment:
     * Microsoft Visual C++ 2019
     * Windows Driver Kit (10.0.19030.1000)
 
-## Requirements
+## Limitations
 Only tested with the NVMe drive directly attached to PC via PCIe.
 
 It is ok to access to M.2 drives and M.2 drives that attached to M.2-PCIe converter Add-In-Card (AIC).
@@ -214,7 +214,7 @@ But it may not work over protocol translations such as usb-nvme.
 1. Build program with _Build_ -> _Build Solution_ (or Control+Shift+B)
 1. Run program (F5)
 
-Note that, when you run (debug) in Visual Studio, confirm that the command line argument is set to appropriate ID for your system.
+Note that, when you run (debug) in Visual Studio, confirm that the command line argument is set to appropriate drive ID for your system.
 
 You can find the settings of command line arguments from _Debug_ menu -> _NVMeTool Debug Properties_ -> _Configuration Properties_ -> _Debugging_ -> _Command Arguments_.
 
