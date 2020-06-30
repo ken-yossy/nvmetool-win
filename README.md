@@ -105,8 +105,8 @@ Table 4. Log Identifier (LID)
 | 09h -- 6Fh | _Reserved_                     | --                     |      |
 |        70h | Discovery                      | --                     | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          | --                     |      |
-|        80h | Reservation Notification       | --                     | For NVMe over Fabrics (NVMeoF) |
-|        81h | Sanitize Status                | --                     | For NVMe over Fabrics (NVMeoF) |
+|        80h | Reservation Notification       | --                     | Probably cannot issue [8] |
+|        81h | Sanitize Status                |                        | Probably can issue only in WinPE mode [8] |
 | 82h -- BFh | _Reserved_                     | --                     |      |
 | C0h -- FFh | _Vendor Specific_              | --                     |      |
 
@@ -139,12 +139,12 @@ Table 5. Feature Identifier (FID)
 | 78h -- 7Fh | _Refer to the NVMe-MI spec._       | -- / --                          |      |
 |        80h | Software Progress Marker           | x /                              |      |
 |        81h | Host Identifier                    |  /                               |      |
-|        82h | Reservation Notification Mask      | -- / --                          |      |
-|        83h | Reservation Persistence            | -- / --                          |      |
+|        82h | Reservation Notification Mask      | -- / --                          | 1    |
+|        83h | Reservation Persistence            | -- / --                          | 1    |
 | 84h -- BFh | _Reserved_                         | -- / --                          |      |
 | C0h -- FFh | _Vendor specific_                  | -- / --                          |      |
 
-FID 82h and 83h are seemed to be unable to issue, because commands related to Reservation are not supported according to [8].
+Note 1: FID 82h and 83h are seemed to be unable to issue, because commands related to Reservation are not supported according to [8].
 
 ## Note for some commands
 
