@@ -47,21 +47,23 @@ Note 2: can issue this command only in WinPE mode according to [8]
 
 Table 2. Command matrix (NVM Command Set)
 
-|     Opcode | Command name         | Confirmed in this tool          | Note (according to [8])        |
-| ---------: | :--------------------|:--------------------------------|:-------------------------------|
-|        00h | Flush                |                                 |                                |
-|        01h | Write                | x                               |                                |
-|        02h | Read                 | x                               |                                |
-|        04h | Write Uncorrectable  | --                              | Not supported                  |
-|        05h | Compare              |                                 | Can issue only in WinPE mode   |
-|        08h | Write Zeroes         | --                              | Not supported                  |
-|        09h | Dataset Management   | x                               | Only `Deallocate` is supported |
-|        0Ch | Verify               | --                              | Not supported                  |
-|        0Dh | Reservation Register | --                              | Not supported                  |
-|        0Eh | Reservation Report   | --                              | Not supported                  |
-|        11h | Reservation Acquire  | --                              | Not supported                  |
-|        15h | Reservation Release  | --                              | Not supported                  |
-| 80h -- FFh | _Vendor Specific_    | --                              |                                |
+|     Opcode | Command name         | Confirmed in this tool          | Note                             |
+| ---------: | :--------------------|:--------------------------------|:---------------------------------|
+|        00h | Flush                | x                               |                                  |
+|        01h | Write                | x                               |                                  |
+|        02h | Read                 | x                               |                                  |
+|        04h | Write Uncorrectable  | --                              | 1                                |
+|        05h | Compare              |                                 | Can issue only in WinPE mode [8] |
+|        08h | Write Zeroes         | --                              | 1                                |
+|        09h | Dataset Management   | x                               | Only `Deallocate` is supported   |
+|        0Ch | Verify               | --                              | 1                                |
+|        0Dh | Reservation Register | --                              | 1                                |
+|        0Eh | Reservation Report   | --                              | 1                                |
+|        11h | Reservation Acquire  | --                              | 1                                |
+|        15h | Reservation Release  | --                              | 1                                |
+| 80h -- FFh | _Vendor Specific_    | --                              |                                  |
+
+Note 1: these command are stated as "Not supported" in [8]
 
 ## Controller or Namespace Structure (CNS) for Identify command
 

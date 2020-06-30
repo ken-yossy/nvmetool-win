@@ -140,6 +140,7 @@ int eGetCommandFromConsole(void)
 		"#  - i: Identify\n"
 		"#  - g: Get Feature\n"
 		"#  - s: Get Feature\n"
+		"#  - f: Flush\n"
 		"#\n"
 		"#  press 'q' to quit program\n",
 		strCmd);
@@ -196,6 +197,15 @@ int eGetCommandFromConsole(void)
 	case 's':
 	case 'S':
 		iMajorCmd = CMD_TYPE_SET_FEATURE;
+		break;
+
+	case 'f':
+	case 'F':
+		cCmd = cGetConsoleInput("\n# Flush, Press 'y' to continue\n", strCmd);
+		if (cCmd == 'y')
+		{
+			iMajorCmd = CMD_TYPE_FLUSH;
+		}
 		break;
 
 	default:

@@ -757,3 +757,95 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
 	}
 	return iResult;
 }
+
+int iFlushViaSCSIPassThrough(HANDLE _hDevice)
+{
+	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
+	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX sptdwb_ex;
+	int iResult = -1;
+	ULONG length = 0, errorCode = 0, returned = 0;
+
+	ULONG alignmentMask = 0; // default == no alignment requirement
+	UCHAR srbType = 0; // default == SRB_TYPE_SCSI_REQUEST_BLOCK
+
+	if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false) return false;
+
+	if (srbType)
+	{
+		ZeroMemory(&sptdwb_ex, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX));
+
+		sptdwb_ex.sptd.Version					= 0;
+		sptdwb_ex.sptd.Length					= sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
+		sptdwb_ex.sptd.ScsiStatus				= 0;
+		sptdwb_ex.sptd.CdbLength				= CDB10GENERIC_LENGTH;
+		sptdwb_ex.sptd.StorAddressLength		= sizeof(STOR_ADDR_BTL8);
+		sptdwb_ex.sptd.SenseInfoLength			= SPT_SENSE_LENGTH;
+		sptdwb_ex.sptd.DataOutBuffer			= 0;
+		sptdwb_ex.sptd.DataOutTransferLength	= 0;
+		sptdwb_ex.sptd.DataInTransferLength		= 0;
+		sptdwb_ex.sptd.DataDirection			= SCSI_IOCTL_DATA_UNSPECIFIED; // no data-in, no data-out
+		sptdwb_ex.sptd.TimeOutValue				= 5;
+		sptdwb_ex.sptd.StorAddressOffset		= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
+		sptdwb_ex.StorAddress.Type				= STOR_ADDRESS_TYPE_BTL8;
+		sptdwb_ex.StorAddress.Port				= 0;
+		sptdwb_ex.StorAddress.AddressLength		= STOR_ADDR_BTL8_ADDRESS_LENGTH;
+		sptdwb_ex.StorAddress.Path				= 0;
+		sptdwb_ex.StorAddress.Target			= 0;
+		sptdwb_ex.StorAddress.Lun				= 0;
+		sptdwb_ex.sptd.SenseInfoOffset			= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
+
+		sptdwb_ex.sptd.Cdb[0] = SCSIOP_SYNCHRONIZE_CACHE;
+		sptdwb_ex.sptd.Cdb[1] = 0x6;	// SYNC_NV (bit 2) and IMMED (bit 1) are set
+		sptdwb_ex.sptd.Cdb[5] = 0;		// logical block address
+		sptdwb_ex.sptd.Cdb[8] = 1;		// number of logical blocks
+
+		length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX);
+		iResult = iIssueDeviceIoControl(
+			_hDevice,
+			IOCTL_SCSI_PASS_THROUGH_DIRECT_EX,
+			&sptdwb_ex,
+			sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX),
+			&sptdwb_ex,
+			length,
+			&returned,
+			FALSE);
+
+		PrintStatusResultsEx(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataOutTransferLength);
+	}
+	else
+	{
+		ZeroMemory(&sptdwb, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER));
+
+		sptdwb.sptd.Length				= sizeof(SCSI_PASS_THROUGH_DIRECT);
+		sptdwb.sptd.PathId				= 0;
+		sptdwb.sptd.TargetId			= 0;
+		sptdwb.sptd.Lun					= 0;
+		sptdwb.sptd.CdbLength			= CDB10GENERIC_LENGTH;
+		sptdwb.sptd.SenseInfoLength		= SPT_SENSE_LENGTH;
+		sptdwb.sptd.SenseInfoOffset		= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
+		sptdwb.sptd.DataIn				= SCSI_IOCTL_DATA_UNSPECIFIED; // no data-in, no data-out
+		sptdwb.sptd.DataTransferLength	= 0;
+		sptdwb.sptd.TimeOutValue		= 5;
+		sptdwb.sptd.DataBuffer			= 0;
+
+		sptdwb_ex.sptd.Cdb[0] = SCSIOP_SYNCHRONIZE_CACHE;
+		sptdwb_ex.sptd.Cdb[1] = 0x6;	// SYNC_NV (bit 2) and IMMED (bit 1) are set
+		sptdwb_ex.sptd.Cdb[5] = 0;		// logical block address
+		sptdwb_ex.sptd.Cdb[8] = 1;		// number of logical blocks
+
+		length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
+		iResult = iIssueDeviceIoControl(
+			_hDevice,
+			IOCTL_SCSI_PASS_THROUGH_DIRECT,
+			&sptdwb,
+			length,
+			&sptdwb,
+			length,
+			&returned,
+			FALSE);
+
+		PrintStatusResults(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
+	}
+
+	return iResult;
+}
