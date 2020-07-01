@@ -2,4 +2,4 @@
 
 #include <windows.h>
 
-int iNVMeGetDeviceSelftestLog(HANDLE _hDevice);
+int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress);

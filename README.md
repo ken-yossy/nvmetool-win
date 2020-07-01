@@ -26,7 +26,7 @@ Table 1. Command matrix (Admin Command Set)
 |        0Dh | Namespace Management        |                                 | 2                 |
 |        10h | Firmware Commit             |                                 |                   |
 |        11h | Firmware Image Download     |                                 |                   |
-|        14h | Device Self-test            |                                 |                   |
+|        14h | Device Self-test            | x                               |                   |
 |        15h | Namespace Attachment        |                                 | 2                 |
 |        18h | Keep Alive                  | --                              | Not listed in [8] |
 |        19h | Directive Send              | --                              | 1                 |

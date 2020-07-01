@@ -37,7 +37,7 @@ static void s_vPrintNVMeDeviceSelftestLog(PNVME_DEVICE_SELF_TEST_LOG _pData)
     printf("[I] Current Device Self-test Completion :\n");
     if (_pData->CurrentOperation.Status == 0)
     {
-        printf("\tbyte [    1] ------ = No test is in progress\n");
+        printf("\tbyte [    1] ---- = No test is in progress\n");
     }
     else
     {
@@ -175,7 +175,7 @@ static void s_vPrintNVMeDeviceSelftestLog(PNVME_DEVICE_SELF_TEST_LOG _pData)
     }
 }
 
-int iNVMeGetDeviceSelftestLog(HANDLE _hDevice)
+int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress)
 {
     int     iResult = -1;
     PVOID   buffer = NULL;
@@ -185,6 +185,8 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice)
     PSTORAGE_PROPERTY_QUERY query = NULL;
     PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
     PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
+
+    (*_bInProgress) = false;
 
     if (!g_stController.OACS.DeviceSelfTest)
     {
@@ -254,7 +256,18 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice)
 
     {
         PNVME_DEVICE_SELF_TEST_LOG aLog = (PNVME_DEVICE_SELF_TEST_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
-        s_vPrintNVMeDeviceSelftestLog(aLog);
+        if ( _bPrint )
+        {
+            s_vPrintNVMeDeviceSelftestLog(aLog);
+        }
+        if (aLog->CurrentOperation.Status == 0)
+        {
+            (*_bInProgress) = false;
+        }
+        else
+        {
+            (*_bInProgress) = true;
+        }
         iResult = 0; // succeeded
     }
 

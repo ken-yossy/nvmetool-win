@@ -141,6 +141,7 @@ int eGetCommandFromConsole(void)
         "#  - g: Get Feature\n"
         "#  - s: Get Feature\n"
         "#  - f: Flush\n"
+        "#  - t: Device Self-test\n"
         "#\n"
         "#  press 'q' to quit program\n",
         strCmd);
@@ -197,6 +198,15 @@ int eGetCommandFromConsole(void)
     case 's':
     case 'S':
         iMajorCmd = CMD_TYPE_SET_FEATURE;
+        break;
+
+    case 't':
+    case 'T':
+        cCmd = cGetConsoleInput("\n# Device Self-test, Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iMajorCmd = CMD_TYPE_DEVICE_SELF_TEST;
+        }
         break;
 
     case 'f':

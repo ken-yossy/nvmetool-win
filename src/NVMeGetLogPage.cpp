@@ -73,7 +73,8 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         cCmd = cGetConsoleInput("\n# Get Log Page - Device Self-test (Log Identifier 06h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iResult = iNVMeGetDeviceSelftestLog(_hDevice);
+            bool bInProgress;
+            iResult = iNVMeGetDeviceSelftestLog(_hDevice, true, &bInProgress);
         }
         break;
 
