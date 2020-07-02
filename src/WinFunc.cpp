@@ -26,14 +26,14 @@ void vUtilPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc)
 
 // wrapper for DeviceIoControl()
 int iIssueDeviceIoControl(
-    HANDLE			_hDevice,
-    DWORD			_dwControlCode,
-    LPVOID			_lpInBuffer,
-    DWORD			_nInBufferSize,
-    LPVOID			_lpOutBuffer,
-    DWORD			_nOutBufferSize,
-    LPDWORD			_lpBytesReturned,
-    LPOVERLAPPED	_lpOverlapped)
+    HANDLE          _hDevice,
+    DWORD           _dwControlCode,
+    LPVOID          _lpInBuffer,
+    DWORD           _nInBufferSize,
+    LPVOID          _lpOutBuffer,
+    DWORD           _nOutBufferSize,
+    LPDWORD         _lpBytesReturned,
+    LPOVERLAPPED    _lpOverlapped)
 {
     int iResult = -1;
     BOOL iRetIoControl = 0;

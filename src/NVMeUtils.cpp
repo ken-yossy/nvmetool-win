@@ -142,6 +142,7 @@ int eGetCommandFromConsole(void)
         "#  - s: Get Feature\n"
         "#  - f: Flush\n"
         "#  - t: Device Self-test\n"
+        "#  - z: Format NVM\n"
         "#\n"
         "#  press 'q' to quit program\n",
         strCmd);
@@ -215,6 +216,16 @@ int eGetCommandFromConsole(void)
         if (cCmd == 'y')
         {
             iMajorCmd = CMD_TYPE_FLUSH;
+        }
+        break;
+
+    case 'z':
+    case 'Z':
+        fprintf(stderr, "\n# Format NVM : CAUTION!! all data are erased on the target drive");
+        cCmd = cGetConsoleInput("\n# Format NVM : Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iMajorCmd = CMD_TYPE_FORMAT_NVM;
         }
         break;
 

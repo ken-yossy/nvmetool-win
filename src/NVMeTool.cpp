@@ -12,6 +12,7 @@
 #include "NVMeGetFeatures.h"
 #include "NVMeSetFeatures.h"
 #include "NVMeDeviceSelftest.h"
+#include "NVMeFormatNVM.h"
 #include "NVMeSMART.h"
 #include "NVMeUtils.h"
 
@@ -132,6 +133,10 @@ int main(int _argc, char* _argv[])
 
         case CMD_TYPE_DEVICE_SELF_TEST:
             iResult = iNVMeDeviceSelftest(hDevice);
+            break;
+
+        case CMD_TYPE_FORMAT_NVM:
+            iResult = iNVMeFormatNVM(hDevice);
             break;
 
         case CMD_TYPE_QUIT:
