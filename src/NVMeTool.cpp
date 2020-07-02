@@ -103,11 +103,11 @@ int main(int _argc, char* _argv[])
             break;
 
         case CMD_TYPE_FLUSH:
-            iResult = iReadViaSCSIPassThrough(hDevice);
+            iResult = iFlushViaSCSIPassThrough(hDevice);
             break;
 
         case CMD_TYPE_READ:
-            iResult = iFlushViaSCSIPassThrough(hDevice);
+            iResult = iReadViaSCSIPassThrough(hDevice);
             break;
 
         case CMD_TYPE_WRITE:
