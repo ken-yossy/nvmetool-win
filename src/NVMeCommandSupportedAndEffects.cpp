@@ -109,16 +109,16 @@ static const char* strNVMCommand[256] =
     "(reserved)", "(reserved)",     // 06h, 07h
     "Write Zeroes",                 // 08h
     "Dataset Management",           // 09h
-    "(reserved)", "(reserved)",	"(reserved)", // 0A, 0Bh, 0Ch
+    "(reserved)", "(reserved)", "(reserved)", // 0A, 0Bh, 0Ch
     "Reservation Register",         // 0Dh
     "Reservation Report",           // 0Eh
     "(reserved)", "(reserved)",     // 0Fh, 10h
     "Reservation Acquire",          // 11h
-    "(reserved)", "(reserved)",	"(reserved)", // 12h, 13h, 14h
+    "(reserved)", "(reserved)", "(reserved)", // 12h, 13h, 14h
     "Reservation Release",          // 15h
     "(reserved)", "(reserved)",     // 16h, 17h
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 18h -- 1Bh
-    "(reserved)", "(reserved)", "(reserved)", "(reserved)",	// 1Ch -- 1Fh
+    "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 1Ch -- 1Fh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 20h -- 23h
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 24h -- 27h
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 28h -- 2Bh

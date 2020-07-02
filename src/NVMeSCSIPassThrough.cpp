@@ -458,7 +458,7 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
     }
     else
     {
-//		PrintAdapterDescriptor(adapterDescriptor);
+        // PrintAdapterDescriptor(adapterDescriptor);
         *AlignmentMask = adapterDescriptor->AlignmentMask;
         *SrbType = adapterDescriptor->SrbType;
         status = true;
@@ -470,7 +470,7 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
     }
     else
     {
-//		PrintDeviceDescriptor(deviceDescriptor);
+        // PrintDeviceDescriptor(deviceDescriptor);
         status = true;
     }
 
@@ -586,28 +586,28 @@ int iWriteViaSCSIPassThrough(HANDLE _hDevice)
         }
 
         ZeroMemory(&sptdwb_ex, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX));
-        sptdwb_ex.sptd.Version					= 0;
-        sptdwb_ex.sptd.Length					= sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
-        sptdwb_ex.sptd.ScsiStatus				= 0;
-        sptdwb_ex.sptd.CdbLength				= CDB10GENERIC_LENGTH;
-        sptdwb_ex.sptd.StorAddressLength		= sizeof(STOR_ADDR_BTL8);
-        sptdwb_ex.sptd.SenseInfoLength			= SPT_SENSE_LENGTH;
-        sptdwb_ex.sptd.DataOutBuffer			= (PVOID)databuffer;
-        sptdwb_ex.sptd.DataOutTransferLength	= sectorSize;
-        sptdwb_ex.sptd.DataInTransferLength		= 0;
-        sptdwb_ex.sptd.DataDirection			= SCSI_IOCTL_DATA_OUT;
-        sptdwb_ex.sptd.TimeOutValue				= 5;
-        sptdwb_ex.sptd.StorAddressOffset		= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
-        sptdwb_ex.StorAddress.Type				= STOR_ADDRESS_TYPE_BTL8;
-        sptdwb_ex.StorAddress.Port				= 0;
-        sptdwb_ex.StorAddress.AddressLength		= STOR_ADDR_BTL8_ADDRESS_LENGTH;
-        sptdwb_ex.StorAddress.Path				= 0;
-        sptdwb_ex.StorAddress.Target			= 0;
-        sptdwb_ex.StorAddress.Lun				= 0;
-        sptdwb_ex.sptd.SenseInfoOffset			= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
-        sptdwb_ex.sptd.Cdb[0]					= SCSIOP_WRITE;
-        sptdwb_ex.sptd.Cdb[5]					= 0; // Starting LBA
-        sptdwb_ex.sptd.Cdb[8]					= 1; // TRANSFER LENGTH
+        sptdwb_ex.sptd.Version                  = 0;
+        sptdwb_ex.sptd.Length                   = sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
+        sptdwb_ex.sptd.ScsiStatus               = 0;
+        sptdwb_ex.sptd.CdbLength                = CDB10GENERIC_LENGTH;
+        sptdwb_ex.sptd.StorAddressLength        = sizeof(STOR_ADDR_BTL8);
+        sptdwb_ex.sptd.SenseInfoLength          = SPT_SENSE_LENGTH;
+        sptdwb_ex.sptd.DataOutBuffer            = (PVOID)databuffer;
+        sptdwb_ex.sptd.DataOutTransferLength    = sectorSize;
+        sptdwb_ex.sptd.DataInTransferLength     = 0;
+        sptdwb_ex.sptd.DataDirection            = SCSI_IOCTL_DATA_OUT;
+        sptdwb_ex.sptd.TimeOutValue             = 5;
+        sptdwb_ex.sptd.StorAddressOffset        = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
+        sptdwb_ex.StorAddress.Type              = STOR_ADDRESS_TYPE_BTL8;
+        sptdwb_ex.StorAddress.Port              = 0;
+        sptdwb_ex.StorAddress.AddressLength     = STOR_ADDR_BTL8_ADDRESS_LENGTH;
+        sptdwb_ex.StorAddress.Path              = 0;
+        sptdwb_ex.StorAddress.Target            = 0;
+        sptdwb_ex.StorAddress.Lun               = 0;
+        sptdwb_ex.sptd.SenseInfoOffset          = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
+        sptdwb_ex.sptd.Cdb[0]                   = SCSIOP_WRITE;
+        sptdwb_ex.sptd.Cdb[5]                   = 0; // Starting LBA
+        sptdwb_ex.sptd.Cdb[8]                   = 1; // TRANSFER LENGTH
 
         length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX);
         iResult = iIssueDeviceIoControl(
@@ -641,20 +641,20 @@ int iWriteViaSCSIPassThrough(HANDLE _hDevice)
         }
 
         ZeroMemory(&sptdwb, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER));
-        sptdwb.sptd.Length				= sizeof(SCSI_PASS_THROUGH_DIRECT);
-        sptdwb.sptd.PathId				= 0;
-        sptdwb.sptd.TargetId			= 0;
-        sptdwb.sptd.Lun					= 0;
-        sptdwb.sptd.CdbLength			= CDB10GENERIC_LENGTH;
-        sptdwb.sptd.SenseInfoLength		= SPT_SENSE_LENGTH;
-        sptdwb.sptd.SenseInfoOffset		= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
-        sptdwb.sptd.DataIn				= SCSI_IOCTL_DATA_OUT;
-        sptdwb.sptd.DataTransferLength	= sectorSize;
-        sptdwb.sptd.TimeOutValue		= 5;
-        sptdwb.sptd.DataBuffer			= databuffer;
-        sptdwb.sptd.Cdb[0]				= SCSIOP_WRITE;
-        sptdwb.sptd.Cdb[5]				= 0; // Starting LBA
-        sptdwb.sptd.Cdb[8]				= 1; // TRANSFER LENGTH
+        sptdwb.sptd.Length              = sizeof(SCSI_PASS_THROUGH_DIRECT);
+        sptdwb.sptd.PathId              = 0;
+        sptdwb.sptd.TargetId            = 0;
+        sptdwb.sptd.Lun                 = 0;
+        sptdwb.sptd.CdbLength           = CDB10GENERIC_LENGTH;
+        sptdwb.sptd.SenseInfoLength     = SPT_SENSE_LENGTH;
+        sptdwb.sptd.SenseInfoOffset     = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
+        sptdwb.sptd.DataIn              = SCSI_IOCTL_DATA_OUT;
+        sptdwb.sptd.DataTransferLength  = sectorSize;
+        sptdwb.sptd.TimeOutValue        = 5;
+        sptdwb.sptd.DataBuffer          = databuffer;
+        sptdwb.sptd.Cdb[0]              = SCSIOP_WRITE;
+        sptdwb.sptd.Cdb[5]              = 0; // Starting LBA
+        sptdwb.sptd.Cdb[8]              = 1; // TRANSFER LENGTH
 
         length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
         iResult = iIssueDeviceIoControl(

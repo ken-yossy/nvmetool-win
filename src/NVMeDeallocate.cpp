@@ -50,6 +50,6 @@ int iNVMeDeallocate(HANDLE _hDevice)
 
     free(buffer);
 
-     return iResult;
+    return iResult;
 }
 

@@ -25,13 +25,13 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
     ULONG   bufferLength = 0;
     ULONG   returnedLength = 0;
 
-    PSTORAGE_PROPERTY_SET query = NULL;
-    PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
-    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
+    PSTORAGE_PROPERTY_SET query                             = NULL;
+    PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT protocolData        = NULL;
+    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT protocolDataDescr = NULL;
 
     // Allocate buffer for use.
-    bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
-        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
+    bufferLength = offsetof(STORAGE_PROPERTY_SET, AdditionalParameters)
+        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA_EXT);
     buffer = malloc(bufferLength);
 
     if (buffer == NULL)
@@ -42,19 +42,19 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
 
     ZeroMemory(buffer, bufferLength);
 
-    query = (PSTORAGE_PROPERTY_SET)buffer;
-    protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
-    protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
+    query               = (PSTORAGE_PROPERTY_SET)buffer;
+    protocolDataDescr   = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT)buffer;
+    protocolData        = (PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT)query->AdditionalParameters;
 
-    query->PropertyId = StorageDeviceProtocolSpecificProperty;
-    query->SetType = PropertyStandardSet;
+    query->PropertyId   = StorageAdapterProtocolSpecificProperty;
+    query->SetType      = PropertyStandardSet;
 
-    protocolData->ProtocolType = ProtocolTypeNvme;
-    protocolData->DataType = NVMeDataTypeFeature;
-    protocolData->ProtocolDataRequestValue    = _cdw10;
-    protocolData->ProtocolDataRequestSubValue = _cdw11;
-    protocolData->ProtocolDataOffset = 0;
-    protocolData->ProtocolDataLength = 0;
+    protocolData->ProtocolType          = ProtocolTypeNvme;
+    protocolData->DataType              = NVMeDataTypeFeature;
+    protocolData->ProtocolDataValue     = _cdw10;
+    protocolData->ProtocolDataSubValue  = _cdw11;
+    protocolData->ProtocolDataOffset    = 0;
+    protocolData->ProtocolDataLength    = 0;
 
     // Send request down.  
     iResult = iIssueDeviceIoControl(_hDevice,
@@ -92,9 +92,18 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
 
 int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
 {
-    int result  = false;
     int iResult = -1;
     int iTMT1, iTMT2;
+
+    if (g_stController.HCTMA.Supported == 0)
+    {
+        fprintf(stderr, "\n[E] This SSD controller does not support Host Controlled Thermal Management (HCTM), skip\n");
+        return iResult;
+    }
+
+    fprintf(stderr, "\n[I] Minimum Thermal Management Temperature is %d (K)", g_stController.MNTMT);
+    fprintf(stderr, "\n[I] Maximum Thermal Management Temperature is %d (K)", g_stController.MXTMT);
+    fprintf(stderr, "\n[I] You can speficy TMT1 and TMT2, satisfying TMT1 < TMT2, MNTMT <= TMT1, and TMT2 <= MXTMT\n");
 
     {
         char cCmd;
@@ -116,29 +125,29 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
     if (!(iTMT1 < iTMT2))
     {
         printf("\n[E] Should be TMT1 < TMT2, you tried TMT1 = %d and TMT2 = %d, process aborted\n", iTMT1, iTMT2);
-        return false;
+        return iResult;
     }
 
     if (!(g_stController.MNTMT <= iTMT1))
     {
         printf("\n[E] Should be MNTMT <= TMT1, you tried TMT1 = %d against MNTMT = %d, process aborted\n", iTMT1, g_stController.MNTMT);
-        return false;
+        return iResult;
     }
 
     if (!(iTMT2 <= g_stController.MXTMT))
     {
         printf("\n[E] Should be TMT2 <= MXTMT, you tried TMT2 = %d against MXTMT = %d, process aborted\n", iTMT2, g_stController.MXTMT);
-        return false;
+        return iResult;
     }
 
     {
         NVME_CDW10_SET_FEATURES cdw10;
         NVME_CDW11_FEATURE_HCTM cdw11;
 
-        cdw10.FID  = FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT;
-        cdw10.SV = 0; // temporary
-        cdw11.TMT1 = iTMT1;
-        cdw11.TMT2 = iTMT2;
+        cdw10.FID   = NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT;
+        cdw10.SV    = 0; // not saved
+        cdw11.TMT1  = iTMT1;
+        cdw11.TMT2  = iTMT2;
 
         iResult = siNVMeSetFeaturesHCTM(_hDevice, cdw10.AsUlong, cdw11.AsUlong);
         if (iResult != 0)
