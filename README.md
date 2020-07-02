@@ -35,7 +35,7 @@ Table 1. Command matrix (Admin Command Set)
 |        1Dh | NVMe-MI Send                |                                 | 2                 |
 |        1Eh | NVMe-MI Receive             |                                 | 2                 |
 |        7Ch | Doorbell Buffer Config      | --                              | Not supported     |
-|        80h | Format NVM                  |                                 |                   |
+|        80h | Format NVM                  | x                               | Only for data drive. Need to support Format NVM command and cryptographic erase is supported along Format NVM (bit 2 of the FNA field in Identify Controller data structure) |
 |        81h | Security Send               |                                 |                   |
 |        82h | Security Receive            |                                 |                   |
 |        84h | Sanitize                    |                                 | 2                 |
@@ -182,7 +182,7 @@ If it is 010b, the drive returns all bytes set to FFh for reading deallocated lo
 For further information, see "5.15.2 Identify Namespace data structure (CNS 00h)" in the NVMe specification[2]. 
 
 ## Caution
-"Write" and "Dataset Management (Deallocate)" command to LBA 0 of devices under management by file systems (e.g. FAT, NTFS) will corrupt your system.
+Issuing "Write", "Dataset Management (Deallocate)", and "Format NVM" command to devices under management by file systems (e.g. FAT, NTFS) will corrupt your system.
 
 These commands should be issued with highest care.
 
@@ -220,6 +220,7 @@ You can find the settings of command line arguments from _Debug_ menu -> _NVMeTo
 
 ## Future Works
 * Test commands, LIDs, FIDs, and CNSs in the NVMe specification and listed in [8]
+* Test in WinPE mode
 
 ## License
 This software is released under the MIT License and Microsoft Public License (MS-PL), see LICENSE.
