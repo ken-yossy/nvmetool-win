@@ -84,6 +84,9 @@
     <ClInclude Include="NVMeFormatNVM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NVMeIdentifyActiveNSIDList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinFunc.cpp">
@@ -153,6 +156,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NVMeFormatNVM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeIdentifyActiveNSIDList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

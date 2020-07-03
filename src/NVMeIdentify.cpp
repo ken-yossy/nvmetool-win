@@ -4,6 +4,7 @@
 #include "NVMeIdentify.h"
 #include "NVMeIdentifyController.h"
 #include "NVMeIdentifyNamespace.h"
+#include "NVMeIdentifyActiveNSIDList.h"
 
 int iNVMeIdentify(HANDLE _hDevice)
 {
@@ -16,14 +17,20 @@ int iNVMeIdentify(HANDLE _hDevice)
     sprintf_s(strPrompt,
         1024,
         "\n# Input Controller or Namespace Structure (CNS) value (in hex):"
-        "\n#    Supported CNS = %02xh, %02xh\n",
-        IDENTIFY_CNS_NAMESPACE, IDENTIFY_CNS_CONTROLLER);
+        "\n#    Supported CNS values are:"
+        "\n#     %02Xh = Namespace data structure (NSID = 1)"
+        "\n#     %02Xh = Controller data structure (CNTID = 0)"
+        "\n#     %02Xh = Active Namespace ID list"
+        "\n",
+        IDENTIFY_CNS_NAMESPACE,
+        IDENTIFY_CNS_CONTROLLER,
+        IDENTIFY_CNS_ACTIVE_NSID_LIST);
 
     int iCNS = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iCNS)
     {
     case IDENTIFY_CNS_NAMESPACE:
-        cCmd = cGetConsoleInput("\n# Identify - Active Namespace (1), Press 'y' to continue\n",	strCmd);
+        cCmd = cGetConsoleInput("\n# Identify : Namespace data structure (NSID = 1), Press 'y' to continue\n",	strCmd);
         if (cCmd == 'y')
         {
             iResult = iNVMeIdentifyNamespace(_hDevice, 1);
@@ -31,10 +38,22 @@ int iNVMeIdentify(HANDLE _hDevice)
         break;
 
     case IDENTIFY_CNS_CONTROLLER:
-        cCmd = cGetConsoleInput("\n# Identify - Controller, Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Identify : Controller data structure (CNTID = 0), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = iNVMeIdentifyController(_hDevice);
+            if (iResult == 0)
+            {
+                vPrintNVMeIdentifyControllerData();
+            }
+        }
+        break;
+
+    case IDENTIFY_CNS_ACTIVE_NSID_LIST:
+        cCmd = cGetConsoleInput("\n# Identify : Active Namespace ID list, Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = iNVMeIdentifyActiveNSIDList(_hDevice);
             if (iResult == 0)
             {
                 vPrintNVMeIdentifyControllerData();
