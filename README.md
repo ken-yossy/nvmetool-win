@@ -10,7 +10,8 @@ For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM 
 ## Command matrix
 
 Table 1. Command matrix (Admin Command Set)
-Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not confirmed
+
+Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_) => not confirmed
 
 |     Opcode | Command name                | Status      | Note              |
 | ---------: | :---------------------------|:------------|:------------------|
@@ -44,10 +45,12 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not c
 | C0h -- FFh | _Vendor Specific_           |             |                   |
 
 Note 1: probably cannot issue this command because only "Internal Driver Use" is written in [8]
+
 Note 2: can issue this command only in WinPE mode according to [8]
 
 Table 2. Command matrix (NVM Command Set)
-Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not confirmed
+
+Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_) => not confirmed
 
 |     Opcode | Command name         | Status | Note                             |
 | ---------: | :--------------------|:-------|:---------------------------------|
@@ -74,7 +77,8 @@ CNS values from 10h to 13h are seemed to be able to issue only in WinPE mode, be
 CNS values 14h and 15h are seemed to be unable to issue, because these values are mandatory for controllers that support Virtualization Enhancements in NVMe spec., but Virtualization Management command is not supported according to [8].
 
 Table 3. Controller or Namespace Structure (CNS)
-Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not confirmed
+
+Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_) => not confirmed
 
 |        CNS | Description                                         |Status| Note |
 | ---------: | :---------------------------------------------------|:-----|:-----|
@@ -95,7 +99,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not c
 ## Log Identifier (LID) for Get Log Page command
 
 Table 4. Log Identifier (LID)
-Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not confirmed
+
+Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_) => not confirmed
 
 |        LID | Description                    |Status| Note |
 | ---------: | :----------------------------- |:-----|:-----|
@@ -119,7 +124,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not c
 According to [8], only Host Controlled Thermal Management is supported via Set Features command with `IOCTL_STORAGE_SET_PROPERTY`.
 
 Table 5. Feature Identifier (FID)
-Legend for "Status" column: "x" => can issue, "--" => cannot issue, " " => not confirmed
+
+Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_) => not confirmed
 
 |        FID | Description                        | Status (Get/Set) | Note |
 | ---------: | :----------------------------------|:-----------------|:-----|
