@@ -164,6 +164,7 @@
     <ClInclude Include="NVMeDeviceSelftest.h" />
     <ClInclude Include="NVMeDeviceSelftestLog.h" />
     <ClInclude Include="NVMeErrorInformation.h" />
+    <ClInclude Include="NVMeFeaturesAPST.h" />
     <ClInclude Include="NVMeFeaturesHCTM.h" />
     <ClInclude Include="NVMeFeaturesVWC.h" />
     <ClInclude Include="NVMeFormatNVM.h" />
@@ -189,6 +190,7 @@
     <ClCompile Include="NVMeDeviceSelftest.cpp" />
     <ClCompile Include="NVMeDeviceSelftestLog.cpp" />
     <ClCompile Include="NVMeErrorInformation.cpp" />
+    <ClCompile Include="NVMeFeaturesAPST.cpp" />
     <ClCompile Include="NVMeFeaturesHCTM.cpp" />
     <ClCompile Include="NVMeFeaturesVWC.cpp" />
     <ClCompile Include="NVMeFormatNVM.cpp" />

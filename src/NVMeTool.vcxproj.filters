@@ -87,6 +87,9 @@
     <ClInclude Include="NVMeIdentifyActiveNSIDList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NVMeFeaturesAPST.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinFunc.cpp">
@@ -159,6 +162,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NVMeIdentifyActiveNSIDList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeFeaturesAPST.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

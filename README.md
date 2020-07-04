@@ -140,7 +140,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        09h | Interrupt Vector Configuration     |  /               |      |
 |        0Ah | Write Atomicity Normal             | x /              |      |
 |        0Bh | Asynchronous Event Configuration   | x /              |      |
-|        0Ch | Autonomous Power State Transition  |  /               |      |
+|        0Ch | Autonomous Power State Transition  | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        0Dh | Host Memory Buffer                 |  /               |      |
 |        0Eh | Timestamp                          |  /               |      |
 |        0Fh | Keep Alive Timer                   |  /               |      |

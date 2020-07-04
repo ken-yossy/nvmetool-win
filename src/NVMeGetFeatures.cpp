@@ -4,10 +4,12 @@
 
 #include "NVMeUtils.h"
 #include "NVMeSMART.h" // to use g_stSMARTLog
+#include "NVMeIdentifyController.h" // to use g_stController
 #include "NVMeGetFeatures.h"
+#include "NVMeFeaturesAPST.h"
 
 // NVMeGetFeature32() : used for Get Feature command with 32bit fixed return value
-static int NVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11, uint32_t* _pulData)
+int iNVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11, uint32_t* _pulData)
 {
     int     iResult = -1;
     PVOID   buffer = NULL;
@@ -94,19 +96,19 @@ static int NVMeGetFeaturesArbitration(HANDLE _hDevice)
     printf("\n[I] Arbitration:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ARBITRATION, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [ 31: 24] High Priority Weight (HPW)\n"
@@ -160,19 +162,19 @@ static int NVMeGetFeaturesPowerManagement(HANDLE _hDevice)
     printf("\n[I] Power Management:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [  7:  5] Workload Hint (WH), (0) no workload, (1) workload #1, (2) workload #2\n"
@@ -219,15 +221,15 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
     cdw11.THSEL = NVME_TEMPERATURE_OVER_THRESHOLD;
     cdw11.TMPSEL = 0; // composite temperature
     cdw11.TMPTH = 0; // not used
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value (over)
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value (over)
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
     if (result) return result;
 
     printf("\tbit [ 15:  0] Over Temperature Threshold (TMPTH)\n"
@@ -239,7 +241,7 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
         ulSavedData & 0xFFFF);
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tCapabilities: this feature is\n"
@@ -254,15 +256,15 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
     cdw11.THSEL = NVME_TEMPERATURE_UNDER_THRESHOLD;
     cdw11.TMPSEL = 0; // composite temperature
     cdw11.TMPTH = 0; // not used
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
     if (result) return result;
 
     // 6. get default value (over)
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
     if (result) return result;
 
     // 7. get saved value (over)
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
     if (result) return result;
 
     printf("\tbit [ 15:  0] Under Temperature Threshold (TMPTH)\n"
@@ -274,7 +276,7 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
         ulSavedData & 0xFFFF);
 
     // 8. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tCapabilities: this feature is\n"
@@ -297,15 +299,15 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
             cdw11.THSEL = NVME_TEMPERATURE_OVER_THRESHOLD;
             cdw11.TMPSEL = i+1; // Temperature Sensor i+1
             cdw11.TMPTH = 0; // not used
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
             if (result) return result;
 
             // 2. get default value (over)
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
             if (result) return result;
 
             // 3. get saved value (over)
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
             if (result) return result;
 
             printf("\tbit [ 15:  0] Over Temperature Threshold (TMPTH)\n"
@@ -317,7 +319,7 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
                 ulSavedData & 0xFFFF);
 
             // 4. get supported capabilities
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
             if (result) return result;
 
             printf("\tCapabilities: this feature is\n"
@@ -332,15 +334,15 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
             cdw11.THSEL = NVME_TEMPERATURE_UNDER_THRESHOLD;
             cdw11.TMPSEL = i+1; // Temperature Sensor i+1
             cdw11.TMPTH = 0; // not used
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_CURRENT, (DWORD)cdw11.AsUlong, &ulCurrentData);
             if (result) return result;
 
             // 6. get default value (over)
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_DEFAULT, (DWORD)cdw11.AsUlong, &ulDefaultData);
             if (result) return result;
 
             // 7. get saved value (over)
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
             if (result) return result;
 
             printf("\tbit [ 15:  0] Under Temperature Threshold (TMPTH)\n"
@@ -352,7 +354,7 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
                 ulSavedData & 0xFFFF);
 
             // 8. get supported capabilities
-            result = NVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
+            result = iNVMeGetFeature32(_hDevice, FEATURE_ID_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
             if (result) return result;
 
             printf("\tCapabilities: this feature is\n"
@@ -378,19 +380,19 @@ static int NVMeGetFeaturesErrorRecovery(HANDLE _hDevice)
     printf("\n[I] Error Recovery:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [     16] Deallocated or Unwritten Logical Block Error Enable (DULBE), (0) disabled, (1) enabled\n"
@@ -430,19 +432,19 @@ static int NVMeGetFeaturesVolatileWriteCache(HANDLE _hDevice)
     printf("\n[I] Volatile Write Cache:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [      0] Volatile Write Cache Enable (WCE), (0) disabled, (1) enabled\n"
@@ -474,19 +476,19 @@ static int NVMeGetFeaturesNumberOfQueues(HANDLE _hDevice)
     printf("\n[I] Number of Queues:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [ 31: 16] Number of I/O Completion Queues Allocated (NCQA)\n"
@@ -526,19 +528,19 @@ static int NVMeGetFeaturesInterruptCoalescing(HANDLE _hDevice)
     printf("\n[I] Interrupt Coalescing:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [ 15:  8] Aggregation Time (TIME); in 100 microsecond units, 0 means no delay\n"
@@ -578,19 +580,19 @@ static int NVMeGetFeaturesWriteAtomicityNormal(HANDLE _hDevice)
     printf("\n[I] Write Atomicity Normal:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_WRITE_ATOMICITY_NORMAL, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [      0] Disable Normal (DN); (0) controller honor AWUN, NAWUN, AWUPF, and NAWUPF (1) controller honor only AWUPF and NAWUPF\n"
@@ -623,19 +625,19 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
     printf("\n[I] Asynchronous Event Configuration:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [     10] Telemetry Log Notices; (0) disabled, (1) enabled\n"
@@ -717,19 +719,19 @@ static int NVMeGetFeaturesHCTM(HANDLE _hDevice)
     printf("\n[I] Host Controlled Thermal Management:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [ 31: 16] Thermal Management Temperature 1 (TMT1); in Kelvin, 0 means disabled\n"
@@ -769,19 +771,19 @@ static int NVMeGetFeaturesSoftwareProgressMarker(HANDLE _hDevice)
     printf("\n[I] Software Progress Marker:\n");
 
     // 1. get current value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
     if (result) return result;
 
     // 2. get default value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
     if (result) return result;
 
     // 3. get saved value
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
     if (result) return result;
 
     // 4. get supported capabilities
-    result = NVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, FEATURE_ID_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
     if (result) return result;
 
     printf("\tbit [  7:  0] Pre-boot Software Load Count (PBSLC)\n"
@@ -825,6 +827,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         "\n#     %02Xh = Interrupt Coalescing"
         "\n#     %02Xh = Write Atomicity Normal"
         "\n#     %02Xh = Asynchronous Event Configuration"
+        "\n#     %02Xh = Autonomous Power State Transition"
         "\n#     %02Xh = Host Controlled Thermal Management"
         "\n#     %02Xh = Software Progress Marker"
         //		"\n#     %02Xh = Host Identifier"
@@ -838,6 +841,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         FEATURE_ID_INTERRUPT_COALESCING,
         FEATURE_ID_WRITE_ATOMICITY_NORMAL,
         FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION,
+        FEATURE_ID_AUTONOMOUS_POWER_STATE_TRANSITION,
         FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT,
         FEATURE_ID_SOFTWARE_PROGRESS_MARKER);
 
@@ -845,7 +849,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
     switch (iFId)
     {
     case FEATURE_ID_ARBITRATION:
-        cCmd = cGetConsoleInput("\n# Get Feature - Arbitration (Feature Identifier = 01h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Arbitration (Feature Identifier = 01h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesArbitration(_hDevice);
@@ -853,7 +857,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_POWER_MANAGEMENT:
-        cCmd = cGetConsoleInput("\n# Get Feature - Power Management (Feature Identifier = 02h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Power Management (Feature Identifier = 02h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesPowerManagement(_hDevice);
@@ -861,7 +865,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_TEMPERATURE_THRESHOLD:
-        cCmd = cGetConsoleInput("\n# Get Feature - Temperature Threshold (Feature Identifier = 04h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Temperature Threshold (Feature Identifier = 04h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesTemperatureThreshold(_hDevice);
@@ -870,7 +874,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
 
 
     case FEATURE_ID_ERROR_RECOVERY:
-        cCmd = cGetConsoleInput("\n# Get Feature - Error Recovery (Feature Identifier = 05h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Error Recovery (Feature Identifier = 05h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesErrorRecovery(_hDevice);
@@ -878,7 +882,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_VOLATILE_WRITE_CACHE:
-        cCmd = cGetConsoleInput("\n# Get Feature - Volatile Write Cache (Feature Identifier = 06h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Volatile Write Cache (Feature Identifier = 06h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesVolatileWriteCache(_hDevice);
@@ -886,7 +890,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_NUMBER_OF_QUEUES:
-        cCmd = cGetConsoleInput("\n# Get Feature - Number of Queues (Feature Identifier = 07h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Number of Queues (Feature Identifier = 07h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesNumberOfQueues(_hDevice);
@@ -894,7 +898,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_INTERRUPT_COALESCING:
-        cCmd = cGetConsoleInput("\n# Get Feature - Interrupt Coalescing (Feature Identifier = 08h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Interrupt Coalescing (Feature Identifier = 08h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesInterruptCoalescing(_hDevice);
@@ -902,7 +906,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_WRITE_ATOMICITY_NORMAL:
-        cCmd = cGetConsoleInput("\n# Get Feature - Write Atomicity Normal (Feature Identifier = 0Ah), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Write Atomicity Normal (Feature Identifier = 0Ah), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesWriteAtomicityNormal(_hDevice);
@@ -910,15 +914,30 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_ASYNCHRONOUS_EVENT_CONFIGURATION:
-        cCmd = cGetConsoleInput("\n# Get Feature - Asynchronous Event Configuration (Feature Identifier = 0Bh), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Asynchronous Event Configuration (Feature Identifier = 0Bh), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesAsynchronousEventConfiguration(_hDevice);
         }
         break;
 
+    case FEATURE_ID_AUTONOMOUS_POWER_STATE_TRANSITION:
+        cCmd = cGetConsoleInput("\n# Get Feature : Autonomous Power State Transition (Feature Identifier = 0Ch), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            if (g_stController.APSTA.Supported == 0)
+            {
+                fprintf(stderr, "[W] This SSD controller does not support Autonomous Power State Transition (APST), ignore\n");
+            }
+            else
+            {
+                iResult = iNVMeGetFeaturesAPST(_hDevice);
+            }
+        }
+        break;
+
     case FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT:
-        cCmd = cGetConsoleInput("\n# Get Feature - Host Controlled Thermal Management (Feature Identifier = 10h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Host Controlled Thermal Management (Feature Identifier = 10h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesHCTM(_hDevice);
@@ -926,7 +945,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         break;
 
     case FEATURE_ID_SOFTWARE_PROGRESS_MARKER:
-        cCmd = cGetConsoleInput("\n# Get Feature - Software Progress Marker (Feature Identifier = 80h), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Get Feature : Software Progress Marker (Feature Identifier = 80h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesSoftwareProgressMarker(_hDevice);
@@ -936,7 +955,6 @@ int iNVMeGetFeatures(HANDLE _hDevice)
     case FEATURE_ID_HOST_MEMORY_BUFFER:
     case FEATURE_ID_KEEP_ALIVE_TIMER:
     case FEATURE_ID_NON_OPERATIONAL_POWER_STATE_CONFIG:
-    case FEATURE_ID_AUTONOMOUS_POWER_STATE_TRANSITION:
     case FEATURE_ID_HOST_IDENTIFIER:
     case FEATURE_ID_RESERVATION_NOTIFICATION_MASK:
     case FEATURE_ID_RESERVATION_PERSISTENCE:
