@@ -28,16 +28,16 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         "\n#     %02Xh = Command Supported and Effects"
         "\n#     %02Xh = Device Self-test"
         "\n",
-        LOG_ID_ERROR_INFORMATION,
-        LOG_ID_SMART,
-        LOG_ID_FIRMWARE_SLOT_INFORMATION,
-        LOG_ID_COMMAND_SUPPORTED_AND_EFFECTS,
-        LOG_ID_DEVICE_SELF_TEST);
+        NVME_LOG_PAGE_ERROR_INFO,
+        NVME_LOG_PAGE_HEALTH_INFO,
+        NVME_LOG_PAGE_FIRMWARE_SLOT_INFO,
+        NVME_LOG_PAGE_COMMAND_EFFECTS,
+        NVME_LOG_PAGE_DEVICE_SELF_TEST);
 
     int iLId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iLId)
     {
-    case LOG_ID_ERROR_INFORMATION:
+    case NVME_LOG_PAGE_ERROR_INFO:
         cCmd = cGetConsoleInput("\n# Get Log Page - Error Information (Log Identifier 01h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -45,7 +45,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
         break;
 
-    case LOG_ID_SMART:
+    case NVME_LOG_PAGE_HEALTH_INFO:
         cCmd = cGetConsoleInput("\n# Get Log Page - SMART / Health Information (Log Identifier 02h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -53,7 +53,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
         break;
 
-    case LOG_ID_FIRMWARE_SLOT_INFORMATION:
+    case NVME_LOG_PAGE_FIRMWARE_SLOT_INFO:
         cCmd = cGetConsoleInput("\n# Get Log Page - Firmware Slot Information (Log Identifier 03h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -61,7 +61,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
         break;
 
-    case LOG_ID_COMMAND_SUPPORTED_AND_EFFECTS:
+    case NVME_LOG_PAGE_COMMAND_EFFECTS:
         cCmd = cGetConsoleInput("\n# Get Log Page - Command Supported and Effects (Log Identifier 05h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -69,7 +69,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
         break;
 
-    case LOG_ID_DEVICE_SELF_TEST:
+    case NVME_LOG_PAGE_DEVICE_SELF_TEST:
         cCmd = cGetConsoleInput("\n# Get Log Page - Device Self-test (Log Identifier 06h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
