@@ -99,7 +99,7 @@ int iNVMeSetFeaturesVWC(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             cdw11.WCE = 0;
-            cdw10.FID = FEATURE_ID_VOLATILE_WRITE_CACHE;
+            cdw10.FID = NVME_FEATURE_VOLATILE_WRITE_CACHE;
             cdw10.SV  = 0;
         }
         break;
@@ -109,7 +109,7 @@ int iNVMeSetFeaturesVWC(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             cdw11.WCE = 1;
-            cdw10.FID = FEATURE_ID_VOLATILE_WRITE_CACHE;
+            cdw10.FID = NVME_FEATURE_VOLATILE_WRITE_CACHE;
             cdw10.SV  = 0;
         }
         break;
@@ -119,7 +119,7 @@ int iNVMeSetFeaturesVWC(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             cdw11.WCE = 0;
-            cdw10.FID = FEATURE_ID_VOLATILE_WRITE_CACHE;
+            cdw10.FID = NVME_FEATURE_VOLATILE_WRITE_CACHE;
             cdw10.SV  = 1;
         }
         break;
@@ -129,7 +129,7 @@ int iNVMeSetFeaturesVWC(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             cdw11.WCE = 1;
-            cdw10.FID = FEATURE_ID_VOLATILE_WRITE_CACHE;
+            cdw10.FID = NVME_FEATURE_VOLATILE_WRITE_CACHE;
             cdw10.SV  = 1;
         }
         break;

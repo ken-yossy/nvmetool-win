@@ -23,13 +23,13 @@ int iNVMeSetFeatures(HANDLE _hDevice)
         "\n#     %02Xh = Volatile Write Cache"
         "\n#     %02Xh = Host Controlled Thermal Management"
         "\n",
-        FEATURE_ID_VOLATILE_WRITE_CACHE,
-        FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT);
+        NVME_FEATURE_VOLATILE_WRITE_CACHE,
+        NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT);
 
     iFId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iFId)
     {
-    case FEATURE_ID_VOLATILE_WRITE_CACHE:
+    case NVME_FEATURE_VOLATILE_WRITE_CACHE:
         cCmd = cGetConsoleInput("\n# Set Feature - Volatile Write Cache (Feature Identifier = 06h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -37,7 +37,7 @@ int iNVMeSetFeatures(HANDLE _hDevice)
         }
         break;
 
-    case FEATURE_ID_HOST_CONTROLLED_THERMAL_MANAGEMENT:
+    case NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT:
         cCmd = cGetConsoleInput("\n# Set Feature - Host Controlled Thermal Management (Feature Identifier = 10h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
