@@ -44,7 +44,7 @@ char* strConvertUTF8toMultiByte(const char* _str)
     }
 
     // we needs "multi byte"...
-    strDest = (char*)calloc(numChar*2, sizeof(char));
+    strDest = (char*)calloc(((long long)numChar)*2, sizeof(char));
     if (WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)strTemp, -1, (LPSTR)strDest, numChar, NULL, NULL) == 0)
     {
         vUtilPrintSystemError(GetLastError(), "WideCharToMultiByte");
@@ -129,7 +129,7 @@ int eGetCommandFromConsole(void)
 {
     char cCmd;
     char strCmd[256];
-    int iMajorCmd = CMD_TYPE_UNKNOWN;
+    int iMajorCmd = NVME_TOOL_COMMAND_UNKNOWN;
 
     cCmd = cGetConsoleInput(
         "\n# Input command:\n"
@@ -151,7 +151,7 @@ int eGetCommandFromConsole(void)
     {
     case 'q':
     case 'Q':
-        iMajorCmd = CMD_TYPE_QUIT; // quit this program
+        iMajorCmd = NVME_TOOL_COMMAND_QUIT; // quit this program
         break;
 
     case 'r':
@@ -159,7 +159,7 @@ int eGetCommandFromConsole(void)
         cCmd = cGetConsoleInput("\n# Read data from LBA = 0, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iMajorCmd = CMD_TYPE_READ;
+            iMajorCmd = NVME_COMMAND_READ;
         }
         break;
 
@@ -168,7 +168,7 @@ int eGetCommandFromConsole(void)
         cCmd = cGetConsoleInput("\n# Write data to LBA = 0, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iMajorCmd = CMD_TYPE_WRITE;
+            iMajorCmd = NVME_COMMAND_WRITE;
         }
         break;
 
@@ -177,28 +177,28 @@ int eGetCommandFromConsole(void)
         cCmd = cGetConsoleInput("\n# Deallocate LBA = 0, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iMajorCmd = CMD_TYPE_DEALLOCATE;
+            iMajorCmd = NVME_COMMAND_DSM;
         }
         break;
 
     case 'i':
     case 'I':
-        iMajorCmd = CMD_TYPE_IDENTIFY;
+        iMajorCmd = NVME_COMMAND_IDENTIFY;
         break;
 
     case 'l':
     case 'L':
-        iMajorCmd = CMD_TYPE_GET_LOG_PAGE;
+        iMajorCmd = NVME_COMMAND_GET_LOG_PAGE;
         break;
 
     case 'g':
     case 'G':
-        iMajorCmd = CMD_TYPE_GET_FEATURE;
+        iMajorCmd = NVME_COMMAND_GET_FEATURES;
         break;
 
     case 's':
     case 'S':
-        iMajorCmd = CMD_TYPE_SET_FEATURE;
+        iMajorCmd = NVME_COMMAND_SET_FEATURES;
         break;
 
     case 't':
@@ -206,7 +206,7 @@ int eGetCommandFromConsole(void)
         cCmd = cGetConsoleInput("\n# Device Self-test, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iMajorCmd = CMD_TYPE_DEVICE_SELF_TEST;
+            iMajorCmd = NVME_COMMAND_DST;
         }
         break;
 
@@ -215,7 +215,7 @@ int eGetCommandFromConsole(void)
         cCmd = cGetConsoleInput("\n# Flush, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iMajorCmd = CMD_TYPE_FLUSH;
+            iMajorCmd = NVME_COMMAND_FLUSH;
         }
         break;
 
@@ -225,7 +225,7 @@ int eGetCommandFromConsole(void)
         cCmd = cGetConsoleInput("\n# Format NVM : Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iMajorCmd = CMD_TYPE_FORMAT_NVM;
+            iMajorCmd = NVME_COMMAND_FORMAT_NVM;
         }
         break;
 

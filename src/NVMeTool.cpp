@@ -1,5 +1,6 @@
 ﻿#include "WinFunc.h"
 #include <iostream>
+#include <nvme.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -99,47 +100,47 @@ int main(int _argc, char* _argv[])
         int iMajorCmd = eGetCommandFromConsole();
         switch (iMajorCmd)
         {
-        case CMD_TYPE_DEALLOCATE:
+        case NVME_COMMAND_DSM:
             iResult = iNVMeDeallocate(hDevice);
             break;
 
-        case CMD_TYPE_FLUSH:
+        case NVME_COMMAND_FLUSH:
             iResult = iFlushViaSCSIPassThrough(hDevice);
             break;
 
-        case CMD_TYPE_READ:
+        case NVME_COMMAND_READ:
             iResult = iReadViaSCSIPassThrough(hDevice);
             break;
 
-        case CMD_TYPE_WRITE:
+        case NVME_COMMAND_WRITE:
             iResult = iWriteViaSCSIPassThrough(hDevice);
             break;
 
-        case CMD_TYPE_IDENTIFY:
+        case NVME_COMMAND_IDENTIFY:
             iResult = iNVMeIdentify(hDevice);
             break;
 
-        case CMD_TYPE_GET_LOG_PAGE:
+        case NVME_COMMAND_GET_LOG_PAGE:
             iResult = iNVMeGetLogPage(hDevice);
             break;
 
-        case CMD_TYPE_SET_FEATURE:
+        case NVME_COMMAND_SET_FEATURES:
             iResult = iNVMeSetFeatures(hDevice);
             break;
 
-        case CMD_TYPE_GET_FEATURE:
+        case NVME_COMMAND_GET_FEATURES:
             iResult = iNVMeGetFeatures(hDevice);
             break;
 
-        case CMD_TYPE_DEVICE_SELF_TEST:
+        case NVME_COMMAND_DST:
             iResult = iNVMeDeviceSelftest(hDevice);
             break;
 
-        case CMD_TYPE_FORMAT_NVM:
+        case NVME_COMMAND_FORMAT_NVM:
             iResult = iNVMeFormatNVM(hDevice);
             break;
 
-        case CMD_TYPE_QUIT:
+        case NVME_TOOL_COMMAND_QUIT:
             iResult = 0;
             bFinished = true;
             break;
