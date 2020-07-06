@@ -22,14 +22,14 @@ int iNVMeIdentify(HANDLE _hDevice)
         "\n#     %02Xh = Controller data structure (CNTID = 0)"
         "\n#     %02Xh = Active Namespace ID list"
         "\n",
-        IDENTIFY_CNS_NAMESPACE,
-        IDENTIFY_CNS_CONTROLLER,
-        IDENTIFY_CNS_ACTIVE_NSID_LIST);
+        NVME_IDENTIFY_CNS_SPECIFIC_NAMESPACE,
+        NVME_IDENTIFY_CNS_CONTROLLER,
+        NVME_IDENTIFY_CNS_ACTIVE_NAMESPACES);
 
     int iCNS = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iCNS)
     {
-    case IDENTIFY_CNS_NAMESPACE:
+    case NVME_IDENTIFY_CNS_SPECIFIC_NAMESPACE:
         cCmd = cGetConsoleInput("\n# Identify : Namespace data structure (NSID = 1), Press 'y' to continue\n",	strCmd);
         if (cCmd == 'y')
         {
@@ -37,7 +37,7 @@ int iNVMeIdentify(HANDLE _hDevice)
         }
         break;
 
-    case IDENTIFY_CNS_CONTROLLER:
+    case NVME_IDENTIFY_CNS_CONTROLLER:
         cCmd = cGetConsoleInput("\n# Identify : Controller data structure (CNTID = 0), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -49,7 +49,7 @@ int iNVMeIdentify(HANDLE _hDevice)
         }
         break;
 
-    case IDENTIFY_CNS_ACTIVE_NSID_LIST:
+    case NVME_IDENTIFY_CNS_ACTIVE_NAMESPACES:
         cCmd = cGetConsoleInput("\n# Identify : Active Namespace ID list, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
