@@ -3,6 +3,7 @@
 
 #include "NVMeIdentify.h"
 #include "NVMeIdentifyController.h"
+#include "NVMeIdentifyControllerData.h"
 #include "NVMeIdentifyNamespace.h"
 #include "NVMeIdentifyActiveNSIDList.h"
 
@@ -54,10 +55,6 @@ int iNVMeIdentify(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             iResult = iNVMeIdentifyActiveNSIDList(_hDevice);
-            if (iResult == 0)
-            {
-                vPrintNVMeIdentifyControllerData();
-            }
         }
         break;
 

@@ -42,26 +42,6 @@ uint32_t uiPrintControllerBasicData(void)
     return g_stController.VER;
 }
 
-void vPrintNVMeIdentifyControllerData(void)
-{
-    if ((g_stController.VER & 0xFFFFFF00) == 0x00010200)
-    { // rev 1.2.x
-        vPrintNVMeIdentifyControllerData12();
-    }
-    else if ( (g_stController.VER & 0xFFFFFF00) == 0x00010300)
-    { // rev 1.3.x
-        vPrintNVMeIdentifyControllerData13();
-    }
-    else if ((g_stController.VER & 0xFFFFFF00) == 0x00010400)
-    { // rev 1.4.x
-        vPrintNVMeIdentifyControllerData14();
-    }
-    else
-    {
-        fprintf(stderr, "[E] NVMeIdentifyController: Unsupported revision (0x%08x), stop.\n", g_stController.VER);
-    }
-}
-
 int iNVMeIdentifyController(HANDLE _hDevice)
 {
     int     iResult = -1;
@@ -134,7 +114,7 @@ int iNVMeIdentifyController(HANDLE _hDevice)
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
     if ((protocolData->ProtocolDataOffset > sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_IDENTIFY_CONTROLLER_DATA13)))
+        (protocolData->ProtocolDataLength < sizeof(NVME_IDENTIFY_CONTROLLER_DATA)))
     {
         fprintf(stderr, "[E] NVMeIdentifyController: ProtocolData Offset/Length is not valid, stop.\n");
         iResult = -1; // error

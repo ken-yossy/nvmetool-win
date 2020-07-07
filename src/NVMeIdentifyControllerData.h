@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <nvme.h>
 
-// Identify Controller data structure (v1.3d) based on nvme.h
+// Identify Controller data structure (upto v1.4) based on nvme.h
 typedef struct {
     //
     // byte 0 : 255, Controller Capabilities and Features
@@ -20,7 +20,8 @@ typedef struct {
         uint8_t MultiPCIePorts : 1;     // bit [  0]
         uint8_t MultiControllers : 1;   // bit [  1]
         uint8_t SRIOV : 1;              // bit [  2]
-        uint8_t Reserved : 5;           // bit [7:3]
+        uint8_t ANAReport : 1;          // bit [  3] <rev1.4>
+        uint8_t Reserved : 4;           // bit [7:4]
     } CMIC;                         // byte [       76] O - Controller Multi-Path I/O and Namespace Sharing Capabilities (CMIC)
 
     uint8_t     MDTS;               // byte [       77] M - Maximum Data Transfer Size (MDTS)
@@ -30,24 +31,42 @@ typedef struct {
     uint32_t    RTD3E;              // byte [  91:  88] M - RTD3 Entry Latency (RTD3E)
 
     struct {
-        uint32_t    Reserved0 : 8;                  // bit [ 7: 0]
-        uint32_t    NamespaceAttributeChanged : 1;  // bit [    8]
-        uint32_t    FirmwareActivation : 1;         // bit [    9]
-        uint32_t    Reserved1 : 22;                 // bit [31:10]
+        uint32_t    Reserved0 : 8;                                  // bit [ 7: 0]
+        uint32_t    NamespaceAttributeChanged : 1;                  // bit [    8]
+        uint32_t    FirmwareActivation : 1;                         // bit [    9]
+        uint32_t    Reserved1 : 1;                                  // bit [   10]
+        uint32_t    ANAChange : 1;                                  // bit [   11] <rev1.4>
+        uint32_t    PredictableLatencyEventAggregateLogChange : 1;  // bit [   12] <rev1.4>
+        uint32_t    LBAStatusInfo : 1;                              // bit [   13] <rev1.4>
+        uint32_t    EnduranceGroupEventAggregateLogChange : 1;      // bit [   14] <rev1.4>
+        uint32_t    Reserved2 : 17;                                 // bit [31:15]
     } OAES;                         // byte [  95:  92] M - Optional Asynchronous Events Supported (OAES)
 
     struct {
         uint32_t    HostIdEn : 1;               // bit [    0]
-        uint32_t    NoopPSPermissiveModeEn : 1; // bit [    1]
-        uint32_t    Reserved : 30;              // bit [31: 2]
+        uint32_t    NoopPSPermissiveModeEn : 1; // bit [    1] <rev1.3>
+        uint32_t    NVMSet : 1;                 // bit [    2] <rev1.4>
+        uint32_t    ReadRecoveryLevel : 1;      // bit [    3] <rev1.4>
+        uint32_t    EnduranceGroups : 1;        // bit [    4] <rev1.4>
+        uint32_t    PredictableLatencyMode : 1; // bit [    5] <rev1.4>
+        uint32_t    TrafficBasedKeepAlive : 1;  // bit [    6] <rev1.4>
+        uint32_t    NamespaceGranularity : 1;   // bit [    7] <rev1.4>
+        uint32_t    SQAssociation : 1;          // bit [    8] <rev1.4>
+        uint32_t    UUIDList : 1;               // bit [    9] <rev1.4>
+        uint32_t    Reserved : 22;              // bit [31:10]
     } CTRATT;                       // byte [  99:  96] M - Controller Attributes (CTRATT)
 
-    uint8_t Reserved0[12];          // byte [ 111: 100]
+    uint16_t    RRLS;               // byte [ 101: 100] O - Read Recovery Levels Supported (RRLS) <rev1.4>
+    uint8_t     Reserved0[9];       // byte [ 110: 102]
 
-    uint8_t FGUID[16];              // byte [ 127: 112] O - FRU Globally Unique Identifier (FGUID)
+    uint8_t     CNTRLTYPE;          // byte [      111] M - Controller Type (CNTRLTYPE)             <rev1.4>
+    uint8_t     FGUID[16];          // byte [ 127: 112] O - FRU Globally Unique Identifier (FGUID)  <rev1.3>
+    uint16_t    CRDT1;              // byte [ 129: 128] O - Command Retry Delay Time 1 (CRDT1)      <rev1.4>
+    uint16_t    CRDT2;              // byte [ 131: 130] O - Command Retry Delay Time 2 (CRDT2)      <rev1.4>
+    uint16_t    CRDT3;              // byte [ 133: 132] O - Command Retry Delay Time 3 (CRDT3)      <rev1.4>
 
-    uint8_t Reserved1[112];         // byte [ 239: 128]
-    uint8_t Reserved2[16];          // byte [ 255: 240] Refer to the NVMe Management Interface Specification for definition
+    uint8_t     Reserved1[106];     // byte [ 239: 134]
+    uint8_t     Reserved2[16];      // byte [ 255: 240] Refer to the NVMe Management Interface Specification for definition
 
     //
     // byte 256 : 511, Admin Command Set Attributes
@@ -57,12 +76,13 @@ typedef struct {
         uint16_t    FormatNVM : 1;          // bit [    1]
         uint16_t    FirmwareCommands : 1;   // bit [    2]
         uint16_t    NamespaceCommands : 1;  // bit [    3]
-        uint16_t    DeviceSelfTest : 1;     // bit [    4]
-        uint16_t    Directives : 1;         // bit [    5]
-        uint16_t    NVMeMICommands : 1;     // bit [    6]
-        uint16_t    VirtMgmtCommands : 1;   // bit [    7]
-        uint16_t    DBConfigCommand : 1;    // bit [    8]
-        uint16_t    Reserved : 7;           // bit [15: 9]
+        uint16_t    DeviceSelfTest : 1;     // bit [    4] <rev1.3>
+        uint16_t    Directives : 1;         // bit [    5] <rev1.3>
+        uint16_t    NVMeMICommands : 1;     // bit [    6] <rev1.3>
+        uint16_t    VirtMgmtCommands : 1;   // bit [    7] <rev1.3>
+        uint16_t    DBConfigCommand : 1;    // bit [    8] <rev1.3>
+        uint16_t    GetLBAStatusCommand : 1;// bit [    9] <rev1.4>
+        uint16_t    Reserved : 6;           // bit [15:10]
     } OACS;                         // byte [ 257: 256] M - Optional Admin Command Support (OACS)
 
     uint8_t ACL;                    // byte [      258] M - Abort Command Limit (ACL)
@@ -79,8 +99,9 @@ typedef struct {
         uint8_t SmartPagePerNamespace : 1;  // bit [    0]
         uint8_t CommandEffectsLog : 1;      // bit [    1]
         uint8_t LogPageExtendedData : 1;    // bit [    2]
-        uint8_t TelemetrySupport : 1;       // bit [    3]
-        uint8_t Reserved : 4;               // bit [ 7: 4]
+        uint8_t TelemetrySupport : 1;       // bit [    3] <rev1.3>
+        uint8_t PersistentEventLog : 1;     // bit [    4] <rev1.4>
+        uint8_t Reserved : 3;               // bit [ 7: 5]
     } LPA;                          // byte [      261] M - Log Page Attributes (LPA)
 
     uint8_t ELPE;                   // byte [      262] M - Error Log Page Entries (ELPE)
@@ -112,27 +133,50 @@ typedef struct {
         uint32_t    AccessSize : 8;             // bit [31:24] Access Size: in 512B units.
     } RPMBS;                        // byte [ 315: 312] O - Replay Protected Memory Block Support (RPMBS)
 
-    uint16_t    EDSTT;              // byte [ 317: 316] O - Extended Device Self-test Time (EDSTT)
-    uint8_t     DSTO;               // byte [      318] O - Device Self-test Options (DSTO)
-    uint8_t     FWUG;               // byte [      319] M - Firmware Update Granularity (FWUG)
+    uint16_t    EDSTT;              // byte [ 317: 316] O - Extended Device Self-test Time (EDSTT)  <rev1.3>
+    uint8_t     DSTO;               // byte [      318] O - Device Self-test Options (DSTO)         <rev1.3>
+    uint8_t     FWUG;               // byte [      319] M - Firmware Update Granularity (FWUG)      <rev1.3>
     uint16_t    KAS;                // byte [ 321: 320] M - Keep Alive Support (KAS)
 
     struct {
         uint16_t    Supported : 1;  // bit [    0]
         uint16_t    Reserved : 15;  // bit [15: 0]
-    } HCTMA;                        // byte [ 323: 322] O - Host Controlled Thermal Management Attributes (HCTMA)
+    } HCTMA;                        // byte [ 323: 322] O - Host Controlled Thermal Management Attributes (HCTMA)  <rev1.3>
 
-    uint16_t    MNTMT;              // byte [ 325: 324] O - Minimum Thermal Management Temperature (MNTMT)
-    uint16_t    MXTMT;              // byte [ 327: 326] O - Maximum Thermal Management Temperature (MXTMT)
+    uint16_t    MNTMT;              // byte [ 325: 324] O - Minimum Thermal Management Temperature (MNTMT) <rev1.3>
+    uint16_t    MXTMT;              // byte [ 327: 326] O - Maximum Thermal Management Temperature (MXTMT) <rev1.3>
 
     struct {
-        uint32_t    CryptoErase : 1;// bit [    0] Controller supports Crypto Erase Sanitize
-        uint32_t    BlockErase : 1; // bit [    1] Controller supports Block Erase Sanitize
-        uint32_t    Overwrite : 1;  // bit [    2] Controller supports Overwrite Santize
-        uint32_t    Reserved : 29;  // bit [31: 3]
-    } SANICAP;                      // byte [ 331: 328] O - Sanitize Capabilities (SANICAP)
+        uint32_t    CryptoErase : 1;            // bit [    0] Controller supports Crypto Erase Sanitize
+        uint32_t    BlockErase : 1;             // bit [    1] Controller supports Block Erase Sanitize
+        uint32_t    Overwrite : 1;              // bit [    2] Controller supports Overwrite Santize
+        uint32_t    Reserved : 26;              // bit [28: 3]
+        uint32_t    NoDeallocateInhibited : 1;  // bit [   29] No-Deallocate Inhibited (NDI)                            <rev1.4>
+        uint32_t    NODMMAS : 2;                // bit [31:30] No-Deallocate Modifies Media After Sanitize (NODMMAS)    <rev1.4>
+    } SANICAP;                      // byte [ 331: 328] O - Sanitize Capabilities (SANICAP)                             <rev1.3>
 
-    uint8_t Reserved3[180];         // byte [ 511: 332]
+    uint32_t    HMMINDS;            // byte [ 335: 332] O - Host Memory Buffer Minimum Descriptor Entry Size (HMMINDS)  <rev1.4>
+    uint16_t    HMMAXD;             // byte [ 337: 336] O - Host Memory Maximum Descriptors Entries (HMMAXD)            <rev1.4>
+    uint16_t    NSETIDMAX;          // byte [ 339: 338] O - NVM Set Identifier Maximum (NSETIDMAX)                      <rev1.4>
+    uint16_t    ENDGIDMAX;          // byte [ 341: 340] O - Endurance Group Identifier Maximum (ENDGIDMAX)              <rev1.4>
+    uint8_t     ANATT;              // byte [      342] O - ANA Transition Time (ANATT)                                 <rev1.4>
+
+    struct {
+        uint8_t     ReportOptimizedState : 1;       // bit [    0] able to report ANA Optimized state
+        uint8_t     ReportNonOptimizedState : 1;    // bit [    1] able to report ANA Non-Optimized state
+        uint8_t     ReportInaccessibleState : 1;    // bit [    2] able to report ANA Inaccessible state
+        uint8_t     ReportPersistentLossState : 1;  // bit [    3] able to report ANA Persistent Loss state
+        uint8_t     ReportChangeState : 1;          // bit [    4] able to report ANA Change state
+        uint8_t     Reserved0 : 1;                  // bit [    5]
+        uint8_t     NoGRPIDChangeDuringAttached : 1;// bit [    6]
+        uint8_t     NonZeroGRPIDSupport : 1;        // bit [    7]
+    } ANACAP;                       // byte [      343] O - Asymmetric Namespace Access Capabilities (ANACAP) <rev1.4>
+
+    uint32_t    ANAGRPMAX;          // byte [ 347: 344] O - ANA Group Identifier Maximum (ANAGRPMAX)    <rev1.4>
+    uint32_t    NANAGRPID;          // byte [ 351: 348] O - Number of ANA Group Identifiers (NANAGRPID) <rev1.4>
+    uint32_t    PELS;               // byte [ 355: 352] O - Persistent Event Log Size (PELS)            <rev1.4>
+
+    uint8_t     Reserved3[156];     // byte [ 511: 356]
 
     //
     // byte 512 : 703, NVM Command Set Attributes
@@ -157,8 +201,9 @@ typedef struct {
         uint16_t    WriteZeroes : 1;        // bit [    3]
         uint16_t    FeatureField : 1;       // bit [    4]
         uint16_t    Reservations : 1;       // bit [    5]
-        uint16_t    Timestamp : 1;          // bit [    6]
-        uint16_t    Reserved : 9;           // bit [15: 7]
+        uint16_t    Timestamp : 1;          // bit [    6] <rev1.3>
+        uint16_t    Verify : 1;             // bit [    7] <rev1.4>
+        uint16_t    Reserved : 8;           // bit [15: 8]
     } ONCS;                         // byte [ 521: 520] M - Optional NVM Command Support (ONCS)
 
     struct {
@@ -174,8 +219,9 @@ typedef struct {
     } FNA;                          // byte [      524] M - Format NVM Attributes (FNA)
 
     struct {
-        uint8_t     Present : 1;    // bit [    0]
-        uint8_t     Reserved : 7;   // bit [ 7: 0]
+        uint8_t     Present : 1;        // bit [    0]
+        uint8_t     FlushBehavior : 2;  // bit [ 2: 1] <rev1.4>
+        uint8_t     Reserved : 5;       // bit [ 7: 3]
     } VWC;                          // byte [      525] M - Volatile Write Cache (VWC)
 
     uint16_t    AWUN;               // byte [ 527: 526] M - Atomic Write Unit Normal (AWUN)
@@ -186,25 +232,33 @@ typedef struct {
         uint8_t Reserved : 7;               // bit [ 7: 0]
     } NVSCC;                        // byte [      530] M - NVM Vendor Specific Command Configuration (NVSCC)
 
-    uint8_t Reserved4;              // byte [      531]
+    struct {
+        uint8_t NoWriteProtectSupport : 1;              // bit [    0]
+        uint8_t WriteProtectUntilPowerCycleSupport : 1; // bit [    1]
+        uint8_t PermanentWriteProtectSupport : 1;       // bit [    2]
+        uint8_t Reserved : 5;                           // bit [ 7: 3]
+    } NWPC;                         // byte [      531] M - Namespace Write Protection Capabilities (NWPC) <rev1.4>
 
     uint16_t    ACWU;               // byte [ 533: 532] O - Atomic Compare & Write Unit (ACWU)
 
     uint8_t Reserved5[2];           // byte [ 535: 534]
 
     struct {
-        uint32_t    SGLSupported : 2;                       // bit [ 1: 0]
-        uint32_t    KeyedBBDescSupported : 1;               // bit [    2]
-        uint32_t    Reserved0 : 13;                         // bit [15: 3]
-        uint32_t    BitBucketDescrSupported : 1;            // bit [   16]
-        uint32_t    ByteAlignedContiguousPhysicalBuffer : 1;// bit [   17]
-        uint32_t    SGLLengthLargerThanDataLength : 1;      // bit [   18]
-        uint32_t    MPTRContainingSGLDescSupported : 1;     // bit [   19]
-        uint32_t    OffsetByAddrFieldSupported : 1;         // bit [   20]
-        uint32_t    Reserved1 : 11;                         // bit [31:21]
+        uint32_t    SGLSupported : 2;                           // bit [ 1: 0] <rev1.3>
+        uint32_t    KeyedBBDescSupported : 1;                   // bit [    2]
+        uint32_t    Reserved0 : 13;                             // bit [15: 3]
+        uint32_t    BitBucketDescrSupported : 1;                // bit [   16]
+        uint32_t    ByteAlignedContiguousPhysicalBuffer : 1;    // bit [   17]
+        uint32_t    SGLLengthLargerThanDataLength : 1;          // bit [   18]
+        uint32_t    MPTRContainingSGLDescSupported : 1;         // bit [   19]
+        uint32_t    OffsetByAddrFieldSupported : 1;             // bit [   20]
+        uint32_t    TransactionalSGLDataBlockDescSupported : 1; // bit [   21] <rev1.4>
+        uint32_t    Reserved1 : 10;                         // bit [31:22]
     } SGLS;                         // byte [ 539: 536] O - SGL Support (SGLS)
 
-    uint8_t Reserved6[228];         // byte [ 767: 540]
+    uint32_t    MNAN;               // byte [      540] O - Maximum Number of Allowed Namespaces (MNAN) <rev1.4>
+
+    uint8_t Reserved6[224];         // byte [ 767: 544]
 
     uint8_t SUBNQN[256];            // byte [1023: 768] M - NVM Subsystem NVMe Qualified Name (SUBNQN)
 
@@ -215,6 +269,6 @@ typedef struct {
                                     // byte [3071:2080] O - Power State Descriptors from PS1 (PSD1) to PS31 (PSD31) 
 
     uint8_t VS[1024];              // byte [4095:3072] Vendor Specific
-} NVME_IDENTIFY_CONTROLLER_DATA13, *PNVME_IDENTIFY_CONTROLLER_DATA13;
+} NVME_IDENTIFY_CONTROLLER_DATA14, *PNVME_IDENTIFY_CONTROLLER_DATA14;
 
-void vPrintNVMeIdentifyControllerData13(void);
+void vPrintNVMeIdentifyControllerData(void);

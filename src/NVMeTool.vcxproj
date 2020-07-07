@@ -173,9 +173,7 @@
     <ClInclude Include="NVMeIdentify.h" />
     <ClInclude Include="NVMeIdentifyActiveNSIDList.h" />
     <ClInclude Include="NVMeIdentifyController.h" />
-    <ClInclude Include="NVMeIdentifyController12.h" />
-    <ClInclude Include="NVMeIdentifyController13.h" />
-    <ClInclude Include="NVMeIdentifyController14.h" />
+    <ClInclude Include="NVMeIdentifyControllerData.h" />
     <ClInclude Include="NVMeIdentifyNamespace.h" />
     <ClInclude Include="NVMeSCSIPassThrough.h" />
     <ClInclude Include="NVMeGetFeatures.h" />
@@ -199,9 +197,7 @@
     <ClCompile Include="NVMeIdentify.cpp" />
     <ClCompile Include="NVMeIdentifyActiveNSIDList.cpp" />
     <ClCompile Include="NVMeIdentifyController.cpp" />
-    <ClCompile Include="NVMeIdentifyController12.cpp" />
-    <ClCompile Include="NVMeIdentifyController13.cpp" />
-    <ClCompile Include="NVMeIdentifyController14.cpp" />
+    <ClCompile Include="NVMeIdentifyControllerData.cpp" />
     <ClCompile Include="NVMeIdentifyNamespace.cpp" />
     <ClCompile Include="NVMeGetFeatures.cpp" />
     <ClCompile Include="NVMeSetFeatures.cpp" />
