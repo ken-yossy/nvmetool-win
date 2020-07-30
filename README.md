@@ -85,7 +85,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        00h | Namespace                                           | x    | NSID = 1 |
 |        01h | Controller                                          | x    | CNTID = 0 |
 |        02h | Active Namespace ID list                            | --   | error code 1117 ( The request could not be performed because of an I/O device error.) |
-|        03h | Namespace Identification Descriptor list            |      | |
+|        03h | Namespace Identification Descriptor list            | --   | error code 1117 ( The request could not be performed because of an I/O device error.) |
 | 04h -- 0Fh | _Reserved_                                          |      | |
 |        10h | Allocated Namespace ID list                         |      | Probably can issue only in WinPE mode [8]            |
 |        11h | Specified allocated namespace                       |      | Probably can issue only in WinPE mode [8]            |

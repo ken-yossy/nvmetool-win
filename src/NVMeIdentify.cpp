@@ -6,6 +6,7 @@
 #include "NVMeIdentifyControllerData.h"
 #include "NVMeIdentifyNamespace.h"
 #include "NVMeIdentifyActiveNSIDList.h"
+#include "NVMeIdentifyNSIDDescriptor.h"
 
 int iNVMeIdentify(HANDLE _hDevice)
 {
@@ -22,10 +23,12 @@ int iNVMeIdentify(HANDLE _hDevice)
         "\n#     %02Xh = Namespace data structure (NSID = 1)"
         "\n#     %02Xh = Controller data structure (CNTID = 0)"
         "\n#     %02Xh = Active Namespace ID list"
+        "\n#     %02Xh = Namespace Identification Descriptor (NSID = 1)"
         "\n",
         NVME_IDENTIFY_CNS_SPECIFIC_NAMESPACE,
         NVME_IDENTIFY_CNS_CONTROLLER,
-        NVME_IDENTIFY_CNS_ACTIVE_NAMESPACES);
+        NVME_IDENTIFY_CNS_ACTIVE_NAMESPACES,
+        NVME_IDENTIFY_CNS_DESCRIPTOR_NAMESPACE);
 
     int iCNS = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iCNS)
@@ -57,6 +60,15 @@ int iNVMeIdentify(HANDLE _hDevice)
             iResult = iNVMeIdentifyActiveNSIDList(_hDevice);
         }
         break;
+
+    case NVME_IDENTIFY_CNS_DESCRIPTOR_NAMESPACE:
+        cCmd = cGetConsoleInput("\n# Identify : Namespace Identification Descriptor (NSID = 1), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = iNVMeIdentifyNSIDDescriptor(_hDevice, (DWORD)1);
+        }
+        break;
+
 
     default:
         printf("\n[E] Command not implemented yet.\n");
