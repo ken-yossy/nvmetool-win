@@ -26,7 +26,7 @@ static void printNVMeIdentifyNSIDDescriptor(PNVME_IDENTIFY_NSID_DESCRIPTOR _pNSD
     }
     else
     {
-        printf("%02Xh (Reserved value)\n");
+        printf("%02Xh (Reserved value)\n", _pNSData->NIDT);
     }
 
     if (iExpectedNIDL == 0)
