@@ -805,6 +805,57 @@ static int NVMeGetFeaturesSoftwareProgressMarker(HANDLE _hDevice)
     return result;
 }
 
+static int NVMeGetFeaturesNOPPME(HANDLE _hDevice)
+{
+    int result = false;
+    uint32_t ulCurrentData = 0;
+    uint32_t ulDefaultData = 0;
+    uint32_t ulSavedData = 0;
+    uint32_t ulSupportedCapabilities = 0;
+
+    printf("\n[I] Non-Operational Power State Config:\n");
+
+    if (g_stController.CTRATT.NOPSPMode == 0)
+    {
+        printf("\n[W] This controller does not support Non-Operational Power State Permissive Mode, skip\n");
+        return result;
+    }
+
+    // 1. get current value
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NONOPERATIONAL_POWER_STATE, NVME_FEATURE_VALUE_CURRENT, 0, &ulCurrentData);
+    if (result) return result;
+
+    // 2. get default value
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NONOPERATIONAL_POWER_STATE, NVME_FEATURE_VALUE_DEFAULT, 0, &ulDefaultData);
+    if (result) return result;
+
+    // 3. get saved value
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NONOPERATIONAL_POWER_STATE, NVME_FEATURE_VALUE_SAVED, 0, &ulSavedData);
+    if (result) return result;
+
+    // 4. get supported capabilities
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NONOPERATIONAL_POWER_STATE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    if (result) return result;
+
+    printf("\tbit [      0] Non-Operational Power State Permissive Mode Enable (NOPPME)\n"
+        "\t\tCurrent = %d\n"
+        "\t\tDefault = %d\n"
+        "\t\tSaved   = %d\n",
+        ulCurrentData & 0x1,
+        ulDefaultData & 0x1,
+        ulSavedData & 0x1);
+
+    printf("\tCapabilities: this feature is\n"
+        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
+        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
+        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
+        (ulSupportedCapabilities >> 2) & 0x1,
+        (ulSupportedCapabilities >> 1) & 0x1,
+        (ulSupportedCapabilities) & 0x1);
+
+    return result;
+}
+
 int iNVMeGetFeatures(HANDLE _hDevice)
 {
     int iResult = -1;
@@ -829,6 +880,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         "\n#     %02Xh = Asynchronous Event Configuration"
         "\n#     %02Xh = Autonomous Power State Transition"
         "\n#     %02Xh = Host Controlled Thermal Management"
+        "\n#     %02Xh = Non-Operational Power State Config"
         "\n#     %02Xh = Software Progress Marker"
         "\n",
         NVME_FEATURE_ARBITRATION,
@@ -842,6 +894,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         NVME_FEATURE_ASYNC_EVENT_CONFIG,
         NVME_FEATURE_AUTONOMOUS_POWER_STATE_TRANSITION,
         NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT,
+        NVME_FEATURE_NONOPERATIONAL_POWER_STATE,
         NVME_FEATURE_NVM_SOFTWARE_PROGRESS_MARKER);
 
     iFId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
@@ -943,6 +996,14 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         }
         break;
 
+    case NVME_FEATURE_NONOPERATIONAL_POWER_STATE:
+        cCmd = cGetConsoleInput("\n# Get Feature : Non-Operational Power State Config (Feature Identifier = 11h), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = NVMeGetFeaturesNOPPME(_hDevice);
+        }
+        break;
+
     case NVME_FEATURE_NVM_SOFTWARE_PROGRESS_MARKER:
         cCmd = cGetConsoleInput("\n# Get Feature : Software Progress Marker (Feature Identifier = 80h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
@@ -953,7 +1014,6 @@ int iNVMeGetFeatures(HANDLE _hDevice)
 
     case NVME_FEATURE_HOST_MEMORY_BUFFER:
     case NVME_FEATURE_KEEP_ALIVE:
-    case NVME_FEATURE_NONOPERATIONAL_POWER_STATE:
     case NVME_FEATURE_NVM_HOST_IDENTIFIER:
     case NVME_FEATURE_NVM_RESERVATION_NOTIFICATION_MASK:
     case NVME_FEATURE_NVM_RESERVATION_PERSISTANCE:
