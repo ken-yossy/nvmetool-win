@@ -142,7 +142,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Bh | Asynchronous Event Configuration   | x /              |      |
 |        0Ch | Autonomous Power State Transition  | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        0Dh | Host Memory Buffer                 |  /               |      |
-|        0Eh | Timestamp                          |  /               |      |
+|        0Eh | Timestamp                          | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        0Fh | Keep Alive Timer                   |  /               |      |
 |        10h | Host Controlled Thermal Management | x /              |      |
 |        11h | Non-operational Power State Config | -- /             | error code = 1 (Incorrect function.) |

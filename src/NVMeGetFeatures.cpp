@@ -7,6 +7,7 @@
 #include "NVMeIdentifyController.h" // to use g_stController
 #include "NVMeGetFeatures.h"
 #include "NVMeFeaturesAPST.h"
+#include "NVMeFeaturesTimestamp.h"
 
 // NVMeGetFeature32() : used for Get Feature command with 32bit fixed return value
 int iNVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11, uint32_t* _pulData)
@@ -879,6 +880,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         "\n#     %02Xh = Write Atomicity Normal"
         "\n#     %02Xh = Asynchronous Event Configuration"
         "\n#     %02Xh = Autonomous Power State Transition"
+        "\n#     %02Xh = Timestamp"
         "\n#     %02Xh = Host Controlled Thermal Management"
         "\n#     %02Xh = Non-Operational Power State Config"
         "\n#     %02Xh = Software Progress Marker"
@@ -893,6 +895,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         NVME_FEATURE_WRITE_ATOMICITY,
         NVME_FEATURE_ASYNC_EVENT_CONFIG,
         NVME_FEATURE_AUTONOMOUS_POWER_STATE_TRANSITION,
+        NVME_FEATURE_TIMESTAMP,
         NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT,
         NVME_FEATURE_NONOPERATIONAL_POWER_STATE,
         NVME_FEATURE_NVM_SOFTWARE_PROGRESS_MARKER);
@@ -984,6 +987,21 @@ int iNVMeGetFeatures(HANDLE _hDevice)
             else
             {
                 iResult = iNVMeGetFeaturesAPST(_hDevice);
+            }
+        }
+        break;
+
+    case NVME_FEATURE_TIMESTAMP:
+        cCmd = cGetConsoleInput("\n# Get Feature : Timestamp (Feature Identifier = 0Eh), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            if (g_stController.ONCS.Timestamp == 0)
+            {
+                fprintf(stderr, "[W] This SSD controller does not support Timestamp, ignore\n");
+            }
+            else
+            {
+                iResult = iNVMeGetFeaturesTimestamp(_hDevice);
             }
         }
         break;

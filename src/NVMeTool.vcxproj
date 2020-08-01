@@ -166,6 +166,7 @@
     <ClInclude Include="NVMeErrorInformation.h" />
     <ClInclude Include="NVMeFeaturesAPST.h" />
     <ClInclude Include="NVMeFeaturesHCTM.h" />
+    <ClInclude Include="NVMeFeaturesTimestamp.h" />
     <ClInclude Include="NVMeFeaturesVWC.h" />
     <ClInclude Include="NVMeFormatNVM.h" />
     <ClInclude Include="NVMeFwSlotInformation.h" />
@@ -192,6 +193,7 @@
     <ClCompile Include="NVMeErrorInformation.cpp" />
     <ClCompile Include="NVMeFeaturesAPST.cpp" />
     <ClCompile Include="NVMeFeaturesHCTM.cpp" />
+    <ClCompile Include="NVMeFeaturesTimestamp.cpp" />
     <ClCompile Include="NVMeFeaturesVWC.cpp" />
     <ClCompile Include="NVMeFormatNVM.cpp" />
     <ClCompile Include="NVMeFwSlotInformation.cpp" />

@@ -90,6 +90,9 @@
     <ClInclude Include="NVMeGetTelemetry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NVMeFeaturesTimestamp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WinFunc.cpp">
@@ -165,6 +168,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NVMeGetTelemetry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeFeaturesTimestamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
