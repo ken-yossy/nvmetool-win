@@ -145,7 +145,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Eh | Timestamp                          |  /               |      |
 |        0Fh | Keep Alive Timer                   |  /               |      |
 |        10h | Host Controlled Thermal Management | x /              |      |
-|        11h | Non-operational Power State Config |  /               |      |
+|        11h | Non-operational Power State Config | -- /             | error code = 1 (Incorrect function.) |
 | 12h -- 77h | _Reserved_                         |  /               |      |
 | 78h -- 7Fh | _Refer to the NVMe-MI spec._       |  /               |      |
 |        80h | Software Progress Marker           | x /              |      |
