@@ -109,8 +109,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        03h | Firmware Slot Information      | x    | |
 |        05h | Command Supported and Effects  | x    | |
 |        06h | Device Self-test               | x    | Need to support Device Self-test command |
-|        07h | Telemetry Host-initiated       |      | |
-|        08h | Telemetry Controller-initiated |      | |
+|        07h | Telemetry Host-initiated       | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
+|        08h | Telemetry Controller-initiated | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
 | 09h -- 6Fh | _Reserved_                     |      | |
 |        70h | Discovery                      |      | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          |      | |

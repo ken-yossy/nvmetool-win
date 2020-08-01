@@ -170,6 +170,7 @@
     <ClInclude Include="NVMeFormatNVM.h" />
     <ClInclude Include="NVMeFwSlotInformation.h" />
     <ClInclude Include="NVMeGetLogPage.h" />
+    <ClInclude Include="NVMeGetTelemetry.h" />
     <ClInclude Include="NVMeIdentify.h" />
     <ClInclude Include="NVMeIdentifyActiveNSIDList.h" />
     <ClInclude Include="NVMeIdentifyController.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="NVMeFormatNVM.cpp" />
     <ClCompile Include="NVMeFwSlotInformation.cpp" />
     <ClCompile Include="NVMeGetLogPage.cpp" />
+    <ClCompile Include="NVMeGetTelemetry.cpp" />
     <ClCompile Include="NVMeIdentify.cpp" />
     <ClCompile Include="NVMeIdentifyActiveNSIDList.cpp" />
     <ClCompile Include="NVMeIdentifyController.cpp" />
