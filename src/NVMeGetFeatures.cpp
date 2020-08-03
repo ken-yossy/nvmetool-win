@@ -8,6 +8,7 @@
 #include "NVMeGetFeatures.h"
 #include "NVMeFeaturesAPST.h"
 #include "NVMeFeaturesTimestamp.h"
+#include "NVMeFeaturesLBARange.h"
 
 // NVMeGetFeature32() : used for Get Feature command with 32bit fixed return value
 int iNVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11, uint32_t* _pulData)
@@ -872,6 +873,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         "\n#    Supported Features are:"
         "\n#     %02Xh = Arbitration"
         "\n#     %02Xh = Power Management"
+        "\n#     %02Xh = LBA Range Type"
         "\n#     %02Xh = Temperature Threshold"
         "\n#     %02Xh = Error Recovery"
         "\n#     %02Xh = Volatile Write Cache"
@@ -887,6 +889,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         "\n",
         NVME_FEATURE_ARBITRATION,
         NVME_FEATURE_POWER_MANAGEMENT,
+        NVME_FEATURE_LBA_RANGE_TYPE,
         NVME_FEATURE_TEMPERATURE_THRESHOLD,
         NVME_FEATURE_ERROR_RECOVERY,
         NVME_FEATURE_VOLATILE_WRITE_CACHE,
@@ -916,6 +919,14 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             iResult = NVMeGetFeaturesPowerManagement(_hDevice);
+        }
+        break;
+
+    case NVME_FEATURE_LBA_RANGE_TYPE:
+        cCmd = cGetConsoleInput("\n# Get Feature : LBA Range Type (Feature Identifier = 03h) for NSID = 1, Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = iNVMeGetFeaturesLBARange(_hDevice);
         }
         break;
 

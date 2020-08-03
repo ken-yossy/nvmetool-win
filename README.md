@@ -131,7 +131,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 | ---------: | :----------------------------------|:-----------------|:-----|
 |        01h | Arbitration                        | x /              |      |
 |        02h | Power Management                   | x /              |      |
-|        03h | LBA Range Type                     |  /               |      |
+|        03h | LBA Range Type                     | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        04h | Temperature Threashold             | x /              |      |
 |        05h | Error Recovery                     | x /              |      |
 |        06h | Volatile Write Cache               | x / --           | error code = 1117 (The request could not be performed because of an I/O device error.) |
