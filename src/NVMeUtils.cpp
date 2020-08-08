@@ -143,6 +143,7 @@ int eGetCommandFromConsole(void)
         "#  - f: Flush\n"
         "#  - t: Device Self-test\n"
         "#  - z: Format NVM\n"
+        "#  - v: Security Receive (Get Level 0 Discovery data in TCG)\n"
         "#\n"
         "#  press 'q' to quit program\n",
         strCmd);
@@ -226,6 +227,15 @@ int eGetCommandFromConsole(void)
         if (cCmd == 'y')
         {
             iMajorCmd = NVME_COMMAND_FORMAT_NVM;
+        }
+        break;
+
+    case 'v':
+    case 'V':
+        cCmd = cGetConsoleInput("\n# Security Receive (Get Level 0 Discovery data in TCG), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iMajorCmd = NVME_COMMAND_SECURITY_RECV;
         }
         break;
 
