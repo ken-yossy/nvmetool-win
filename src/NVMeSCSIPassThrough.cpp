@@ -799,7 +799,7 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
 
         sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // CDB[0] = A2h (Opcode of "SECURITY PROTOCOL IN" command)
         sptwb.spt.Cdb[1] = 1;   // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
-        sptwb.spt.Cdb[2] = 1;   // CDB[2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
+        sptwb.spt.Cdb[3] = 1;   // CDB[2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
         sptwb.spt.Cdb[8] = 0x2; // CDB[6:9] = 0x200 : Allocation Length is 512 byte (TCG spec allows smaller size than the size of Level 0 Discovery data)
 
         length = sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX);
@@ -833,7 +833,7 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
 
         sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN;
         sptwb.spt.Cdb[1] = 1;
-        sptwb.spt.Cdb[2] = 1;
+        sptwb.spt.Cdb[3] = 1;
         sptwb.spt.Cdb[8] = 0x2;
 
         length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) + sptwb.spt.DataTransferLength;
