@@ -232,7 +232,7 @@ int eGetCommandFromConsole(void)
 
     case 'v':
     case 'V':
-        cCmd = cGetConsoleInput("\n# Security Receive (Get Level 0 Discovery data in TCG), Press 'y' to continue\n", strCmd);
+        cCmd = cGetConsoleInput("\n# Security Receive, Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             iMajorCmd = NVME_COMMAND_SECURITY_RECV;

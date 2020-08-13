@@ -1,4 +1,6 @@
 #include "WinFunc.h"
+#include "NVMeUtils.h"
+
 #include <iostream>
 #include <ntddscsi.h>
 #include <string.h>
@@ -758,7 +760,7 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
     return iResult;
 }
 
-int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
+static int s_iGetLevel0DiscoveryData(HANDLE _hDevice)
 {
     SCSI_PASS_THROUGH_WITH_BUFFERS sptwb;
     SCSI_PASS_THROUGH_WITH_BUFFERS_EX sptwb_ex;
@@ -783,7 +785,7 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
         sptwb_ex.spt.DataInTransferLength   = 512;
 
         sptwb_ex.spt.DataDirection      = SCSI_IOCTL_DATA_IN;
-        sptwb_ex.spt.TimeOutValue       = 2;
+        sptwb_ex.spt.TimeOutValue       = 5;
         sptwb_ex.spt.StorAddressOffset  = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, StorAddress);
         sptwb_ex.StorAddress.Type       = STOR_ADDRESS_TYPE_BTL8;
 
@@ -798,9 +800,10 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
         sptwb_ex.spt.DataInBufferOffset     = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucDataBuf);
 
         sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // CDB[0] = A2h (Opcode of "SECURITY PROTOCOL IN" command)
-        sptwb.spt.Cdb[1] = 1;   // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
-        sptwb.spt.Cdb[3] = 1;   // CDB[2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
-        sptwb.spt.Cdb[8] = 0x2; // CDB[6:9] = 0x200 : Allocation Length is 512 byte (TCG spec allows smaller size than the size of Level 0 Discovery data)
+        sptwb.spt.Cdb[1] = 1;       // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
+        sptwb.spt.Cdb[3] = 1;       // CDB[2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
+        sptwb.spt.Cdb[4] = 0x80;    // CDB[4] bit 7: INC_512
+        sptwb.spt.Cdb[9] = 1;       // CDB[6:9] = 0x1 : Allocation Length is 1x512 byte (TCG spec allows smaller size than the size of Level 0 Discovery data)
 
         length = sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX);
 
@@ -819,24 +822,28 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
     else
     {
         ZeroMemory(&sptwb, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS));
-        sptwb.spt.Length = sizeof(SCSI_PASS_THROUGH);
-        sptwb.spt.PathId = 0;
-        sptwb.spt.TargetId = 0;
-        sptwb.spt.Lun = 0;
-        sptwb.spt.CdbLength = 12;
-        sptwb.spt.SenseInfoLength = SPT_SENSE_LENGTH;
-        sptwb.spt.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
-        sptwb.spt.DataIn = SCSI_IOCTL_DATA_IN;
-        sptwb.spt.DataTransferLength = 512;
-        sptwb.spt.TimeOutValue = 5;
-        sptwb.spt.DataBufferOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
+        sptwb.spt.Length    = sizeof(SCSI_PASS_THROUGH);
+        sptwb.spt.PathId    = 0;
+        sptwb.spt.TargetId  = 0;
+        sptwb.spt.Lun       = 0;
 
-        sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN;
+        sptwb.spt.CdbLength         = 12;
+        sptwb.spt.SenseInfoLength   = SPT_SENSE_LENGTH;
+        sptwb.spt.SenseInfoOffset   = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
+        sptwb.spt.DataIn            = SCSI_IOCTL_DATA_IN;
+
+        sptwb.spt.DataTransferLength    = 512;
+        sptwb.spt.TimeOutValue          = 5;
+        sptwb.spt.DataBufferOffset      = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
+
+        sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // same as above
         sptwb.spt.Cdb[1] = 1;
         sptwb.spt.Cdb[3] = 1;
-        sptwb.spt.Cdb[8] = 0x2;
+        sptwb.spt.Cdb[4] = 0x80;
+        sptwb.spt.Cdb[9] = 1;
 
         length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) + sptwb.spt.DataTransferLength;
+
         iResult = iIssueDeviceIoControl(
             _hDevice,
             IOCTL_SCSI_PASS_THROUGH,
@@ -849,6 +856,38 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
 
         PrintStatusResults(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
     }
+    return iResult;
+}
+
+int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
+{
+    int iResult = -1;
+    char cCmd;
+    char strCmd[256];
+    char strPrompt[1024];
+
+    sprintf_s(strPrompt,
+        1024,
+        "\n# Select and input sub command for Security Receive command:"
+        "\n#     1 = Retrieve Level 0 Discovery data (TCG)"
+        "\n");
+
+    int iCmd = iGetConsoleInputHex((const char*)strPrompt, strCmd);
+    switch (iCmd)
+    {
+    case 1:
+        cCmd = cGetConsoleInput("\n# Security Receive : Retrieve Level 0 Discovery data (TCG), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = s_iGetLevel0DiscoveryData(_hDevice);
+        }
+        break;
+
+    default:
+        printf("\n[E] Command not implemented yet.\n");
+        break;
+    }
+
     return iResult;
 }
 
