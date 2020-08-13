@@ -140,6 +140,10 @@ int main(int _argc, char* _argv[])
             iResult = iNVMeFormatNVM(hDevice);
             break;
 
+        case NVME_COMMAND_SECURITY_RECV:
+            iResult = iSecurityReceiveViaSCSIPassThrough(hDevice);
+            break;
+
         case NVME_TOOL_COMMAND_QUIT:
             iResult = 0;
             bFinished = true;
