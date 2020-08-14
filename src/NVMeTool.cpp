@@ -148,7 +148,14 @@ int main(int _argc, char* _argv[])
             break;
 
         case NVME_COMMAND_SECURITY_RECV:
-            iResult = iSecurityReceiveViaSCSIPassThrough(hDevice);
+            if (g_stController.OACS.SecurityCommands)
+            {
+                iResult = iSecurityReceiveViaSCSIPassThrough(hDevice);
+            }
+            else
+            {
+                fprintf(stderr, "[E] This SSD does not support Security Send / Receive commands, ignore.\n\n");
+            }
             break;
 
         case NVME_TOOL_COMMAND_QUIT:
