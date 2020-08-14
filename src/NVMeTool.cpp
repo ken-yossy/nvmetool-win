@@ -101,7 +101,14 @@ int main(int _argc, char* _argv[])
         switch (iMajorCmd)
         {
         case NVME_COMMAND_DSM:
-            iResult = iNVMeDeallocate(hDevice);
+            if (g_stController.ONCS.DatasetManagement)
+            {
+                iResult = iNVMeDeallocate(hDevice);
+            }
+            else
+            {
+                fprintf(stderr, "[E] This SSD does not support Dataset Management command, ignore.\n\n");
+            }
             break;
 
         case NVME_COMMAND_FLUSH:
