@@ -52,15 +52,19 @@ typedef struct
         uint8_t   Reserved : 7;         // bit [ 7: 1]
     } NMIC;                             // byte [       30] O - Namespace Multi-path I/O and Namespace Sharing Capabilities (NMIC)
 
-    struct {
-        uint8_t   PersistThroughPowerLoss : 1;                  // bit [    0]
-        uint8_t   WriteExclusiveReservation : 1;                // bit [    1]
-        uint8_t   ExclusiveAccessReservation : 1;               // bit [    2]
-        uint8_t   WriteExclusiveRegistrantsOnlyReservation : 1; // bit [    3]
-        uint8_t   ExclusiveAccessRegistrantsOnlyReservation : 1;// bit [    4]
-        uint8_t   WriteExclusiveAllRegistrantsReservation : 1;  // bit [    5]
-        uint8_t   ExclusiveAccessAllRegistrantsReservation : 1; // bit [    6]
-        uint8_t   IgnoreExistingKey : 1;                        // bit [    7]
+    union {
+        struct {
+            uint8_t   PersistThroughPowerLoss : 1;                  // bit [    0]
+            uint8_t   WriteExclusiveReservation : 1;                // bit [    1]
+            uint8_t   ExclusiveAccessReservation : 1;               // bit [    2]
+            uint8_t   WriteExclusiveRegistrantsOnlyReservation : 1; // bit [    3]
+            uint8_t   ExclusiveAccessRegistrantsOnlyReservation : 1;// bit [    4]
+            uint8_t   WriteExclusiveAllRegistrantsReservation : 1;  // bit [    5]
+            uint8_t   ExclusiveAccessAllRegistrantsReservation : 1; // bit [    6]
+            uint8_t   IgnoreExistingKey : 1;                        // bit [    7]
+        } DUMMYSTRUCTNAME;
+
+        UCHAR AsUchar;
     } RESCAP;                           // byte [       31] O - Reservation Capabilities (RESCAP)
 
     struct {

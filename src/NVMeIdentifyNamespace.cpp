@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "NVMeIdentifyNamespace.h"
+#include "NVMeIdentifyController.h"
 
 static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSData, DWORD _dwNSID)
 {
@@ -157,69 +158,83 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
 
     printf("[O] Reservation Capabilities (RESCAP):\n");
-    if (_pNSData->RESCAP.IgnoreExistingKey)
+    if (g_stController.ONCS.Reservations == 0)
     {
-        printf("\tbit [      7] 1 = Ignore Existing Key is used as defined in revision 1.3 or later of this specification.\n");
+        if (_pNSData->RESCAP.AsUchar == 0)
+        {
+            printf("\tbit [  7:  0] 00h = Does not support Reservations\n");
+        }
+        else
+        {
+            printf("\tbit [  7:  0] %02Xh = (Conflict with Identify Controller data)\n", _pNSData->RESCAP.AsUchar);
+        }
     }
     else
     {
-        printf("\tbit [      7] 0 = Ignore Existing Key is used as defined in revision 1.2.1 or earlier of this specification.\n");
-    }
-    if (_pNSData->RESCAP.ExclusiveAccessAllRegistrantsReservation)
-    {
-        printf("\tbit [      6] 1 = Supports the Exclusive Access - All Registrants reservation type.\n");
-    }
-    else
-    {
-        printf("\tbit [      6] 0 = Does not support the Exclusive Access - All Registrants reservation type.\n");
-    }
-    if (_pNSData->RESCAP.WriteExclusiveAllRegistrantsReservation)
-    {
-        printf("\tbit [      5] 1 = Supports the Write Exclusive - All Registrants reservation type.\n");
-    }
-    else
-    {
-        printf("\tbit [      5] 0 = Does not support the Write Exclusive - All Registrants reservation type.\n");
-    }
-    if (_pNSData->RESCAP.ExclusiveAccessRegistrantsOnlyReservation)
-    {
-        printf("\tbit [      4] 1 = Supports the Exclusive Access - Registrants Only reservation type.\n");
-    }
-    else
-    {
-        printf("\tbit [      4] 0 = Does not support the Exclusive Access - Registrants Only reservation type.\n");
-    }
-    if (_pNSData->RESCAP.WriteExclusiveRegistrantsOnlyReservation)
-    {
-        printf("\tbit [      3] 1 = Supports the Write Exclusive - Registrants Only reservation type.\n");
-    }
-    else
-    {
-        printf("\tbit [      3] 0 = Does not support the Write Exclusive - Registrants Only reservation type.\n");
-    }
-    if (_pNSData->RESCAP.ExclusiveAccessReservation)
-    {
-        printf("\tbit [      2] 1 = Supports the Exclusive Access reservation type.\n");
-    }
-    else
-    {
-        printf("\tbit [      2] 0 = Does not support the Exclusive Access reservation type.\n");
-    }
-    if (_pNSData->RESCAP.WriteExclusiveReservation)
-    {
-        printf("\tbit [      1] 1 = Supports the Write Exclusive reservation type.\n");
-    }
-    else
-    {
-        printf("\tbit [      1] 0 = Does not support the Write Exclusive reservation type.\n");
-    }
-    if (_pNSData->RESCAP.PersistThroughPowerLoss)
-    {
-        printf("\tbit [      0] 1 = Supports the Persist Through Power Loss capability.\n");
-    }
-    else
-    {
-        printf("\tbit [      0] 0 = Does not support the Persist Through Power Loss capability.\n");
+        if (_pNSData->RESCAP.IgnoreExistingKey)
+        {
+            printf("\tbit [      7] 1 = Ignore Existing Key is used as defined in revision 1.3 or later of this specification.\n");
+        }
+        else
+        {
+            printf("\tbit [      7] 0 = Ignore Existing Key is used as defined in revision 1.2.1 or earlier of this specification.\n");
+        }
+        if (_pNSData->RESCAP.ExclusiveAccessAllRegistrantsReservation)
+        {
+            printf("\tbit [      6] 1 = Supports the Exclusive Access - All Registrants reservation type.\n");
+        }
+        else
+        {
+            printf("\tbit [      6] 0 = Does not support the Exclusive Access - All Registrants reservation type.\n");
+        }
+        if (_pNSData->RESCAP.WriteExclusiveAllRegistrantsReservation)
+        {
+            printf("\tbit [      5] 1 = Supports the Write Exclusive - All Registrants reservation type.\n");
+        }
+        else
+        {
+            printf("\tbit [      5] 0 = Does not support the Write Exclusive - All Registrants reservation type.\n");
+        }
+        if (_pNSData->RESCAP.ExclusiveAccessRegistrantsOnlyReservation)
+        {
+            printf("\tbit [      4] 1 = Supports the Exclusive Access - Registrants Only reservation type.\n");
+        }
+        else
+        {
+            printf("\tbit [      4] 0 = Does not support the Exclusive Access - Registrants Only reservation type.\n");
+        }
+        if (_pNSData->RESCAP.WriteExclusiveRegistrantsOnlyReservation)
+        {
+            printf("\tbit [      3] 1 = Supports the Write Exclusive - Registrants Only reservation type.\n");
+        }
+        else
+        {
+            printf("\tbit [      3] 0 = Does not support the Write Exclusive - Registrants Only reservation type.\n");
+        }
+        if (_pNSData->RESCAP.ExclusiveAccessReservation)
+        {
+            printf("\tbit [      2] 1 = Supports the Exclusive Access reservation type.\n");
+        }
+        else
+        {
+            printf("\tbit [      2] 0 = Does not support the Exclusive Access reservation type.\n");
+        }
+        if (_pNSData->RESCAP.WriteExclusiveReservation)
+        {
+            printf("\tbit [      1] 1 = Supports the Write Exclusive reservation type.\n");
+        }
+        else
+        {
+            printf("\tbit [      1] 0 = Does not support the Write Exclusive reservation type.\n");
+        }
+        if (_pNSData->RESCAP.PersistThroughPowerLoss)
+        {
+            printf("\tbit [      0] 1 = Supports the Persist Through Power Loss capability.\n");
+        }
+        else
+        {
+            printf("\tbit [      0] 0 = Does not support the Persist Through Power Loss capability.\n");
+        }
     }
 
     printf("[O] Format Progress Indicator (FPI):\n");
