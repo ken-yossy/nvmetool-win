@@ -22,11 +22,11 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
 
     if (_pNSData->NSFEAT.DeallocatedOrUnwrittenError)
     {
-        printf("\tbit [      2] 1 = The controller supports the Deallocated or Unwritten Logical Block error for this namespace.\n");
+        printf("\tbit [      2] 1 = Supports the Deallocated or Unwritten Logical Block error for this namespace.\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = The controller does not support the Deallocated or Unwritten Logical Block error for this namespace.\n");
+        printf("\tbit [      2] 0 = Does not support the Deallocated or Unwritten Logical Block error for this namespace.\n");
     }
 
     if (_pNSData->NSFEAT.NameSpaceAtomicWriteUnit)
@@ -40,11 +40,11 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
 
     if (_pNSData->NSFEAT.ThinProvisioning)
     {
-        printf("\tbit [      0] 1 = The namespace supports thin provisioning.\n");
+        printf("\tbit [      0] 1 = Supports thin provisioning.\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The namespace does not support thin provisioning.\n");
+        printf("\tbit [      0] 0 = Does not support thin provisioning.\n");
     }
 
     printf("[M] Number of LBA Formats (NLBAF): %d (means %d)\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
@@ -63,61 +63,61 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[M] Metadata Capabilities (MC):\n");
     if (_pNSData->MC.MetadataInSeparateBuffer)
     {
-        printf("\tbit [      1] 1 = The namespace supports the metadata being transferred as part of a separate buffer that is specified in the Metadata Pointer.\n");
+        printf("\tbit [      1] 1 = Supports the metadata being transferred as part of a separate buffer that is specified in the Metadata Pointer.\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = The namespace does not support the metadata being transferred as part of a separate buffer.\n");
+        printf("\tbit [      1] 0 = Does not support the metadata being transferred as part of a separate buffer.\n");
     }
     if (_pNSData->MC.MetadataInExtendedDataLBA)
     {
-        printf("\tbit [      0] 1 = The namespace supports the metadata being transferred as part of an extended data LBA.\n");
+        printf("\tbit [      0] 1 = Supports the metadata being transferred as part of an extended data LBA.\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The namespace does not support the metadata being transferred as part of an extended data LBA.\n");
+        printf("\tbit [      0] 0 = Does not support the metadata being transferred as part of an extended data LBA.\n");
     }
 
     printf("[M] End-to-end Data Protection Capabilities (DPC):\n");
     if (_pNSData->DPC.InfoAtEndOfMetadata)
     {
-        printf("\tbit [      4] 1 = The namespace supports protection information transferred as the last eight bytes of metadata.\n");
+        printf("\tbit [      4] 1 = Supports protection information transferred as the last eight bytes of metadata.\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = The namespace does not support protection information transferred as the last eight bytes of metadata.\n");
+        printf("\tbit [      4] 0 = Does not support protection information transferred as the last eight bytes of metadata.\n");
     }
     if (_pNSData->DPC.InfoAtBeginningOfMetadata)
     {
-        printf("\tbit [      3] 1 = The namespace supports protection information transferred as the first eight bytes of metadata.\n");
+        printf("\tbit [      3] 1 = Supports protection information transferred as the first eight bytes of metadata.\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = The namespace does not support protection information transferred as the first eight bytes of metadata.\n");
+        printf("\tbit [      3] 0 = Does not support protection information transferred as the first eight bytes of metadata.\n");
     }
     if (_pNSData->DPC.ProtectionInfoType3)
     {
-        printf("\tbit [      2] 1 = The namespace supports Protection Information Type 3.\n");
+        printf("\tbit [      2] 1 = Supports Protection Information Type 3.\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = The namespace does not support Protection Information Type 3.\n");
+        printf("\tbit [      2] 0 = Does not support Protection Information Type 3.\n");
     }
     if (_pNSData->DPC.ProtectionInfoType2)
     {
-        printf("\tbit [      1] 1 = The namespace supports Protection Information Type 2.\n");
+        printf("\tbit [      1] 1 = Supports Protection Information Type 2.\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = The namespace does not support Protection Information Type 2.\n");
+        printf("\tbit [      1] 0 = Does not support Protection Information Type 2.\n");
     }
     if (_pNSData->DPC.ProtectionInfoType1)
     {
-        printf("\tbit [      0] 1 = The namespace supports Protection Information Type 1.\n");
+        printf("\tbit [      0] 1 = Supports Protection Information Type 1.\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The namespace does not support Protection Information Type 1.\n");
+        printf("\tbit [      0] 0 = Does not support Protection Information Type 1.\n");
     }
 
     printf("[M] End-to-end Data Protection Settings (DPS):\n");
@@ -149,11 +149,11 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[O] Namespace Multi-path I/O and Namespace Sharing Capabilities (NMIC):\n");
     if (_pNSData->NMIC.SharedNameSpace)
     {
-        printf("\tbit [      0] 1 = The namespace may be attached to two or more controllers in the NVM subsystem concurrently (i.e., may be a shared namespace).\n");
+        printf("\tbit [      0] 1 = May be attached to two or more controllers in the NVM subsystem concurrently (i.e., may be a shared namespace).\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The namespace is a private namespace and is able to be attached to only one controller at a time.\n");
+        printf("\tbit [      0] 0 = Is a private namespace and is able to be attached to only one controller at a time.\n");
     }
 
     printf("[O] Reservation Capabilities (RESCAP):\n");
@@ -167,70 +167,70 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     if (_pNSData->RESCAP.ExclusiveAccessAllRegistrantsReservation)
     {
-        printf("\tbit [      6] 1 = The namespace supports the Exclusive Access - All Registrants reservation type.\n");
+        printf("\tbit [      6] 1 = Supports the Exclusive Access - All Registrants reservation type.\n");
     }
     else
     {
-        printf("\tbit [      6] 0 = The namespace does not support the Exclusive Access - All Registrants reservation type.\n");
+        printf("\tbit [      6] 0 = Does not support the Exclusive Access - All Registrants reservation type.\n");
     }
     if (_pNSData->RESCAP.WriteExclusiveAllRegistrantsReservation)
     {
-        printf("\tbit [      5] 1 = The namespace supports the Write Exclusive - All Registrants reservation type.\n");
+        printf("\tbit [      5] 1 = Supports the Write Exclusive - All Registrants reservation type.\n");
     }
     else
     {
-        printf("\tbit [      5] 0 = The namespace does not support the Write Exclusive - All Registrants reservation type.\n");
+        printf("\tbit [      5] 0 = Does not support the Write Exclusive - All Registrants reservation type.\n");
     }
     if (_pNSData->RESCAP.ExclusiveAccessRegistrantsOnlyReservation)
     {
-        printf("\tbit [      4] 1 = The namespace supports the Exclusive Access - Registrants Only reservation type.\n");
+        printf("\tbit [      4] 1 = Supports the Exclusive Access - Registrants Only reservation type.\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = The namespace does not support the Exclusive Access - Registrants Only reservation type.\n");
+        printf("\tbit [      4] 0 = Does not support the Exclusive Access - Registrants Only reservation type.\n");
     }
     if (_pNSData->RESCAP.WriteExclusiveRegistrantsOnlyReservation)
     {
-        printf("\tbit [      3] 1 = The namespace supports the Write Exclusive - Registrants Only reservation type.\n");
+        printf("\tbit [      3] 1 = Supports the Write Exclusive - Registrants Only reservation type.\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = The namespace does not support the Write Exclusive - Registrants Only reservation type.\n");
+        printf("\tbit [      3] 0 = Does not support the Write Exclusive - Registrants Only reservation type.\n");
     }
     if (_pNSData->RESCAP.ExclusiveAccessReservation)
     {
-        printf("\tbit [      2] 1 = The namespace supports the Exclusive Access reservation type.\n");
+        printf("\tbit [      2] 1 = Supports the Exclusive Access reservation type.\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = The namespace does not support the Exclusive Access reservation type.\n");
+        printf("\tbit [      2] 0 = Does not support the Exclusive Access reservation type.\n");
     }
     if (_pNSData->RESCAP.WriteExclusiveReservation)
     {
-        printf("\tbit [      1] 1 = The namespace supports the Write Exclusive reservation type.\n");
+        printf("\tbit [      1] 1 = Supports the Write Exclusive reservation type.\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = The namespace does not support the Write Exclusive reservation type.\n");
+        printf("\tbit [      1] 0 = Does not support the Write Exclusive reservation type.\n");
     }
     if (_pNSData->RESCAP.PersistThroughPowerLoss)
     {
-        printf("\tbit [      0] 1 = The namespace supports the Persist Through Power Loss capability.\n");
+        printf("\tbit [      0] 1 = Supports the Persist Through Power Loss capability.\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The namespace does not support the Persist Through Power Loss capability.\n");
+        printf("\tbit [      0] 0 = Does not support the Persist Through Power Loss capability.\n");
     }
 
     printf("[O] Format Progress Indicator (FPI):\n");
     if (_pNSData->FPI.Supported)
     {
-        printf("\tbit [      7] 1 = The namespace supports the Format Progress Indicator defined by bits 6:0 in this field.\n");
+        printf("\tbit [      7] 1 = Supports the Format Progress Indicator defined by bits 6:0 in this field.\n");
         printf("\tbit [  6:  0] %d = the percentage of the Format NVM command that remains to be completed (%%).\n", _pNSData->FPI.PercentageRemained);
     }
     else
     {
-        printf("\tbit [      7] 0 = The namespace does not support the Format Progress Indicator.\n");
+        printf("\tbit [      7] 0 = Does not support the Format Progress Indicator.\n");
     }
 
     printf("[O] Deallocate Logical Block Features (DLFEAT):\n");
@@ -244,11 +244,11 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     if (_pNSData->DLFEAT.DeallocateInWriteZero)
     {
-        printf("\tbit [      3] 1 = The controller supports the Deallocate bit in the Write Zeroes command for this namespace.\n");
+        printf("\tbit [      3] 1 = Supports the Deallocate bit in the Write Zeroes command for this namespace.\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = The controller does not support the Deallocate bit in the Write Zeroes command for this namespace.\n");
+        printf("\tbit [      3] 0 = Does not support the Deallocate bit in the Write Zeroes command for this namespace.\n");
     }
     switch (_pNSData->DLFEAT.ReadBehavior)
     {

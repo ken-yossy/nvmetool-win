@@ -13,39 +13,39 @@ static void s_vPrintNVMeIdentifyControllerDataCMIC(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.4 or over
         if (_pstController->CMIC.ANAReport)
         {
-            printf("\tbit [      3] 1 = This controller supports Asymmetric Namespace Access Reporting\n");
+            printf("\tbit [      3] 1 = Supports Asymmetric Namespace Access Reporting\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = This controller does not support Asymmetric Namespace Access Reporting\n");
+            printf("\tbit [      3] 0 = Does not support Asymmetric Namespace Access Reporting\n");
         }
     }
 
     if (_pstController->CMIC.SRIOV)
     {
-        printf("\tbit [      2] 1 = This controller is associated with an SR-IOV Virtual Function\n");
+        printf("\tbit [      2] 1 = Associated with an SR-IOV Virtual Function\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = This controller is associated with a PCI Function or a Fabrics connection\n");
+        printf("\tbit [      2] 0 = Associated with a PCI Function or a Fabrics connection\n");
     }
 
     if (_pstController->CMIC.MultiControllers)
     {
-        printf("\tbit [      1] 1 = This NVM subsystem may contain two or more controllers\n");
+        printf("\tbit [      1] 1 = May contain two or more controllers\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = This NVM subsystem contains only a single controller\n");
+        printf("\tbit [      1] 0 = Contains only a single controller\n");
     }
 
     if (_pstController->CMIC.MultiPCIePorts)
     {
-        printf("\tbit [      0] 1 = This NVM subsystem may contain more than one NVM subsystem port\n");
+        printf("\tbit [      0] 1 = May contain more than one NVM subsystem port\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This NVM subsystem contains only a single NVM subsystem port\n");
+        printf("\tbit [      0] 0 = Contains only a single NVM subsystem port\n");
     }
 }
 
@@ -57,57 +57,57 @@ static void s_vPrintNVMeIdentifyControllerDataOAES(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.4 or over
         if (_pstController->OAES.EnduranceGroupEventAggregateLogChange)
         {
-            printf("\tbit [     14] 1 = This controller supports the Endurance Group Event Aggregate Log Page Change Notices event\n");
+            printf("\tbit [     14] 1 = Supports the Endurance Group Event Aggregate Log Page Change Notices event\n");
         }
         else
         {
-            printf("\tbit [     14] 0 = This controller does not support the Endurance Group Event Aggregate Log Page Change Notices event\n");
+            printf("\tbit [     14] 0 = Does not support the Endurance Group Event Aggregate Log Page Change Notices event\n");
         }
 
         if (_pstController->OAES.LBAStatusInfo)
         {
-            printf("\tbit [     13] 1 = This controller supports LBA Status Information Notices event\n");
+            printf("\tbit [     13] 1 = Supports LBA Status Information Notices event\n");
         }
         else
         {
-            printf("\tbit [     13] 0 = This controller does not support LBA Status Information Notices event\n");
+            printf("\tbit [     13] 0 = Does not support LBA Status Information Notices event\n");
         }
 
         if (_pstController->OAES.PredictableLatencyEventAggregateLogChange)
         {
-            printf("\tbit [     12] 1 = This controller supports Predictable Latency Event Aggregate Log Change Notices event\n");
+            printf("\tbit [     12] 1 = Supports Predictable Latency Event Aggregate Log Change Notices event\n");
         }
         else
         {
-            printf("\tbit [     12] 0 = This controller does not support Predictable Latency Event Aggregate Log Change Notices event\n");
+            printf("\tbit [     12] 0 = Does not support Predictable Latency Event Aggregate Log Change Notices event\n");
         }
 
         if (_pstController->OAES.ANAChange)
         {
-            printf("\tbit [     11] 1 = This controller supports Asymmetric Namespace Access Change Notices event\n");
+            printf("\tbit [     11] 1 = Supports Asymmetric Namespace Access Change Notices event\n");
         }
         else
         {
-            printf("\tbit [     11] 0 = This controller does not support Asymmetric Namespace Access Change Notices event\n");
+            printf("\tbit [     11] 0 = Does not support Asymmetric Namespace Access Change Notices event\n");
         }
     }
 
     if (_pstController->OAES.FirmwareActivation)
     {
-        printf("\tbit [      9] 1 = This controller supports sending Firmware Activation Notices\n");
+        printf("\tbit [      9] 1 = Supports sending Firmware Activation Notices\n");
     }
     else
     {
-        printf("\tbit [      9] 0 = This controller does not support the Firmware Activation Notices event\n");
+        printf("\tbit [      9] 0 = Does not support the Firmware Activation Notices event\n");
     }
 
     if (_pstController->OAES.NamespaceAttributeChanged)
     {
-        printf("\tbit [      8] 1 = This controller supports sending Namespace Attribute Notices and the associated Changed Namespace List log page\n");
+        printf("\tbit [      8] 1 = Supports sending Namespace Attribute Notices and the associated Changed Namespace List log page\n");
     }
     else
     {
-        printf("\tbit [      8] 0 = This controller does not support the Namespace Attribute Notices event nor the associated Changed Namespace List log page\n");
+        printf("\tbit [      8] 0 = Does not support the Namespace Attribute Notices event nor the associated Changed Namespace List log page\n");
     }
 }
 
@@ -119,74 +119,74 @@ static void s_vPrintNVMeIdentifyControllerDataCTRATT(PNVME_IDENTIFY_CONTROLLER_D
     { // revision 1.4 or over
         if (_pstController->CTRATT.UUIDList)
         {
-            printf("\tbit [      9] 1 = This controller supports reporting of a UUID List\n");
+            printf("\tbit [      9] 1 = Supports reporting of a UUID List\n");
         }
         else
         {
-            printf("\tbit [      9] 0 = This controller does not support reporting of a UUID List\n");
+            printf("\tbit [      9] 0 = Does not support reporting of a UUID List\n");
         }
 
         if (_pstController->CTRATT.SQAssociation)
         {
-            printf("\tbit [      8] 1 = This controller supports SQ Associations\n");
+            printf("\tbit [      8] 1 = Supports SQ Associations\n");
         }
         else
         {
-            printf("\tbit [      8] 0 = This controller does not support SQ Associations\n");
+            printf("\tbit [      8] 0 = Does not support SQ Associations\n");
         }
 
         if (_pstController->CTRATT.NamespaceGranularity)
         {
-            printf("\tbit [      7] 1 = This controller supports reporting of Namespace Granularity\n");
+            printf("\tbit [      7] 1 = Supports reporting of Namespace Granularity\n");
         }
         else
         {
-            printf("\tbit [      7] 0 = This controller does not support reporting of Namespace Granularity\n");
+            printf("\tbit [      7] 0 = Does not support reporting of Namespace Granularity\n");
         }
 
         if (_pstController->CTRATT.TrafficBasedKeepAlive)
         {
-            printf("\tbit [      6] 1 = This controller supports restarting the Keep Alive Timer if an Admin command or an I/O command is processed during the Keep Alive Timeout Interval\n");
+            printf("\tbit [      6] 1 = Restart the Keep Alive Timer if an Admin command or an I/O command is processed during the Keep Alive Timeout Interval\n");
         }
         else
         {
-            printf("\tbit [      6] 0 = This controller supports restarting the Keep Alive Timer only if a Keep Alive command is processed during the Keep Alive Timeout Interval\n");
+            printf("\tbit [      6] 0 = Restart the Keep Alive Timer only if a Keep Alive command is processed during the Keep Alive Timeout Interval\n");
         }
 
         if (_pstController->CTRATT.PredictableLatencyMode)
         {
-            printf("\tbit [      5] 1 = This controller supports Predictable Latency Mode\n");
+            printf("\tbit [      5] 1 = Supports Predictable Latency Mode\n");
         }
         else
         {
-            printf("\tbit [      5] 0 = This controller does not support Predictable Latency Mode\n");
+            printf("\tbit [      5] 0 = Does not support Predictable Latency Mode\n");
         }
 
         if (_pstController->CTRATT.EnduranceGroups)
         {
-            printf("\tbit [      4] 1 = This controller supports Endurance Groups\n");
+            printf("\tbit [      4] 1 = Supports Endurance Groups\n");
         }
         else
         {
-            printf("\tbit [      4] 0 = This controller does not support Endurance Groups\n");
+            printf("\tbit [      4] 0 = Does not support Endurance Groups\n");
         }
 
         if (_pstController->CTRATT.ReadRecoveryLevel)
         {
-            printf("\tbit [      3] 1 = This controller supports Read Recovery Levels\n");
+            printf("\tbit [      3] 1 = Supports Read Recovery Levels\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = This controller does not support Read Recovery Levels\n");
+            printf("\tbit [      3] 0 = Does not support Read Recovery Levels\n");
         }
 
         if (_pstController->CTRATT.NVMSet)
         {
-            printf("\tbit [      2] 1 = This controller supports NVM Sets\n");
+            printf("\tbit [      2] 1 = Supports NVM Sets\n");
         }
         else
         {
-            printf("\tbit [      2] 0 = This controller does not support NVM Sets\n");
+            printf("\tbit [      2] 0 = Does not support NVM Sets\n");
         }
     }
 
@@ -194,21 +194,21 @@ static void s_vPrintNVMeIdentifyControllerDataCTRATT(PNVME_IDENTIFY_CONTROLLER_D
     { // revision 1.3 or over
         if (_pstController->CTRATT.NoopPSPermissiveModeEn)
         {
-            printf("\tbit [      1] 1 = This controller supports host control of whether the controller may temporarily exceed the power of a non-operational power state for the purpose of executing controller initiated background operations in a non-operational power state\n");
+            printf("\tbit [      1] 1 = Supports host control of whether the controller may temporarily exceed the power of a non-operational power state for the purpose of executing controller initiated background operations in a non-operational power state\n");
         }
         else
         {
-            printf("\tbit [      1] 0 = This controller does not support host control of whether the controller may exceed the power of a non-operational state for the purpose of executing controller initiated background operations in a non-operational state\n");
+            printf("\tbit [      1] 0 = Does not support host control of whether the controller may exceed the power of a non-operational state for the purpose of executing controller initiated background operations in a non-operational state\n");
         }
     }
 
     if (_pstController->CTRATT.HostIdEn)
     {
-        printf("\tbit [      0] 1 = This controller supports a 128-bit Host Identifier\n");
+        printf("\tbit [      0] 1 = Supports a 128-bit Host Identifier\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This controller does not support a 128-bit Host Identifier\n");
+        printf("\tbit [      0] 0 = Does not support a 128-bit Host Identifier\n");
     }
 }
 
@@ -273,11 +273,11 @@ static void s_vPrintNVMeIdentifyControllerDataOACS(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.4 or over
         if (_pstController->OACS.GetLBAStatusCommand)
         {
-            printf("\tbit [      9] 1 = This controller supports the Get LBA Status command\n");
+            printf("\tbit [      9] 1 = Supports the Get LBA Status command\n");
         }
         else
         {
-            printf("\tbit [      9] 0 = This controller does not support the Get LBA Status command\n");
+            printf("\tbit [      9] 0 = Does not support the Get LBA Status command\n");
         }
     }
 
@@ -285,84 +285,84 @@ static void s_vPrintNVMeIdentifyControllerDataOACS(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.3 or over
         if (_pstController->OACS.DBConfigCommand)
         {
-            printf("\tbit [      8] 1 = This controller supports the Doorbell Buffer Config command\n");
+            printf("\tbit [      8] 1 = Supports the Doorbell Buffer Config command\n");
         }
         else
         {
-            printf("\tbit [      8] 0 = This controller does not support the Doorbell Buffer Config command\n");
+            printf("\tbit [      8] 0 = Does not support the Doorbell Buffer Config command\n");
         }
 
         if (_pstController->OACS.VirtMgmtCommands)
         {
-            printf("\tbit [      7] 1 = This controller supports the Virtualization Management command\n");
+            printf("\tbit [      7] 1 = Supports the Virtualization Management command\n");
         }
         else
         {
-            printf("\tbit [      7] 0 = This controller does not support the Virtualization Management command\n");
+            printf("\tbit [      7] 0 = Does not support the Virtualization Management command\n");
         }
 
         if (_pstController->OACS.NVMeMICommands)
         {
-            printf("\tbit [      6] 1 = This controller supports the NVMe-MI Send and NVMe-MI Receive commands\n");
+            printf("\tbit [      6] 1 = Supports the NVMe-MI Send and NVMe-MI Receive commands\n");
         }
         else
         {
-            printf("\tbit [      6] 0 = This controller does not support the NVMe-MI Send and NVMe-MI Receive commands\n");
+            printf("\tbit [      6] 0 = Does not support the NVMe-MI Send and NVMe-MI Receive commands\n");
         }
 
         if (_pstController->OACS.Directives)
         {
-            printf("\tbit [      5] 1 = This controller supports Directives\n");
+            printf("\tbit [      5] 1 = Supports Directives\n");
         }
         else
         {
-            printf("\tbit [      5] 0 = This controller does not support Directives\n");
+            printf("\tbit [      5] 0 = Does not support Directives\n");
         }
 
         if (_pstController->OACS.DeviceSelfTest)
         {
-            printf("\tbit [      4] 1 = This controller supports the Device Self-test command\n");
+            printf("\tbit [      4] 1 = Supports the Device Self-test command\n");
         }
         else
         {
-            printf("\tbit [      4] 0 = This controller does not support the Device Self-test command\n");
+            printf("\tbit [      4] 0 = Does not support the Device Self-test command\n");
         }
     }
 
     if (_pstController->OACS.NamespaceCommands)
     {
-        printf("\tbit [      3] 1 = This controller supports the Namespace Management and Namespace Attachment commands\n");
+        printf("\tbit [      3] 1 = Supports the Namespace Management and Namespace Attachment commands\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = This controller does not support the Namespace Management and Namespace Attachment commands\n");
+        printf("\tbit [      3] 0 = Does not support the Namespace Management and Namespace Attachment commands\n");
     }
 
     if (_pstController->OACS.FirmwareCommands)
     {
-        printf("\tbit [      2] 1 = This controller supports the Firmware Commit and Firmware Image Download commands\n");
+        printf("\tbit [      2] 1 = Supports the Firmware Commit and Firmware Image Download commands\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = This controller does not support the Firmware Commit and Firmware Image Download commands\n");
+        printf("\tbit [      2] 0 = Does not support the Firmware Commit and Firmware Image Download commands\n");
     }
 
     if (_pstController->OACS.FormatNVM)
     {
-        printf("\tbit [      1] 1 = This controller supports the Format NVM command\n");
+        printf("\tbit [      1] 1 = Supports the Format NVM command\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = This controller does not support the Format NVM command\n");
+        printf("\tbit [      1] 0 = Does not support the Format NVM command\n");
     }
 
     if (_pstController->OACS.SecurityCommands)
     {
-        printf("\tbit [      0] 1 = This controller supports the Security Send and Security Receive commands\n");
+        printf("\tbit [      0] 1 = Supports the Security Send and Security Receive commands\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This controller does not support the Security Send and Security Receive commands\n");
+        printf("\tbit [      0] 0 = Does not support the Security Send and Security Receive commands\n");
     }
 }
 
@@ -372,11 +372,11 @@ static void s_vPrintNVMeIdentifyControllerDataFRMW(PNVME_IDENTIFY_CONTROLLER_DAT
 
     if (_pstController->FRMW.ActivationWithoutReset)
     {
-        printf("\tbit [      4] 1 = This controller supports firmware activation without a reset\n");
+        printf("\tbit [      4] 1 = Supports firmware activation without a reset\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = This controller does not support firmware activation without a reset\n");
+        printf("\tbit [      4] 0 = Does not support firmware activation without a reset\n");
     }
 
     printf("\tbit [  3:  1] %d = The number of firmware slots that the controller supports\n", _pstController->FRMW.SlotCount);
@@ -399,11 +399,11 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PNVME_IDENTIFY_CONTROLLER_DATA
     { // revision 1.4 or over
         if (_pstController->LPA.PersistentEventLog)
         {
-            printf("\tbit [      4] 1 = This controller supports the Persistent Event Log\n");
+            printf("\tbit [      4] 1 = Supports the Persistent Event Log\n");
         }
         else
         {
-            printf("\tbit [      4] 0 = This controller does not support the Persistent Event Log\n");
+            printf("\tbit [      4] 0 = Does not support the Persistent Event Log\n");
         }
     }
 
@@ -411,39 +411,39 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PNVME_IDENTIFY_CONTROLLER_DATA
     { // revision 1.3 or over
         if (_pstController->LPA.TelemetrySupport)
         {
-            printf("\tbit [      3] 1 = This controller supports the Telemetry Host-Initiated and Telemetry Controller-Initiated log pages and sending Telemetry Log Notices\n");
+            printf("\tbit [      3] 1 = Supports the Telemetry Host-Initiated and Telemetry Controller-Initiated log pages and sending Telemetry Log Notices\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = This controller does not support the Telemetry Host-Initiated and Telemetry Controller-Initiated log pages and sending Telemetry Log Notices\n");
+            printf("\tbit [      3] 0 = Does not support the Telemetry Host-Initiated and Telemetry Controller-Initiated log pages and sending Telemetry Log Notices\n");
         }
     }
 
     if (_pstController->LPA.LogPageExtendedData)
     {
-        printf("\tbit [      2] 1 = This controller supports extended data for Get Log Page (including extended Number of Dwords and Log Page Offset fields)\n");
+        printf("\tbit [      2] 1 = Supports extended data for Get Log Page (including extended Number of Dwords and Log Page Offset fields)\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = This controller does not support extended data for Get Log Page\n");
+        printf("\tbit [      2] 0 = Does not support extended data for Get Log Page\n");
     }
 
     if (_pstController->LPA.CommandEffectsLog)
     {
-        printf("\tbit [      1] 1 = This controller supports the Commands Supported and Effects log page\n");
+        printf("\tbit [      1] 1 = Supports the Commands Supported and Effects log page\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = This controller does not support the Commands Supported and Effects log page\n");
+        printf("\tbit [      1] 0 = Does not support the Commands Supported and Effects log page\n");
     }
 
     if (_pstController->LPA.SmartPagePerNamespace)
     {
-        printf("\tbit [      0] 1 = This controller supports the SMART / Health information log page on a per namespace basis\n");
+        printf("\tbit [      0] 1 = Supports the SMART / Health information log page on a per namespace basis\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This controller does not support the SMART / Health information log page on a per namespace basis\n");
+        printf("\tbit [      0] 0 = Does not support the SMART / Health information log page on a per namespace basis\n");
     }
 }
 
@@ -465,11 +465,11 @@ static void s_vPrintNVMeIdentifyControllerDataAPSTA(PNVME_IDENTIFY_CONTROLLER_DA
     printf("[O] Autonomous Power State Transition Attributes (APSTA):\n");
     if (_pstController->APSTA.Supported)
     {
-        printf("\tbit [      0] 1 = This controller supports autonomous power state transitions\n");
+        printf("\tbit [      0] 1 = Supports autonomous power state transitions\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This controller does not support autonomous power state transitions\n");
+        printf("\tbit [      0] 0 = Does not support autonomous power state transitions\n");
     }
 }
 
@@ -550,7 +550,7 @@ static void s_vPrintNVMeIdentifyControllerDataRPMB(PNVME_IDENTIFY_CONTROLLER_DAT
 
     if (_pstController->RPMBS.RPMBUnitCount == 0)
     {
-        printf("\tbit [  2:  0] 0 = This controller does not support RPMB\n");
+        printf("\tbit [  2:  0] 0 = Does not support RPMB\n");
     }
     else
     {
@@ -578,11 +578,11 @@ static void s_vPrintNVMeIdentifyControllerDataDSTO(PNVME_IDENTIFY_CONTROLLER_DAT
     {
         if (_pstController->DSTO == 1)
         {
-            printf("\n\tbit [      0] 1 = The NVM subsystem supports only one device self-test operation in progress at a time\n");
+            printf("\n\tbit [      0] 1 = Supports only one device self-test operation in progress at a time\n");
         }
         else if (_pstController->DSTO == 0)
         {
-            printf("\n\tbit [      0] 0 = The NVM subsystem supports one device self-test operation per controller at a time\n");
+            printf("\n\tbit [      0] 0 = Supports one device self-test operation per controller at a time\n");
         }
     }
     else
@@ -626,21 +626,21 @@ static void s_vPrintNVMeIdentifyControllerDataHCTMA(PNVME_IDENTIFY_CONTROLLER_DA
     printf("[O] Host Controlled Thermal Management Attributes (HCTMA):\n");
     if (_pstController->HCTMA.Supported)
     {
-        printf("\tbit [      0] 1 = The controller supports host controlled thermal management\n");
+        printf("\tbit [      0] 1 = Supports host controlled thermal management\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The controller does not support host controlled thermal management\n");
+        printf("\tbit [      0] 0 = Does not support host controlled thermal management\n");
     }
 
     printf("[O] Minimum Thermal Management Temperature (MNTMT): ");
     if (_pstController->HCTMA.Supported == 0)
     {
-        printf("N/A = The controller does not support host controlled thermal management\n");
+        printf("N/A = Does not support host controlled thermal management\n");
     }
     else if (_pstController->MNTMT == 0)
     {
-        printf("0 = The controller does not report this field\n");
+        printf("0 = Does not report this field\n");
     }
     else
     {
@@ -650,11 +650,11 @@ static void s_vPrintNVMeIdentifyControllerDataHCTMA(PNVME_IDENTIFY_CONTROLLER_DA
     printf("[O] Maximum Thermal Management Temperature (MXTMT): ");
     if (_pstController->HCTMA.Supported == 0)
     {
-        printf("N/A = The controller does not support host controlled thermal management\n");
+        printf("N/A = Does not support host controlled thermal management\n");
     }
     else if (_pstController->MNTMT == 0)
     {
-        printf("0 = The controller does not report this field\n");
+        printf("0 = Does not report this field\n");
     }
     else
     {
@@ -699,27 +699,27 @@ static void s_vPrintNVMeIdentifyControllerDataSANICAP(PNVME_IDENTIFY_CONTROLLER_
         }
         if (_pstController->SANICAP.Overwrite)
         {
-            printf("\tbit [      2] 1 = The controller supports the Overwrite sanitize operation\n");
+            printf("\tbit [      2] 1 = Supports the Overwrite sanitize operation\n");
         }
         else
         {
-            printf("\tbit [      2] 0 = The controller does not support the Overwrite sanitize operation\n");
+            printf("\tbit [      2] 0 = Does not support the Overwrite sanitize operation\n");
         }
         if (_pstController->SANICAP.BlockErase)
         {
-            printf("\tbit [      1] 1 = The controller supports the Block Erase sanitize operation\n");
+            printf("\tbit [      1] 1 = Supports the Block Erase sanitize operation\n");
         }
         else
         {
-            printf("\tbit [      1] 0 = The controller does not support the Block Erase sanitize operation\n");
+            printf("\tbit [      1] 0 = Does not support the Block Erase sanitize operation\n");
         }
         if (_pstController->SANICAP.CryptoErase)
         {
-            printf("\tbit [      0] 1 = The controller supports the Crypto Erase sanitize operation\n");
+            printf("\tbit [      0] 1 = Supports the Crypto Erase sanitize operation\n");
         }
         else
         {
-            printf("\tbit [      0] 0 = The controller does not support the Crypto Erase sanitize operation\n");
+            printf("\tbit [      0] 0 = Does not support the Crypto Erase sanitize operation\n");
         }
     }
     else
@@ -785,11 +785,11 @@ static void s_vPrintNVMeIdentifyControllerDataANACAP(PNVME_IDENTIFY_CONTROLLER_D
     printf("[O] Asymmetric Namespace Access Capabilities (ANACAP):\n");
     if (_pstController->ANACAP.NonZeroGRPIDSupport)
     {
-        printf("\tbit [      7] 1 = This controller supports a non-zero value in the ANAGRPID field of the Namespace Management command\n");
+        printf("\tbit [      7] 1 = Supports a non-zero value in the ANAGRPID field of the Namespace Management command\n");
     }
     else
     {
-        printf("\tbit [      7] 0 = This controller does not support a non-zero value in the ANAGRPID field of the Namespace Management command\n");
+        printf("\tbit [      7] 0 = Does not support a non-zero value in the ANAGRPID field of the Namespace Management command\n");
     }
 
     if (_pstController->ANACAP.NoGRPIDChangeDuringAttached)
@@ -803,47 +803,47 @@ static void s_vPrintNVMeIdentifyControllerDataANACAP(PNVME_IDENTIFY_CONTROLLER_D
 
     if (_pstController->ANACAP.ReportChangeState)
     {
-        printf("\tbit [      4] 1 = This controller reports ANA Change state\n");
+        printf("\tbit [      4] 1 = Reports ANA Change state\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = This controller does not report ANA Change state\n");
+        printf("\tbit [      4] 0 = Does not report ANA Change state\n");
     }
 
     if (_pstController->ANACAP.ReportPersistentLossState)
     {
-        printf("\tbit [      3] 1 = This controller reports ANA Persistent Loss state\n");
+        printf("\tbit [      3] 1 = Reports ANA Persistent Loss state\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = This controller does not report ANA Persistent Loss state\n");
+        printf("\tbit [      3] 0 = Does not report ANA Persistent Loss state\n");
     }
 
     if (_pstController->ANACAP.ReportInaccessibleState)
     {
-        printf("\tbit [      2] 1 = This controller reports ANA Inaccessible state\n");
+        printf("\tbit [      2] 1 = Reports ANA Inaccessible state\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = This controller does not report ANA Inaccessible state\n");
+        printf("\tbit [      2] 0 = Does not report ANA Inaccessible state\n");
     }
 
     if (_pstController->ANACAP.ReportNonOptimizedState)
     {
-        printf("\tbit [      1] 1 = This controller reports ANA Non-Optimized state\n");
+        printf("\tbit [      1] 1 = Reports ANA Non-Optimized state\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = This controller does not report ANA Non-Optimized state\n");
+        printf("\tbit [      1] 0 = Does not report ANA Non-Optimized state\n");
     }
 
     if (_pstController->ANACAP.ReportOptimizedState)
     {
-        printf("\tbit [      0] 1 = This controller reports ANA Optimized state\n");
+        printf("\tbit [      0] 1 = Reports ANA Optimized state\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This controller does not report ANA Optimized state\n");
+        printf("\tbit [      0] 0 = Does not report ANA Optimized state\n");
     }
 }
 
@@ -930,11 +930,11 @@ static void s_vPrintNVMeIdentifyControllerDataONCS(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.4 or over
         if (_pstController->ONCS.Verify)
         {
-            printf("\tbit [      7] 1 = The controller supports the Verify command\n");
+            printf("\tbit [      7] 1 = Supports the Verify command\n");
         }
         else
         {
-            printf("\tbit [      7] 0 = The controller does not support the Verify command\n");
+            printf("\tbit [      7] 0 = Does not support the Verify command\n");
         }
     }
 
@@ -942,66 +942,66 @@ static void s_vPrintNVMeIdentifyControllerDataONCS(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.3 or over
         if (_pstController->ONCS.Timestamp)
         {
-            printf("\tbit [      6] 1 = The controller supports the Timestamp feature\n");
+            printf("\tbit [      6] 1 = Supports the Timestamp feature\n");
         }
         else
         {
-            printf("\tbit [      6] 0 = The controller does not support the Timestamp feature\n");
+            printf("\tbit [      6] 0 = Does not support the Timestamp feature\n");
         }
     }
 
     if (_pstController->ONCS.Reservations)
     {
-        printf("\tbit [      5] 1 = The controller supports reservations\n");
+        printf("\tbit [      5] 1 = Supports Reservations\n");
     }
     else
     {
-        printf("\tbit [      5] 0 = The controller does not support reservations\n");
+        printf("\tbit [      5] 0 = Does not support Reservations\n");
     }
 
     if (_pstController->ONCS.FeatureField)
     {
-        printf("\tbit [      4] 1 = The controller supports the Save field set to a non-zero value in the Set Features command and the Select field set to a non-zero value in the Get Features command\n");
+        printf("\tbit [      4] 1 = Supports the Save field set to a non-zero value in the Set Features command and the Select field set to a non-zero value in the Get Features command\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = The controller does not support the Save field set to a non-zero value in the Set Features command and the Select field set to a non-zero value in the Get Features command\n");
+        printf("\tbit [      4] 0 = Does not support the Save field set to a non-zero value in the Set Features command and the Select field set to a non-zero value in the Get Features command\n");
     }
 
     if (_pstController->ONCS.WriteZeroes)
     {
-        printf("\tbit [      3] 1 = The controller supports the Write Zeroes command\n");
+        printf("\tbit [      3] 1 = Supports the Write Zeroes command\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = The controller does not support the Write Zeroes command\n");
+        printf("\tbit [      3] 0 = Does not support the Write Zeroes command\n");
     }
 
     if (_pstController->ONCS.DatasetManagement)
     {
-        printf("\tbit [      2] 1 = The controller supports the Dataset Management command\n");
+        printf("\tbit [      2] 1 = Supports the Dataset Management command\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = The controller does not support the Dataset Management command\n");
+        printf("\tbit [      2] 0 = Does not support the Dataset Management command\n");
     }
 
     if (_pstController->ONCS.WriteUncorrectable)
     {
-        printf("\tbit [      1] 1 = The controller supports the Write Uncorrectable command\n");
+        printf("\tbit [      1] 1 = Supports the Write Uncorrectable command\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = The controller does not support the Write Uncorrectable command\n");
+        printf("\tbit [      1] 0 = Does not support the Write Uncorrectable command\n");
     }
 
     if (_pstController->ONCS.Compare)
     {
-        printf("\tbit [      0] 1 = The controller supports the Compare command\n");
+        printf("\tbit [      0] 1 = Supports the Compare command\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The controller does not support the Compare command\n");
+        printf("\tbit [      0] 0 = Does not support the Compare command\n");
     }
 }
 
@@ -1010,11 +1010,11 @@ static void s_vPrintNVMeIdentifyControllerDataFUSES(PNVME_IDENTIFY_CONTROLLER_DA
     printf("[M] Fused Operation Support (FUSES):\n");
     if (_pstController->FUSES.CompareAndWrite)
     {
-        printf("\tbit [      0] 1 = The controller supports the Compare and Write fused operation\n");
+        printf("\tbit [      0] 1 = Supports the Compare and Write fused operation\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = The controller does not support the Compare and Write fused operation\n");
+        printf("\tbit [      0] 0 = Does not support the Compare and Write fused operation\n");
     }
 }
 
@@ -1023,11 +1023,11 @@ static void s_vPrintNVMeIdentifyControllerDataFNA(PNVME_IDENTIFY_CONTROLLER_DATA
     printf("[M] Format NVM Attributes (FNA):\n");
     if (_pstController->FNA.CryptographicEraseSupported)
     {
-        printf("\tbit [      2] 1 = The controller supports cryptographic erase operation\n");
+        printf("\tbit [      2] 1 = Supports cryptographic erase operation\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = The controller does not support cryptographic erase operation\n");
+        printf("\tbit [      2] 0 = Does not support cryptographic erase operation\n");
     }
 
     if (_pstController->FNA.SecureEraseApplyToAll)
@@ -1119,29 +1119,29 @@ static void s_vPrintNVMeIdentifyControllerDataNWPC(PNVME_IDENTIFY_CONTROLLER_DAT
     printf("[M] Namespace Write Protection Capabilities (NWPC):\n");
     if (_pstController->NWPC.PermanentWriteProtectSupport)
     {
-        printf("\tbit [      2] 1 = This controller supports the Permanent Write Protect state\n");
+        printf("\tbit [      2] 1 = Supports the Permanent Write Protect state\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = This controller does not support the Permanent Write Protect state\n");
+        printf("\tbit [      2] 0 = Does not support the Permanent Write Protect state\n");
     }
 
     if (_pstController->NWPC.WriteProtectUntilPowerCycleSupport)
     {
-        printf("\tbit [      1] 1 = This controller supports the Write Protect Until Power Cycle state\n");
+        printf("\tbit [      1] 1 = Supports the Write Protect Until Power Cycle state\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = This controller does not support the Write Protect Until Power Cycle state\n");
+        printf("\tbit [      1] 0 = Does not support the Write Protect Until Power Cycle state\n");
     }
 
     if (_pstController->NWPC.NoWriteProtectSupport)
     {
-        printf("\tbit [      0] 1 = This controller supports No Write Protect and Write Protect namespace write protection states\n");
+        printf("\tbit [      0] 1 = Supports No Write Protect and Write Protect namespace write protection states\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = This controller does not support the Namespace Write Protection\n");
+        printf("\tbit [      0] 0 = Does not support the Namespace Write Protection\n");
     }
 }
 
@@ -1179,57 +1179,57 @@ static void s_vPrintNVMeIdentifyControllerDataSGLS(PNVME_IDENTIFY_CONTROLLER_DAT
     { // revision 1.4 or over
         if (_pstController->SGLS.TransactionalSGLDataBlockDescSupported)
         {
-            printf("\tbit [     21] 1 = The controller supports Transport SGL Data Block descriptor\n");
+            printf("\tbit [     21] 1 = Supports Transport SGL Data Block descriptor\n");
         }
         else
         {
-            printf("\tbit [     21] 0 = The controller does not support Transport SGL Data Block descriptor\n");
+            printf("\tbit [     21] 0 = Does not support Transport SGL Data Block descriptor\n");
         }
     }
 
     if (_pstController->SGLS.OffsetByAddrFieldSupported)
     {
-        printf("\tbit [     20] 1 = The controller supports the Address field in SGL Data Block, SGL Segment, and SGL Last Segment descriptor types specifying an offset\n");
+        printf("\tbit [     20] 1 = Supports the Address field in SGL Data Block, SGL Segment, and SGL Last Segment descriptor types specifying an offset\n");
     }
     else
     {
-        printf("\tbit [     20] 0 = The controller does not support the Address field specifying an offset\n");
+        printf("\tbit [     20] 0 = Does not support the Address field specifying an offset\n");
     }
 
     if (_pstController->SGLS.MPTRContainingSGLDescSupported)
     {
-        printf("\tbit [     19] 1 = The controller supports the use of a Metadata Pointer (MPTR) that contains an address of an SGL segment containing exactly one SGL Descriptor that is Qword aligned\n");
+        printf("\tbit [     19] 1 = Supports the use of a Metadata Pointer (MPTR) that contains an address of an SGL segment containing exactly one SGL Descriptor that is Qword aligned\n");
     }
     else
     {
-        printf("\tbit [     19] 0 = The controller does not support the use of a Metadata Pointer (MPTR) that contains an address of an SGL segment containing exactly one SGL Descriptor that is Qword aligned\n");
+        printf("\tbit [     19] 0 = Does not support the use of a Metadata Pointer (MPTR) that contains an address of an SGL segment containing exactly one SGL Descriptor that is Qword aligned\n");
     }
 
     if (_pstController->SGLS.SGLLengthLargerThanDataLength)
     {
-        printf("\tbit [     18] 1 = The controller supports commands that contain a data or metadata SGL of a length larger than the amount of data to be transferred\n");
+        printf("\tbit [     18] 1 = Supports commands that contain a data or metadata SGL of a length larger than the amount of data to be transferred\n");
     }
     else
     {
-        printf("\tbit [     18] 0 = The controller requires the SGL length is equal to the amount of data to be transferred\n");
+        printf("\tbit [     18] 0 = Requires the SGL length is equal to the amount of data to be transferred\n");
     }
 
     if (_pstController->SGLS.ByteAlignedContiguousPhysicalBuffer)
     {
-        printf("\tbit [     17] 1 = The controller supports the use of a byte aligned contiguous physical buffer of metadata\n");
+        printf("\tbit [     17] 1 = Supports the use of a byte aligned contiguous physical buffer of metadata\n");
     }
     else
     {
-        printf("\tbit [     17] 0 = The controller does not supports the use of a byte aligned contiguous physical buffer of metadata\n");
+        printf("\tbit [     17] 0 = Does not support the use of a byte aligned contiguous physical buffer of metadata\n");
     }
 
     if (_pstController->SGLS.BitBucketDescrSupported)
     {
-        printf("\tbit [     16] 1 = The controller supports the SGL Bit Bucket descriptor\n");
+        printf("\tbit [     16] 1 = Supports the SGL Bit Bucket descriptor\n");
     }
     else
     {
-        printf("\tbit [     16] 0 = The controller does not supports the SGL Bit Bucket descriptor\n");
+        printf("\tbit [     16] 0 = Does not support the SGL Bit Bucket descriptor\n");
     }
 
     switch (_pstController->SGLS.SGLSupported)
@@ -1395,14 +1395,13 @@ static void s_vPrintNVMeIdentifyControllerDataPSD(PNVME_POWER_STATE_DESC pDesc, 
         printf("%d (msec)\n", pDesc->ENLAT);
     }
 
-    printf("\tbit [     25] %d (Non-Operational State (NOPS)) = ", pDesc->NOPS);
     if (pDesc->NOPS == 0)
     {
-        printf("This power state is operational.\n");
+        printf("\tbit [     25] 0 = Operational state\n");
     }
     else
     {
-        printf("This power state is non-operational.\n");
+        printf("\tbit [     25] 1 = Non-operational state\n");
     }
 
     if (ulVersion < 0x10300)
