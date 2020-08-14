@@ -83,11 +83,18 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         break;
 
     case NVME_LOG_PAGE_DEVICE_SELF_TEST:
-        cCmd = cGetConsoleInput("\n# Get Log Page - Device Self-test (Log Identifier 06h), Press 'y' to continue\n", strCmd);
-        if (cCmd == 'y')
+        if (g_stController.OACS.DeviceSelfTest)
         {
-            bool bInProgress;
-            iResult = iNVMeGetDeviceSelftestLog(_hDevice, true, &bInProgress);
+            cCmd = cGetConsoleInput("\n# Get Log Page - Device Self-test (Log Identifier 06h), Press 'y' to continue\n", strCmd);
+            if (cCmd == 'y')
+            {
+                bool bInProgress;
+                iResult = iNVMeGetDeviceSelftestLog(_hDevice, true, &bInProgress);
+            }
+        }
+        else
+        {
+            printf("\n[E] This controller does not support Drive Self-test command, ignore\n");
         }
         break;
 
