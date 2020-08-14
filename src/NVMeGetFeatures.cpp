@@ -87,13 +87,44 @@ error_exit:
     return iResult;
 }
 
+void vNVMeGetFeaturesShowCapabilities(NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY _ulCaps)
+{
+    printf("\tCapabilities: this feature is\n");
+    if (_ulCaps.MOD)
+    {
+        printf("\t\tbit [      2] 1 = changable\n");
+    }
+    else
+    {
+        printf("\t\tbit [      2] 0 = not changable\n");
+    }
+
+    if (_ulCaps.NSS)
+    {
+        printf("\t\tbit [      1] 1 = namespace specific\n");
+    }
+    else
+    {
+        printf("\t\tbit [      1] 0 = for entire controller\n");
+    }
+
+    if (_ulCaps.SAVE)
+    {
+        printf("\t\tbit [      0] 1 = savable\n");
+    }
+    else
+    {
+        printf("\t\tbit [      0] 0 = not savable\n");
+    }
+}
+
 static int NVMeGetFeaturesArbitration(HANDLE _hDevice)
 {
     int result = false;
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Arbitration:\n");
 
@@ -110,7 +141,7 @@ static int NVMeGetFeaturesArbitration(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ARBITRATION, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ARBITRATION, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
     printf("\tbit [ 31: 24] High Priority Weight (HPW)\n"
@@ -142,14 +173,8 @@ static int NVMeGetFeaturesArbitration(HANDLE _hDevice)
         ulDefaultData & 0x7, 1 << (ulDefaultData & 0x7),
         ulSavedData & 0x7, 1 << (ulSavedData & 0x7));
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
-
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
+        
     return result;
 }
 
@@ -159,7 +184,7 @@ static int NVMeGetFeaturesPowerManagement(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Power Management:\n");
 
@@ -176,16 +201,58 @@ static int NVMeGetFeaturesPowerManagement(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_POWER_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [  7:  5] Workload Hint (WH), (0) no workload, (1) workload #1, (2) workload #2\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 5) & 0x7,
-        (ulDefaultData >> 5) & 0x7,
-        (ulSavedData >> 5) & 0x7);
+    printf("\tbit [  7:  5] Workload Hint (WH):\n");
+    switch ((ulCurrentData >> 5) & 0x7)
+    {
+    case 0:
+        printf("\t\tCurrent = 0 (no workload)\n");
+        break;
+
+    case 1:
+    case 2:
+        printf("\t\tCurrent = %d (workload #%d)\n", (ulCurrentData >> 5) & 0x7, (ulCurrentData >> 5) & 0x7);
+        break;
+
+    default:
+        printf("\t\tCurrent = %d (unknown)\n", (ulCurrentData >> 5) & 0x7);
+        break;
+    }
+
+    switch ((ulDefaultData >> 5) & 0x7)
+    {
+    case 0:
+        printf("\t\tDefault = 0 (no workload)\n");
+        break;
+
+    case 1:
+    case 2:
+        printf("\t\tDefault = %d (workload #%d)\n", (ulDefaultData >> 5) & 0x7, (ulDefaultData >> 5) & 0x7);
+        break;
+
+    default:
+        printf("\t\tDefault = %d (unknown)\n", (ulDefaultData >> 5) & 0x7);
+        break;
+    }
+
+    switch ((ulSavedData >> 5) & 0x7)
+    {
+    case 0:
+        printf("\t\tSaved   = 0 (no workload)\n");
+        break;
+
+    case 1:
+    case 2:
+        printf("\t\tSaved   = %d (workload #%d)\n", (ulSavedData >> 5) & 0x7, (ulSavedData >> 5) & 0x7);
+        break;
+
+    default:
+        printf("\t\tSaved   = %d (unknown)\n", (ulSavedData >> 5) & 0x7);
+        break;
+    }
+
     printf("\tbit [  4:  0] Power State (PS)\n"
         "\t\tCurrent = PS%d\n"
         "\t\tDefault = PS%d\n"
@@ -194,13 +261,7 @@ static int NVMeGetFeaturesPowerManagement(HANDLE _hDevice)
         (ulDefaultData) & 0x1F,
         (ulSavedData) & 0x1F);
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -211,7 +272,7 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
     NVME_CDW11_FEATURE_TEMPERATURE_THRESHOLD cdw11 = { 0 };
 
     printf("\n[I] Temperature Threshold:\n");
@@ -243,16 +304,10 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
         ulSavedData & 0xFFFF);
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     // 5. get current value (under)
     cdw11.THSEL = NVME_TEMPERATURE_UNDER_THRESHOLD;
@@ -278,16 +333,10 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
         ulSavedData & 0xFFFF);
 
     // 8. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     for (int i = 0; i < 8; i++)
     {
@@ -312,25 +361,19 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
             result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
             if (result) return result;
 
-            printf("\tbit [ 15:  0] Over Temperature Threshold (TMPTH)\n"
-                "\t\tCurrent = %d (default = 65535)\n"
-                "\t\tDefault = %d (default = 65535)\n"
-                "\t\tSaved   = %d (default = 65535)\n",
+            printf("\tbit [ 15:  0] Over Temperature Threshold (TMPTH): (65535 means default)\n"
+                "\t\tCurrent = %d\n"
+                "\t\tDefault = %d\n"
+                "\t\tSaved   = %d\n",
                 ulCurrentData & 0xFFFF,
                 ulDefaultData & 0xFFFF,
                 ulSavedData & 0xFFFF);
 
             // 4. get supported capabilities
-            result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
+            result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
             if (result) return result;
 
-            printf("\tCapabilities: this feature is\n"
-                "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-                "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-                "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-                (ulSupportedCapabilities >> 2) & 0x1,
-                (ulSupportedCapabilities >> 1) & 0x1,
-                (ulSupportedCapabilities) & 0x1);
+            vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
             // 5. get current value (under)
             cdw11.THSEL = NVME_TEMPERATURE_UNDER_THRESHOLD;
@@ -347,25 +390,19 @@ static int NVMeGetFeaturesTemperatureThreshold(HANDLE _hDevice)
             result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SAVED, (DWORD)cdw11.AsUlong, &ulSavedData);
             if (result) return result;
 
-            printf("\tbit [ 15:  0] Under Temperature Threshold (TMPTH)\n"
-                "\t\tCurrent = %d (default = 0)\n"
-                "\t\tDefault = %d (default = 0)\n"
-                "\t\tSaved   = %d (default = 0)\n",
+            printf("\tbit [ 15:  0] Under Temperature Threshold (TMPTH): (0 means default)\n"
+                "\t\tCurrent = %d\n"
+                "\t\tDefault = %d\n"
+                "\t\tSaved   = %d\n",
                 ulCurrentData & 0xFFFF,
                 ulDefaultData & 0xFFFF,
                 ulSavedData & 0xFFFF);
 
             // 8. get supported capabilities
-            result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, &ulSupportedCapabilities);
+            result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_TEMPERATURE_THRESHOLD, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, (DWORD)cdw11.AsUlong, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
             if (result) return result;
 
-            printf("\tCapabilities: this feature is\n"
-                "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-                "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-                "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-                (ulSupportedCapabilities >> 2) & 0x1,
-                (ulSupportedCapabilities >> 1) & 0x1,
-                (ulSupportedCapabilities) & 0x1);
+            vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
         }
     }
     return result;
@@ -377,7 +414,7 @@ static int NVMeGetFeaturesErrorRecovery(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities =  { 0 };
 
     printf("\n[I] Error Recovery:\n");
 
@@ -394,31 +431,66 @@ static int NVMeGetFeaturesErrorRecovery(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ERROR_RECOVERY, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ERROR_RECOVERY, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [     16] Deallocated or Unwritten Logical Block Error Enable (DULBE), (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 16) & 0x1,
-        (ulDefaultData >> 16) & 0x1,
-        (ulSavedData >> 16) & 0x1);
-    printf("\tbit [ 15:  0] Time Limited Error Recovery (TLER), in 100 millisecond units, 0 means no timeout\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData) & 0xFFFF,
-        (ulDefaultData) & 0xFFFF,
-        (ulSavedData) & 0xFFFF);
+    printf("\tbit [     16] Deallocated or Unwritten Logical Block Error Enable (DULBE):\n");
+    if ((ulCurrentData >> 16) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    if ((ulDefaultData >> 16) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 16) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [ 15:  0] Time Limited Error Recovery (TLER):\n");
+    if ((ulCurrentData) & 0xFFFF)
+    {
+        printf("\t\tCurrent = %d (means %d ms)\n", (ulCurrentData) & 0xFFFF, ((ulCurrentData) & 0xFFFF) * 100);
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (no timeout)\n");
+    }
+
+    if ((ulDefaultData) & 0xFFFF)
+    {
+        printf("\t\tDefault = %d (means %d ms)\n", (ulDefaultData) & 0xFFFF, ((ulDefaultData) & 0xFFFF) * 100);
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (no timeout)\n");
+    }
+
+    if ((ulSavedData) & 0xFFFF)
+    {
+        printf("\t\tSaved   = %d (means %d ms)\n", (ulSavedData) & 0xFFFF, ((ulSavedData) & 0xFFFF) * 100);
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (no timeout)\n");
+    }
+
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -429,7 +501,7 @@ static int NVMeGetFeaturesVolatileWriteCache(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Volatile Write Cache:\n");
 
@@ -446,23 +518,38 @@ static int NVMeGetFeaturesVolatileWriteCache(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_VOLATILE_WRITE_CACHE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [      0] Volatile Write Cache Enable (WCE), (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        ulCurrentData & 0x1,
-        ulDefaultData & 0x1,
-        ulSavedData & 0x1);
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    printf("\tbit [      0] Volatile Write Cache Enable (WCE):\n");
+    if (ulCurrentData & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if (ulDefaultData & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if (ulSavedData & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -473,7 +560,7 @@ static int NVMeGetFeaturesNumberOfQueues(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Number of Queues:\n");
 
@@ -490,7 +577,7 @@ static int NVMeGetFeaturesNumberOfQueues(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NUMBER_OF_QUEUES, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
     printf("\tbit [ 31: 16] Number of I/O Completion Queues Allocated (NCQA)\n"
@@ -508,13 +595,7 @@ static int NVMeGetFeaturesNumberOfQueues(HANDLE _hDevice)
         ulDefaultData & 0xFFFF, (ulDefaultData & 0xFFFF) + 1,
         ulSavedData & 0xFFFF, (ulSavedData & 0xFFFF) + 1);
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -525,7 +606,7 @@ static int NVMeGetFeaturesInterruptCoalescing(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Interrupt Coalescing:\n");
 
@@ -542,16 +623,37 @@ static int NVMeGetFeaturesInterruptCoalescing(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_INTERRUPT_COALESCING, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [ 15:  8] Aggregation Time (TIME); in 100 microsecond units, 0 means no delay\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 8) & 0xFF,
-        (ulDefaultData >> 8) & 0xFF,
-        (ulSavedData >> 8) & 0xFF);
+    printf("\tbit [ 15:  8] Aggregation Time (TIME):\n");
+    if ((ulCurrentData >> 8) & 0xFF)
+    {
+        printf("\t\tCurrent = %d (means %d us)\n", (ulCurrentData >> 8) & 0xFF, ((ulCurrentData >> 8) & 0xFF) * 100);
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (no delay)\n");
+    }
+
+    if ((ulDefaultData >> 8) & 0xFF)
+    {
+        printf("\t\tDefault = %d (means %d us)\n", (ulDefaultData >> 8) & 0xFF, ((ulDefaultData >> 8) & 0xFF) * 100);
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (no delay)\n");
+    }
+
+    if ((ulSavedData >> 8) & 0xFF)
+    {
+        printf("\t\tSaved   = %d (means %d us)\n", (ulSavedData >> 8) & 0xFF, ((ulSavedData >> 8) & 0xFF) * 100);
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (no delay)\n");
+    }
+
     printf("\tbit [  7:  0] Aggregation Threshold (THR); number of queue entries\n"
         "\t\tCurrent = %d\n"
         "\t\tDefault = %d\n"
@@ -560,13 +662,7 @@ static int NVMeGetFeaturesInterruptCoalescing(HANDLE _hDevice)
         ulDefaultData & 0xFF,
         ulSavedData & 0xFF);
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -577,7 +673,7 @@ static int NVMeGetFeaturesWriteAtomicityNormal(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Write Atomicity Normal:\n");
 
@@ -594,24 +690,38 @@ static int NVMeGetFeaturesWriteAtomicityNormal(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_WRITE_ATOMICITY, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_WRITE_ATOMICITY, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [      0] Disable Normal (DN); (0) controller honor AWUN, NAWUN, AWUPF, and NAWUPF (1) controller honor only AWUPF and NAWUPF\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        ulCurrentData & 0x1,
-        ulDefaultData & 0x1,
-        ulSavedData & 0x1);
+    printf("\tbit [      0] Disable Normal (DN):\n");
+    if (ulCurrentData & 0x1)
+    {
+        printf("\t\tCurrent = 1 (honor only AWUPF and NAWUPF)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (honor AWUN, NAWUN, AWUPF, and NAWUPF)\n");
+    }
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    if (ulDefaultData & 0x1)
+    {
+        printf("\t\tDefault = 1 (honor only AWUPF and NAWUPF)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (honor AWUN, NAWUN, AWUPF, and NAWUPF)\n");
+    }
+
+    if (ulSavedData & 0x1)
+    {
+        printf("\t\tSaved   = 1 (honor only AWUPF and NAWUPF)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (honor AWUN, NAWUN, AWUPF, and NAWUPF)\n");
+    }
+
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -622,7 +732,7 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Asynchronous Event Configuration:\n");
 
@@ -639,73 +749,234 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ASYNC_EVENT_CONFIG, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ASYNC_EVENT_CONFIG, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [     10] Telemetry Log Notices; (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 10) & 0x1,
-        (ulDefaultData >> 10) & 0x1,
-        (ulSavedData >> 10) & 0x1);
-    printf("\tbit [      9] Firmware Activation Notices; (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 9) & 0x1,
-        (ulDefaultData >> 9) & 0x1,
-        (ulSavedData >> 9) & 0x1);
-    printf("\tbit [      8] Namespace Attribute Notices; (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 8) & 0x1,
-        (ulDefaultData >> 8) & 0x1,
-        (ulSavedData >> 8) & 0x1);
-    printf("\tbit [      4] SMART / Health Critical Warnings (Volatile memory backup device fail); (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 4) & 0x1,
-        (ulDefaultData >> 4) & 0x1,
-        (ulSavedData >> 4) & 0x1);
-    printf("\tbit [      3] SMART / Health Critical Warnings (Read only mode); (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 3) & 0x1,
-        (ulDefaultData >> 3) & 0x1,
-        (ulSavedData >> 3) & 0x1);
-    printf("\tbit [      2] SMART / Health Critical Warnings (Degraded reliability); (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 2) & 0x1,
-        (ulDefaultData >> 2) & 0x1,
-        (ulSavedData >> 2) & 0x1);
-    printf("\tbit [      1] SMART / Health Critical Warnings (Temperature threshold); (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 1) & 0x1,
-        (ulDefaultData >> 1) & 0x1,
-        (ulSavedData >> 1) & 0x1);
-    printf("\tbit [      0] SMART / Health Critical Warnings (Lower spare capacity); (0) disabled, (1) enabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        ulCurrentData & 0x1,
-        ulDefaultData & 0x1,
-        ulSavedData & 0x1);
+    printf("\tbit [     10] Telemetry Log Notices:\n");
+    if ((ulCurrentData >> 10) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    if ((ulDefaultData >> 10) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 10) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      9] Firmware Activation Notices:\n");
+    if ((ulCurrentData >> 9) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if ((ulDefaultData >> 9) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 9) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      8] Namespace Attribute Notices:\n");
+    if ((ulCurrentData >> 8) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if ((ulDefaultData >> 8) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 8) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      4] SMART / Health Critical Warnings (Volatile memory backup device fail):\n");
+    if ((ulCurrentData >> 4) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if ((ulDefaultData >> 4) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 4) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      3] SMART / Health Critical Warnings (Read only mode):\n");
+    if ((ulCurrentData >> 3) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if ((ulDefaultData >> 3) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 3) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      2] SMART / Health Critical Warnings (Degraded reliability):\n");
+    if ((ulCurrentData >> 2) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if ((ulDefaultData >> 2) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 2) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      1] SMART / Health Critical Warnings (Temperature threshold):\n");
+    if ((ulCurrentData >> 1) & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if ((ulDefaultData >> 1) & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 1) & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [      0] SMART / Health Critical Warnings (Lower spare capacity):\n");
+    if (ulCurrentData & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if (ulDefaultData & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if (ulSavedData & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -716,7 +987,7 @@ static int NVMeGetFeaturesHCTM(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Host Controlled Thermal Management:\n");
 
@@ -733,31 +1004,66 @@ static int NVMeGetFeaturesHCTM(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [ 31: 16] Thermal Management Temperature 1 (TMT1); in Kelvin, 0 means disabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        (ulCurrentData >> 16) & 0xFFFF,
-        (ulDefaultData >> 16) & 0xFFFF,
-        (ulSavedData >> 16) & 0xFFFF);
-    printf("\tbit [ 15:  0] Thermal Management Temperature 2 (TMT2); in Kelvin, 0 means disabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        ulCurrentData & 0xFFFF,
-        ulDefaultData & 0xFFFF,
-        ulSavedData & 0xFFFF);
+    printf("\tbit [ 31: 16] Thermal Management Temperature 1 (TMT1):\n");
+    if ((ulCurrentData >> 16) & 0xFFFF)
+    {
+        printf("\t\tCurrent = %d (K)\n", (ulCurrentData >> 16) & 0xFFFF);
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    if ((ulDefaultData >> 16) & 0xFFFF)
+    {
+        printf("\t\tDefault = %d (K)\n", (ulDefaultData >> 16) & 0xFFFF);
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if ((ulSavedData >> 16) & 0xFFFF)
+    {
+        printf("\t\tSaved   = %d (K)\n", (ulSavedData >> 16) & 0xFFFF);
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    printf("\tbit [ 15:  0] Thermal Management Temperature 2 (TMT2):\n");
+    if (ulCurrentData & 0xFFFF)
+    {
+        printf("\t\tCurrent = %d (K)\n", ulCurrentData & 0xFFFF);
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
+
+    if (ulDefaultData & 0xFFFF)
+    {
+        printf("\t\tDefault = %d (K)\n", ulDefaultData & 0xFFFF);
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if (ulSavedData & 0xFFFF)
+    {
+        printf("\t\tSaved   = %d (K)\n", ulSavedData & 0xFFFF);
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -768,7 +1074,7 @@ static int NVMeGetFeaturesSoftwareProgressMarker(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Software Progress Marker:\n");
 
@@ -785,7 +1091,7 @@ static int NVMeGetFeaturesSoftwareProgressMarker(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NVM_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NVM_SOFTWARE_PROGRESS_MARKER, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
     printf("\tbit [  7:  0] Pre-boot Software Load Count (PBSLC)\n"
@@ -796,13 +1102,7 @@ static int NVMeGetFeaturesSoftwareProgressMarker(HANDLE _hDevice)
         ulDefaultData & 0xFF,
         ulSavedData & 0xFF);
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }
@@ -813,7 +1113,7 @@ static int NVMeGetFeaturesNOPPME(HANDLE _hDevice)
     uint32_t ulCurrentData = 0;
     uint32_t ulDefaultData = 0;
     uint32_t ulSavedData = 0;
-    uint32_t ulSupportedCapabilities = 0;
+    NVME_CDW11_FEATURE_SUPPORTED_CAPABILITY ulSupportedCapabilities = { 0 };
 
     printf("\n[I] Non-Operational Power State Config:\n");
 
@@ -836,24 +1136,38 @@ static int NVMeGetFeaturesNOPPME(HANDLE _hDevice)
     if (result) return result;
 
     // 4. get supported capabilities
-    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NONOPERATIONAL_POWER_STATE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, &ulSupportedCapabilities);
+    result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_NONOPERATIONAL_POWER_STATE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    printf("\tbit [      0] Non-Operational Power State Permissive Mode Enable (NOPPME)\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        ulCurrentData & 0x1,
-        ulDefaultData & 0x1,
-        ulSavedData & 0x1);
+    printf("\tbit [      0] Non-Operational Power State Permissive Mode Enable (NOPPME)\n");
+    if (ulCurrentData & 0x1)
+    {
+        printf("\t\tCurrent = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disabled)\n");
+    }
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        (ulSupportedCapabilities >> 2) & 0x1,
-        (ulSupportedCapabilities >> 1) & 0x1,
-        (ulSupportedCapabilities) & 0x1);
+    if (ulDefaultData & 0x1)
+    {
+        printf("\t\tDefault = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disabled)\n");
+    }
+
+    if (ulSavedData & 0x1)
+    {
+        printf("\t\tSaved   = 1 (enabled)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    vNVMeGetFeaturesShowCapabilities(ulSupportedCapabilities);
 
     return result;
 }

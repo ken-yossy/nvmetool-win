@@ -33,7 +33,7 @@ static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG13 _pData, int _iLo
         printf("\tbyte [ 27: 24] 0h = No namespace information is available.\n");
     }
 
-    printf("\tbyte [ 23: 16] %16llXh = The first LBA that experienced the error condition, if applicable.\n", _pData->Lba);
+    printf("\tbyte [ 23: 16] %llXh = The first LBA that experienced the error condition, if applicable.\n", _pData->Lba);
     printf("\tbyte [ 15: 14] Parameter Error Location:\n");
     if (_pData->ParameterErrorLocation.AsUshort == 0xFFFF)
     {
@@ -73,7 +73,7 @@ static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG13 _pData, int _iLo
         printf("%04Xh\n", _pData->SQID);
     }
 
-    printf("\tbyte[  7:  0] Error Count: %llx\n", _pData->ErrorCount);
+    printf("\tbyte [  7:  0] Error Count: %llX\n", _pData->ErrorCount);
 }
 
 int iNVMeGetErrorInformation(HANDLE _hDevice)

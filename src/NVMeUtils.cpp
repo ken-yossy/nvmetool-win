@@ -143,7 +143,7 @@ int eGetCommandFromConsole(void)
         "#  - f: Flush\n"
         "#  - t: Device Self-test\n"
         "#  - z: Format NVM\n"
-        "#  - v: Security Receive (Get Level 0 Discovery data in TCG)\n"
+        "#  - v: Security Receive\n"
         "#\n"
         "#  press 'q' to quit program\n",
         strCmd);

@@ -253,6 +253,7 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
         }
     }
 
+    printf("\n");
     printf("[I] Command Supported and Effect Log: NVM Command\n");
     for (int i = 0; i < 256; i++)
     {

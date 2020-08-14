@@ -115,13 +115,33 @@ int iNVMeGetFeaturesAPST(HANDLE _hDevice)
 
     printf("\n[I] Autonomous Power State Transition:\n");
 
-    printf("\tAutonomous Power State Transition Enable (APSTE): 1 => enabled, 0 => disabled\n"
-        "\t\tCurrent = %d\n"
-        "\t\tDefault = %d\n"
-        "\t\tSaved   = %d\n",
-        CurrentSetting.APSTE,
-        DefaultSetting.APSTE,
-        SavedSetting.APSTE);
+    printf("\tAutonomous Power State Transition Enable (APSTE):\n");
+    if (CurrentSetting.APSTE)
+    {
+        printf("\t\tCurrent = 1 (enable)\n");
+    }
+    else
+    {
+        printf("\t\tCurrent = 0 (disable)\n");
+    }
+
+    if (DefaultSetting.APSTE)
+    {
+        printf("\t\tDefault = 1 (enable)\n");
+    }
+    else
+    {
+        printf("\t\tDefault = 0 (disable)\n");
+    }
+
+    if (SavedSetting.APSTE)
+    {
+        printf("\t\tSaved   = 1 (enable)\n");
+    }
+    else
+    {
+        printf("\t\tSaved   = 0 (disable)\n");
+    }
 
     printf("\tIdle Transition Power State (ITPS):\n"
         "\t\tCurrent = PS%d\n"
@@ -139,11 +159,7 @@ int iNVMeGetFeaturesAPST(HANDLE _hDevice)
         DefaultEntry.IdleTimePriorToTransition,
         SavedEntry.IdleTimePriorToTransition);
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        Cap.MOD, Cap.NSS, Cap.SAVE);
+    vNVMeGetFeaturesShowCapabilities(Cap);
 
     return iResult;
 }

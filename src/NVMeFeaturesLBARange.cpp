@@ -215,11 +215,7 @@ int iNVMeGetFeaturesLBARange(HANDLE _hDevice)
     iResult = iNVMeGetFeature32(_hDevice, NVME_FEATURE_LBA_RANGE_TYPE, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&Cap);
     if (iResult != 0) return iResult;
 
-    printf("\tCapabilities: this feature is\n"
-        "\t\tbit [      2] %d = (1) changable, (0) not changable\n"
-        "\t\tbit [      1] %d = (1) namespace specific, (0) for entire controller\n"
-        "\t\tbit [      0] %d = (1) savable, (0) not savable\n",
-        Cap.MOD, Cap.NSS, Cap.SAVE);
+    vNVMeGetFeaturesShowCapabilities(Cap);
 
     return iResult;
 }
