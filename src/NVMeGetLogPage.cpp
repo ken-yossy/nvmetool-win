@@ -68,10 +68,17 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         break;
 
     case NVME_LOG_PAGE_COMMAND_EFFECTS:
-        cCmd = cGetConsoleInput("\n# Get Log Page - Command Supported and Effects (Log Identifier 05h), Press 'y' to continue\n", strCmd);
-        if (cCmd == 'y')
+        if (g_stController.LPA.CommandEffectsLog)
         {
-            iResult = iNVMeGetCommandSupportedAndEffects(_hDevice, 1);
+            cCmd = cGetConsoleInput("\n# Get Log Page - Command Supported and Effects (Log Identifier 05h), Press 'y' to continue\n", strCmd);
+            if (cCmd == 'y')
+            {
+                iResult = iNVMeGetCommandSupportedAndEffects(_hDevice, 1);
+            }
+        }
+        else
+        {
+            printf("\n[E] This controller does not support Command Supported and Effects log page, ignore\n");
         }
         break;
 
