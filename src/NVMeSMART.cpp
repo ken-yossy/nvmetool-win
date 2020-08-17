@@ -2,11 +2,24 @@
 #include <iostream>
 #include <nvme.h>
 #include "NVMeUtils.h"
+#include "NVMeIdentifyController.h"
 #include "NVMeSMART.h"
 
-static void s_vPrintNVMeSMARTLog(PNVME_HEALTH_INFO_LOG13 _pData)
+static void s_vPrintNVMeSMARTLog(PNVME_SMART_INFO_LOG _pData)
 {
     printf("[I] Critical Warning:\n");
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    { // revision 1.4 or later
+        if (_pData->CriticalWarning.PMRDegraded)
+        {
+            printf("\tbit [      5] 1 = Persistent Memory Region has become read-only or unreliable.\n");
+        }
+        else
+        {
+            printf("\tbit [      5] 0 = Persistent Memory Region has not become read-only or unreliable.\n");
+        }
+    }
+
     if (_pData->CriticalWarning.VolatileMemoryBackupDeviceFailed)
     {
         printf("\tbit [      4] 1 = Volatile memory backup device has failed.\n");
@@ -60,98 +73,139 @@ static void s_vPrintNVMeSMARTLog(PNVME_HEALTH_INFO_LOG13 _pData)
     printf("[I] Available Spare Threshold: %d (%%)\n", _pData->AvailableSpareThreshold);
     printf("[I] Percentage Used: %d (%%)\n", _pData->PercentageUsed);
 
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    { // revision 1.4 or later
+        printf("[I] Endurance Group Critical Warning Summary:\n");
+        if (_pData->EnduranceGroupSummary.ReadOnly)
+        {
+            printf("\tbit [      3] 1 = The namespaces in one or more Endurance Groups have been placed in read only mode.\n");
+        }
+        else
+        {
+            printf("\tbit [      3] 0 = No namespace in all Endurance Groups has been placed in read only mode.\n");
+        }
+
+        if (_pData->EnduranceGroupSummary.ReliabilityDegraded)
+        {
+            printf("\tbit [      3] 1 = The reliability of one or more Endurance Groups has been degraded.\n");
+        }
+        else
+        {
+            printf("\tbit [      3] 0 = The reliability of all Endurance Groups has not been degraded.\n");
+        }
+
+        if (_pData->EnduranceGroupSummary.AvailableSpareLow)
+        {
+            printf("\tbit [      3] 1 = The available spare capacity of one or more Endurance Groups has fallen below the threshold.\n");
+        }
+        else
+        {
+            printf("\tbit [      3] 0 = The available spare capacity of all Endurance Groups has not fallen below the threshold.\n");
+        }
+    }
+
     uint64_t ullLow = 0;
     uint64_t ullHigh = 0;
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->DataUnitRead), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->DataUnitRead[8])), sizeof(char) * 8);
 
-    printf("[I] Data Units Read (Lower 8 bytes): %llu (x 512 byte = %llu byte = %llu MiB)\n", ullLow, ullLow * 512, ullLow / 2 / 1024);
+    printf("[I] Data Units Read (in unit of 512 byte x 1000): 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Data Units Read (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->DataUnitWritten), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->DataUnitWritten[8])), sizeof(char) * 8);
 
-    printf("[I] Data Units Written (Lower 8 bytes): %llu (x 512 byte = %llu byte = %llu MiB)\n", ullLow, ullLow * 512, ullLow / 2 / 1024);
+    printf("[I] Data Units Written (in unit of 512 byte x 1000): 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Data Units Written (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->HostReadCommands), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->HostReadCommands[8])), sizeof(char) * 8);
 
-    printf("[I] Host Read Commands (Lower 8 bytes): %llu (commands)\n", ullLow);
+    printf("[I] Host Read Commands: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Host Read Commands (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (commands)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->HostWrittenCommands), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->HostWrittenCommands[8])), sizeof(char) * 8);
 
-    printf("[I] Host Write Commands (Lower 8 bytes): %llu (commands)\n", ullLow);
+    printf("[I] Host Write Commands: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Host Write Commands (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (commands)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->ControllerBusyTime), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->ControllerBusyTime[8])), sizeof(char) * 8);
 
-    printf("[I] Controller Busy Time (Lower 8 bytes): %llu (minutes) (= %llu hours)\n", ullLow, ullLow/60);
+    printf("[I] Controller Busy Time: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Controller Busy Time (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (minutes)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->PowerCycle), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->PowerCycle[8])), sizeof(char) * 8);
 
-    printf("[I] Power Cycles (Lower 8 bytes): %llu (times)\n", ullLow);
+    printf("[I] Power Cycles: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Power Cycles (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (times)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->PowerOnHours), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->PowerOnHours[8])), sizeof(char) * 8);
 
-    printf("[I] Power On Hours (Lower 8 bytes): %llu (hours) (= %llu days)\n", ullLow, ullLow/24);
+    printf("[I] Power On Hours: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Power On Hours (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (hours)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->UnsafeShutdowns), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->UnsafeShutdowns[8])), sizeof(char) * 8);
 
-    printf("[I] Unsafe Shutdowns (Lower 8 bytes): %llu (times)\n", ullLow);
+    printf("[I] Unsafe Shutdowns: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Unsafe Shutdowns (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (times)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->MediaErrors), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->MediaErrors[8])), sizeof(char) * 8);
 
-    printf("[I] Media and Data Integrity Errors (Lower 8 bytes): %llu (times)\n", ullLow);
+    printf("[I] Media and Data Integrity Errors: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Media and Data Integrity Errors (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX (times)\n", ullLow);
 
     memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->ErrorInfoLogEntryNum), sizeof(char) * 8);
     memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->ErrorInfoLogEntryNum[8])), sizeof(char) * 8);
 
-    printf("[I] Number of Error Information Log Entries (Lower 8 bytes): %llu\n", ullLow);
+    printf("[I] Number of Error Information Log Entries: 0x");
     if (ullHigh != 0)
     {
-        printf("[I] Number of Error Information Log Entries (Higher 8 bytes) : %llu\n", ullHigh);
+        printf("%llX", ullHigh);
     }
+    printf("%08llX\n", ullLow);
 
     printf("[I] Warning Composite Temperature Time: %lu (minutes) (= %lu hours)\n", _pData->WCTempTime, _pData->WCTempTime / 60);
     printf("[I] Critical Composite Temperature Time: %lu (minutes) (= %lu hours)\n", _pData->CCTempTime, _pData->CCTempTime / 60);
@@ -241,7 +295,7 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
         + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-        + sizeof(NVME_HEALTH_INFO_LOG13);
+        + sizeof(NVME_SMART_INFO_LOG);
     buffer = malloc(bufferLength);
 
     if (buffer == NULL)
@@ -264,7 +318,7 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
     protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_HEALTH_INFO;
     protocolData->ProtocolDataRequestSubValue = NVME_NAMESPACE_ALL;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-    protocolData->ProtocolDataLength = sizeof(NVME_HEALTH_INFO_LOG13);
+    protocolData->ProtocolDataLength = sizeof(NVME_SMART_INFO_LOG);
 
     // Send request down.
     iResult = iIssueDeviceIoControl(_hDevice,
@@ -292,16 +346,16 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_HEALTH_INFO_LOG13))) {
+        (protocolData->ProtocolDataLength < sizeof(NVME_SMART_INFO_LOG))) {
         printf("[E] NVMeGetSMARTLog: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
 
     // Command Support and Effect Log Data
-    if ( _bPrint ) s_vPrintNVMeSMARTLog((PNVME_HEALTH_INFO_LOG13)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
+    if ( _bPrint ) s_vPrintNVMeSMARTLog((PNVME_SMART_INFO_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
 
-    memcpy_s((void*)(&g_stSMARTLog), sizeof(NVME_HEALTH_INFO_LOG13), (uint8_t*)protocolData + protocolData->ProtocolDataOffset, sizeof(NVME_HEALTH_INFO_LOG13));
+    memcpy_s((void*)(&g_stSMARTLog), sizeof(NVME_SMART_INFO_LOG), (uint8_t*)protocolData + protocolData->ProtocolDataOffset, sizeof(NVME_SMART_INFO_LOG));
     iResult = 0; // succeeded;
 
 error_exit:

@@ -20,7 +20,7 @@
 #pragma warning(disable:6301)
 
 NVME_IDENTIFY_CONTROLLER_DATA g_stController;
-NVME_HEALTH_INFO_LOG13 g_stSMARTLog;
+NVME_SMART_INFO_LOG g_stSMARTLog;
 
 uint32_t g_uiRevision; // revision that this controller conforms to; format is same as VER field
 

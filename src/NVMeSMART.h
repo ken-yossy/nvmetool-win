@@ -4,7 +4,7 @@
 #include <cstdint>
 
 //
-// Information of log: NVME_LOG_PAGE_HEALTH_INFO. Size: 512 bytes
+// Information of SMART log: 512 bytes
 //
 typedef struct {
 
@@ -14,14 +14,24 @@ typedef struct {
         uint8_t   ReliabilityDegraded : 1;              // bit [    2]
         uint8_t   ReadOnly : 1;                         // bit [    3]
         uint8_t   VolatileMemoryBackupDeviceFailed : 1; // bit [    4]
-        uint8_t   Reserved : 3;                         // bit [ 5: 7]
+        uint8_t   PMRDegraded : 1;                      // bit [    5] <rev1.4>
+        uint8_t   Reserved : 2;                         // bit [ 6: 7]
     } CriticalWarning;                  // byte [      0] Critical Warning
 
     uint8_t   Temperature[2];           // byte [  2:  1] Composite Temperature
     uint8_t   AvailableSpare;           // byte [      3] Available Spare
     uint8_t   AvailableSpareThreshold;  // byte [      4] Available Spare Threshold
     uint8_t   PercentageUsed;           // byte [      5] Percentage Used
-    uint8_t   Reserved0[26];            // byte [ 31:  6]
+
+    struct {
+        uint8_t   AvailableSpareLow : 1;                // bit [    0]
+        uint8_t   Reserved1 : 1;                        // bit [    1]
+        uint8_t   ReliabilityDegraded : 1;              // bit [    2]
+        uint8_t   ReadOnly : 1;                         // bit [    3]
+        uint8_t   Reserved2 : 4;                        // bit [ 7: 4]
+    } EnduranceGroupSummary;            // byte [      6] Endurance Group Critical Warning Summary <rev1.4>
+
+    uint8_t   Reserved0[25];            // byte [ 31:  7]
 
     uint8_t   DataUnitRead[16];         // byte [ 47: 32] Data Units Read
     uint8_t   DataUnitWritten[16];      // byte [ 63: 48] Data Units Written
@@ -45,15 +55,15 @@ typedef struct {
     uint16_t  TemperatureSensor7;       // byte [213:212] Current temperature reported by temperature sensor 7.
     uint16_t  TemperatureSensor8;       // byte [215:214] Current temperature reported by temperature sensor 8.
 
-    uint32_t  TMT1TransitionCount;      // byte [219:216] Thermal Management Temperature 1 Transition Count
-    uint32_t  TMT2TransitionCount;      // byte [223:220] Thermal Management Temperature 2 Transition Count
-    uint32_t  TMT1TotalTime;            // byte [227:224] Total Time For Thermal Management Temperature 1
-    uint32_t  TMT2TotalTime;            // byte [231:228] Total Time For Thermal Management Temperature 2
+    uint32_t  TMT1TransitionCount;      // byte [219:216] Thermal Management Temperature 1 Transition Count <rev1.3>
+    uint32_t  TMT2TransitionCount;      // byte [223:220] Thermal Management Temperature 2 Transition Count <rev1.3>
+    uint32_t  TMT1TotalTime;            // byte [227:224] Total Time For Thermal Management Temperature 1 <rev1.3>
+    uint32_t  TMT2TotalTime;            // byte [231:228] Total Time For Thermal Management Temperature 2 <rev1.3>
 
     uint8_t   Reserved1[280];           // byte [511:232]
 
-} NVME_HEALTH_INFO_LOG13, *PNVME_HEALTH_INFO_LOG13;
+} NVME_SMART_INFO_LOG, *PNVME_SMART_INFO_LOG;
 
-extern NVME_HEALTH_INFO_LOG13 g_stSMARTLog;
+extern NVME_SMART_INFO_LOG g_stSMARTLog;
 
 int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint);
