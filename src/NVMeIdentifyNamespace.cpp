@@ -14,29 +14,29 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[M] Namespace Features (NSFEAT):\n");
     if (_pNSData->NSFEAT.SkipReuseUI)
     {
-        printf("\tbit [      3] 1 = The value in the NGUID and the EUI64 field for this namespace is never reused by the controller.\n");
+        printf("\tbit [      3] 1 = NGUID and EUI64 is never reused.\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = The NGUID and the EUI64 value for this namespace may be reused by the controller for a new namespace created after this namespace is deleted.\n");
+        printf("\tbit [      3] 0 = NGUID and EUI64 may be reused.\n");
     }
 
     if (_pNSData->NSFEAT.DeallocatedOrUnwrittenError)
     {
-        printf("\tbit [      2] 1 = Supports the Deallocated or Unwritten Logical Block error for this namespace.\n");
+        printf("\tbit [      2] 1 = Supports the Deallocated or Unwritten Logical Block error.\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = Does not support the Deallocated or Unwritten Logical Block error for this namespace.\n");
+        printf("\tbit [      2] 0 = Does not support the Deallocated or Unwritten Logical Block error.\n");
     }
 
     if (_pNSData->NSFEAT.NameSpaceAtomicWriteUnit)
     {
-        printf("\tbit [      1] 1 = The fields NAWUN, NAWUPF, and NACWU are defined for this namespace.\n");
+        printf("\tbit [      1] 1 = Use NAWUN, NAWUPF, and NACWU.\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = The host should use the AWUN, AWUPF, and ACWU fields defined in the Identify Controller data structure.\n");
+        printf("\tbit [      1] 0 = Use AWUN, AWUPF, and ACWU.\n");
     }
 
     if (_pNSData->NSFEAT.ThinProvisioning)
@@ -48,7 +48,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
         printf("\tbit [      0] 0 = Does not support thin provisioning.\n");
     }
 
-    printf("[M] Number of LBA Formats (NLBAF): %d (means %d)\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
+    printf("[M] Number of LBA Formats (NLBAF): %d = Supports %d format(s).\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
 
     printf("[M] Formatted LBA Size (FLBAS):\n");
     if (_pNSData->FLBAS.MetadataInExtendedDataLBA)
@@ -57,14 +57,14 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("\tbit [      4] 0 = All of the metadata for a command is transferred as a separate contiguous buffer of data.\n");
+        printf("\tbit [      4] 0 = All of the metadata is transferred as a separate contiguous buffer of data.\n");
     }
-    printf("\tbit [  3:  0] %d = One of the 16 supported LBA Formats.\n", _pNSData->FLBAS.LbaFormatIndex);
+    printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d).\n", _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex);
 
     printf("[M] Metadata Capabilities (MC):\n");
     if (_pNSData->MC.MetadataInSeparateBuffer)
     {
-        printf("\tbit [      1] 1 = Supports the metadata being transferred as part of a separate buffer that is specified in the Metadata Pointer.\n");
+        printf("\tbit [      1] 1 = Supports the metadata being transferred as part of a separate buffer.\n");
     }
     else
     {
@@ -150,7 +150,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[O] Namespace Multi-path I/O and Namespace Sharing Capabilities (NMIC):\n");
     if (_pNSData->NMIC.SharedNameSpace)
     {
-        printf("\tbit [      0] 1 = May be attached to two or more controllers in the NVM subsystem concurrently (i.e., may be a shared namespace).\n");
+        printf("\tbit [      0] 1 = May be attached to two or more controllers in the NVM subsystem concurrently.\n");
     }
     else
     {
@@ -290,7 +290,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("0 (The same size as that reported in the AWUN field of the Identify Controller data structure)\n");
+        printf("0 (The same size as that reported in the AWUN field)\n");
     }
 
     printf("[O] Namespace Atomic Write Unit Power Fail (NAWUPF): ");
@@ -300,7 +300,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("0 (The same size as that reported in the AWUPF field of the Identify Controller data structure)\n");
+        printf("0 (The same size as that reported in the AWUPF field)\n");
     }
 
     printf("[O] Namespace Atomic Compare & Write Unit (NACWU): ");
@@ -310,7 +310,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("0 (The same size as that reported in the ACWU field of the Identify Controller data structure)\n");
+        printf("0 (The same size as that reported in the ACWU field)\n");
     }
 
     printf("[O] Namespace Atomic Boundary Size Normal (NABSN): ");
@@ -351,7 +351,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[O] Namespace Globally Unique Identifier (NGUID):\n");
     printf("\tbyte [ 15: 11] %02X%02X%02X%02X%02X (Extension identifer assigned by the vendor)\n",
         _pNSData->NGUID[11], _pNSData->NGUID[12], _pNSData->NGUID[13], _pNSData->NGUID[14], _pNSData->NGUID[15]); // Bytes [119:115] (5 byte, 40 bit = Extension identifer assigned by the organization
-    printf("\tbyte [ 10:  8] %02X%02X%02X (Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority)\n",
+    printf("\tbyte [ 10:  8] %02X%02X%02X (Organizationally Unique Identifier (OUI))\n",
         _pNSData->NGUID[8], _pNSData->NGUID[9], _pNSData->NGUID[10]); // Bytes [114:112] (3 byte, 24 bit = Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority
     printf("\tbyte [  7:  0] %02X%02X%02X%02X%02X%02X%02X%02X (Vendor specific extension identifier)\n",
         _pNSData->NGUID[0], _pNSData->NGUID[1], _pNSData->NGUID[2], _pNSData->NGUID[3], _pNSData->NGUID[4], _pNSData->NGUID[5], _pNSData->NGUID[6], _pNSData->NGUID[7]); // Bytes [111:104] (8 byte, 64 bit = Vendor specific extension identifier
@@ -359,7 +359,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[O] IEEE Extended Unique Identifier (EUI64):\n");
     printf("\tbyte [  7:  3] %02X%02X%02X%02X%02X (Extension identifer assigned by the vendor)\n",
         _pNSData->EUI64[3], _pNSData->EUI64[4], _pNSData->EUI64[5], _pNSData->EUI64[6], _pNSData->EUI64[7]); // Bytes [127:123] (5 byte, 40 bit = Extension identifer assigned by the organization
-    printf("\tbyte [  2:  0] %02X%02X%02X (Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority)\n",
+    printf("\tbyte [  2:  0] %02X%02X%02X (Organizationally Unique Identifier (OUI))\n",
         _pNSData->EUI64[0], _pNSData->EUI64[1], _pNSData->EUI64[2]); // Bytes [122:120] (3 byte, 24 bit = Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority
 
     for (int i = 0; i < ( _pNSData->NLBAF + 1 ); i++)
