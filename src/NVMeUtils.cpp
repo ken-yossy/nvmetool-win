@@ -139,7 +139,7 @@ int eGetCommandFromConsole(void)
         "#  - l: Get Log Page\n"
         "#  - i: Identify\n"
         "#  - g: Get Feature\n"
-        "#  - s: Get Feature\n"
+        "#  - s: Set Feature\n"
         "#  - f: Flush\n"
         "#  - t: Device Self-test\n"
         "#  - z: Format NVM\n"
