@@ -104,6 +104,10 @@ int main(int _argc, char* _argv[])
             if (g_stController.ONCS.DatasetManagement)
             {
                 iResult = iNVMeDeallocate(hDevice);
+                if (iResult == 0)
+                {
+                    fprintf(stderr, "[I] Deallocation succeeded.\n\n");
+                }
             }
             else
             {

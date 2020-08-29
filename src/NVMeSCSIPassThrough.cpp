@@ -164,7 +164,7 @@ static void PrintSenseInfoEx(PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex)
     fprintf(stderr, "\n\n");
 }
 
-static void PrintStatusResultsEx(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex,	ULONG length)
+static void PrintStatusResultsExDIn(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex, ULONG length)
 {
     if (status)
     {
@@ -179,9 +179,29 @@ static void PrintStatusResultsEx(int status, DWORD returned, PSCSI_PASS_THROUGH_
     }
     else
     {
-        fprintf(stdout, "Scsi status: %02Xh, Bytes returned: %Xh, ",	psptwb_ex->spt.ScsiStatus, returned);
-        fprintf(stdout, "DataOut buffer length: %Xh\nDataIn buffer length: %Xh\n\n\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
+        fprintf(stdout, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
+        fprintf(stdout, "DataOut buffer length: %Xh, DataIn buffer length: %Xh\n\n\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
         PrintDataBuffer((PUCHAR)(psptwb_ex->ucDataBuf), length);
+    }
+}
+
+static void PrintStatusResultsExDOut(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex, ULONG length)
+{
+    if (status)
+    {
+        vUtilPrintSystemError(GetLastError(), "(Unknown)");
+        return;
+    }
+
+    if (psptwb_ex->spt.ScsiStatus)
+    {
+        PrintSenseInfoEx(psptwb_ex);
+        return;
+    }
+    else
+    {
+        fprintf(stdout, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
+        fprintf(stdout, "DataOut buffer length: %Xh, DataIn buffer length: %Xh\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
     }
 }
 
@@ -491,7 +511,7 @@ Cleanup:
     return status;
 }
 
-static void PrintStatusResults(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb, ULONG length)
+static void PrintStatusResultsDIn(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb, ULONG length)
 {
     if (status)
     {
@@ -506,9 +526,29 @@ static void PrintStatusResults(int status, DWORD returned, PSCSI_PASS_THROUGH_WI
     }
     else
     {
-        fprintf(stderr, "Scsi status: %02Xh, Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
+        fprintf(stderr, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
         fprintf(stdout, "Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
         PrintDataBuffer((PUCHAR)(psptwb->ucDataBuf), length);
+    }
+}
+
+static void PrintStatusResultsDOut(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb, ULONG length)
+{
+    if (status)
+    {
+        vUtilPrintSystemError(GetLastError(), "(Unknown)");
+        return;
+    }
+
+    if (psptwb->spt.ScsiStatus)
+    {
+        PrintSenseInfo(psptwb);
+        return;
+    }
+    else
+    {
+        fprintf(stderr, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
+        fprintf(stdout, "Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
     }
 }
 
@@ -622,7 +662,7 @@ int iWriteViaSCSIPassThrough(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResultsEx(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataOutTransferLength);
+        PrintStatusResultsExDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataInTransferLength);
         free(pUnAlignedBuffer);
     }
     else
@@ -669,7 +709,7 @@ int iWriteViaSCSIPassThrough(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResults(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
+        PrintStatusResultsDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
     }
 
     return iResult;
@@ -724,7 +764,7 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResultsEx(iResult, returned, &sptwb_ex, sptwb_ex.spt.DataInTransferLength);
+        PrintStatusResultsExDIn(iResult, returned, &sptwb_ex, sptwb_ex.spt.DataInTransferLength);
     }
     else
     {
@@ -755,7 +795,7 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResults(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
+        PrintStatusResultsDIn(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
     }
     return iResult;
 }
@@ -817,7 +857,7 @@ static int s_iGetLevel0DiscoveryData(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResultsEx(iResult, returned, &sptwb_ex, sptwb_ex.spt.DataInTransferLength);
+        PrintStatusResultsExDIn(iResult, returned, &sptwb_ex, sptwb_ex.spt.DataInTransferLength);
     }
     else
     {
@@ -854,7 +894,7 @@ static int s_iGetLevel0DiscoveryData(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResults(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
+        PrintStatusResultsDIn(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
     }
     return iResult;
 }
@@ -943,7 +983,7 @@ int iFlushViaSCSIPassThrough(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResultsEx(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataOutTransferLength);
+        PrintStatusResultsExDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataOutTransferLength);
     }
     else
     {
@@ -977,7 +1017,7 @@ int iFlushViaSCSIPassThrough(HANDLE _hDevice)
             &returned,
             FALSE);
 
-        PrintStatusResults(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
+        PrintStatusResultsDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
     }
 
     return iResult;
