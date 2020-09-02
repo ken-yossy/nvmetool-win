@@ -152,6 +152,7 @@ static void PrintSenseInfoEx(PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex)
     fprintf(stderr, "Scsi status: %02Xh\n\n", psptwb_ex->spt.ScsiStatus);
     if (psptwb_ex->spt.SenseInfoLength == 0)
     {
+        fprintf(stderr, "No sense information is available.\n\n");
         return;
     }
 
