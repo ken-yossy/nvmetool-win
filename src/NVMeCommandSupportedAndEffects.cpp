@@ -205,11 +205,11 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
             break;
 
         case 1:
-            printf("\tbit [ 18: 16] 1 = The command associated with this structure may be submitted when there is no other outstanding command to the same namespace and another command should not be submitted to the same namespace until this command is complete\n");
+            printf("\tbit [ 18: 16] 1 = May be submitted when there is no other outstanding command to the same namespace and another command should not be submitted to the same namespace until this command is complete\n");
             break;
 
         case 2:
-            printf("\tbit [ 18: 16] 2 = The command associated with this structure may be submitted when there is no other outstanding command to any namespace and another command should not be submitted to any namespace until this command is complete\n");
+            printf("\tbit [ 18: 16] 2 = May be submitted when there is no other outstanding command to any namespace and another command should not be submitted to any namespace until this command is complete\n");
             break;
 
         default:
@@ -218,38 +218,38 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
 
         if (Data.CCC)
         {
-            printf("\tbit [      4] 1 = This command may change controller capabilities\n");
+            printf("\tbit [      4] 1 = May change controller capabilities\n");
         }
         else
         {
-            printf("\tbit [      4] 0 = This command does not modify controller capabilities\n");
+            printf("\tbit [      4] 0 = Does not modify controller capabilities\n");
         }
 
         if (Data.NIC)
         {
-            printf("\tbit [      3] 1 = This command may change the number of namespaces or capabilities for multiple namespaces\n");
+            printf("\tbit [      3] 1 = May change the number of namespaces or capabilities for multiple namespaces\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = This command does not modify the number of namespaces or capabilities for multiple namespaces\n");
+            printf("\tbit [      3] 0 = Does not modify the number of namespaces or capabilities for multiple namespaces\n");
         }
 
         if (Data.NCC)
         {
-            printf("\tbit [      2] 1 = This command may change the capabilities of a single namespace\n");
+            printf("\tbit [      2] 1 = May change the capabilities of a single namespace\n");
         }
         else
         {
-            printf("\tbit [      2] 0 = This command does not modify any namespace capabilities for the specified namespace\n");
+            printf("\tbit [      2] 0 = Does not modify any namespace capabilities for the specified namespace\n");
         }
 
         if (Data.LBCC)
         {
-            printf("\tbit [      1] 1 = This command may modify logical block content in one or more namespaces\n");
+            printf("\tbit [      1] 1 = May modify logical block content in one or more namespaces\n");
         }
         else
         {
-            printf("\tbit [      1] 0 = This command does not modify logical block content in any namespace\n");
+            printf("\tbit [      1] 0 = Does not modify logical block content in any namespace\n");
         }
     }
 
@@ -280,11 +280,11 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
             break;
 
         case 1:
-            printf("\tbit [ 18: 16] 1 = The command associated with this structure may be submitted when there is no other outstanding command to the same namespace and another command should not be submitted to the same namespace until this command is complete\n");
+            printf("\tbit [ 18: 16] 1 = May be submitted when there is no other outstanding command to the same namespace and another command should not be submitted to the same namespace until this command is complete\n");
             break;
 
         case 2:
-            printf("\tbit [ 18: 16] 2 = The command associated with this structure may be submitted when there is no other outstanding command to any namespace and another command should not be submitted to any namespace until this command is complete\n");
+            printf("\tbit [ 18: 16] 2 = May be submitted when there is no other outstanding command to any namespace and another command should not be submitted to any namespace until this command is complete\n");
             break;
 
         default:
@@ -293,38 +293,38 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
 
         if (Data.CCC)
         {
-            printf("\tbit [      4] 1 = This command may change controller capabilities\n");
+            printf("\tbit [      4] 1 = May change controller capabilities\n");
         }
         else
         {
-            printf("\tbit [      4] 0 = This command does not modify controller capabilities\n");
+            printf("\tbit [      4] 0 = Does not modify controller capabilities\n");
         }
 
         if (Data.NIC)
         {
-            printf("\tbit [      3] 1 = This command may change the number of namespaces or capabilities for multiple namespaces\n");
+            printf("\tbit [      3] 1 = May change the number of namespaces or capabilities for multiple namespaces\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = This command does not modify the number of namespaces or capabilities for multiple namespaces\n");
+            printf("\tbit [      3] 0 = Does not modify the number of namespaces or capabilities for multiple namespaces\n");
         }
 
         if (Data.NCC)
         {
-            printf("\tbit [      2] 1 = This command may change the capabilities of a single namespace\n");
+            printf("\tbit [      2] 1 = May change the capabilities of a single namespace\n");
         }
         else
         {
-            printf("\tbit [      2] 0 = This command does not modify any namespace capabilities for the specified namespace\n");
+            printf("\tbit [      2] 0 = Does not modify any namespace capabilities for the specified namespace\n");
         }
 
         if (Data.LBCC)
         {
-            printf("\tbit [      1] 1 = This command may modify logical block content in one or more namespaces\n");
+            printf("\tbit [      1] 1 = May modify logical block content in one or more namespaces\n");
         }
         else
         {
-            printf("\tbit[       1] 0 = This command does not modify logical block content in any namespace\n");
+            printf("\tbit[       1] 0 = Does not modify logical block content in any namespace\n");
         }
     }
 }
