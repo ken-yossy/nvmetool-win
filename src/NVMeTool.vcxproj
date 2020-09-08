@@ -166,6 +166,7 @@
     <ClInclude Include="NVMeErrorInformation.h" />
     <ClInclude Include="NVMeFeaturesAPST.h" />
     <ClInclude Include="NVMeFeaturesHCTM.h" />
+    <ClInclude Include="NVMeFeaturesHMB.h" />
     <ClInclude Include="NVMeFeaturesLBARange.h" />
     <ClInclude Include="NVMeFeaturesTimestamp.h" />
     <ClInclude Include="NVMeFeaturesVWC.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="NVMeErrorInformation.cpp" />
     <ClCompile Include="NVMeFeaturesAPST.cpp" />
     <ClCompile Include="NVMeFeaturesHCTM.cpp" />
+    <ClCompile Include="NVMeFeaturesHMB.cpp" />
     <ClCompile Include="NVMeFeaturesLBARange.cpp" />
     <ClCompile Include="NVMeFeaturesTimestamp.cpp" />
     <ClCompile Include="NVMeFeaturesVWC.cpp" />

@@ -9,6 +9,7 @@
 #include "NVMeFeaturesAPST.h"
 #include "NVMeFeaturesTimestamp.h"
 #include "NVMeFeaturesLBARange.h"
+#include "NVMeFeaturesHMB.h"
 
 // NVMeGetFeature32() : used for Get Feature command with 32bit fixed return value
 int iNVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11, uint32_t* _pulData)
@@ -1196,6 +1197,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         "\n#     %02Xh = Write Atomicity Normal"
         "\n#     %02Xh = Asynchronous Event Configuration"
         "\n#     %02Xh = Autonomous Power State Transition"
+        "\n#     %02Xh = Host Memory Buffer"
         "\n#     %02Xh = Timestamp"
         "\n#     %02Xh = Host Controlled Thermal Management"
         "\n#     %02Xh = Non-Operational Power State Config"
@@ -1212,6 +1214,7 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         NVME_FEATURE_WRITE_ATOMICITY,
         NVME_FEATURE_ASYNC_EVENT_CONFIG,
         NVME_FEATURE_AUTONOMOUS_POWER_STATE_TRANSITION,
+        NVME_FEATURE_HOST_MEMORY_BUFFER,
         NVME_FEATURE_TIMESTAMP,
         NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT,
         NVME_FEATURE_NONOPERATIONAL_POWER_STATE,
@@ -1316,13 +1319,28 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         }
         break;
 
+    case NVME_FEATURE_HOST_MEMORY_BUFFER:
+        cCmd = cGetConsoleInput("\n# Get Feature : Host Memory Buffer (Feature Identifier = 0Dh), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            if (g_stController.HMPRE == 0)
+            {
+                fprintf(stderr, "\n[W] This SSD controller does not support Host Memory Buffer (HMB), ignore\n");
+            }
+            else
+            {
+                iResult = iNVMeGetFeaturesHMB(_hDevice);
+            }
+        }
+        break;
+
     case NVME_FEATURE_TIMESTAMP:
         cCmd = cGetConsoleInput("\n# Get Feature : Timestamp (Feature Identifier = 0Eh), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
             if (g_stController.ONCS.Timestamp == 0)
             {
-                fprintf(stderr, "[W] This SSD controller does not support Timestamp, ignore\n");
+                fprintf(stderr, "\n[W] This SSD controller does not support Timestamp, ignore\n");
             }
             else
             {
@@ -1355,13 +1373,12 @@ int iNVMeGetFeatures(HANDLE _hDevice)
         }
         break;
 
-    case NVME_FEATURE_HOST_MEMORY_BUFFER:
     case NVME_FEATURE_KEEP_ALIVE:
     case NVME_FEATURE_NVM_HOST_IDENTIFIER:
     case NVME_FEATURE_NVM_RESERVATION_NOTIFICATION_MASK:
     case NVME_FEATURE_NVM_RESERVATION_PERSISTANCE:
     default:
-        printf("\n[E] Feature is not implemented yet.\n");
+        printf("\n[E] Feature %02Xh is not implemented yet.\n", iFId);
         break;
     }
 
