@@ -109,8 +109,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        03h | Firmware Slot Information      | x    | |
 |        05h | Command Supported and Effects  | x    | |
 |        06h | Device Self-test               | x    | Need to support Device Self-test command |
-|        07h | Telemetry Host-initiated       | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
-|        08h | Telemetry Controller-initiated | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
+|        07h | Telemetry Host-initiated       | x    | Need to support Telemetry. `Create Telemetry Host-Initiated Data` seems not working (dependent on device?). Not support getting "Telemetry Host-Initiated Data Block"s |
+|        08h | Telemetry Controller-initiated | x    | Need to support Telemetry. Not support getting "Telemetry Controller-Initiated Data Block"s |
 | 09h -- 6Fh | _Reserved_                     |      | |
 |        70h | Discovery                      |      | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          |      | |

@@ -8,12 +8,12 @@ static void s_vPrintNVMeTelemetryHostInitiated(PNVME_TELEMETRY_HOST_INITIATED_LO
     printf("[I] Telemetry Host Initiated :\n");
     if (_pData->LogIdentifier != 7)
     {
-        printf("\tbyte[      0] %d = Log Identifier (invalid)\n", _pData->LogIdentifier);
+        printf("\tbyte [      0] %d = Log Identifier (invalid)\n", _pData->LogIdentifier);
         return;
     }
     else
     {
-        printf("\tbyte[      0] %d = Log Identifier\n", _pData->LogIdentifier);
+        printf("\tbyte [      0] %d = Log Identifier\n", _pData->LogIdentifier);
     }
 
     printf("\tbyte [  7:  5] %02X%02X%02X = IEEE OUI Identifier\n", _pData->OrganizationID[0], _pData->OrganizationID[1], _pData->OrganizationID[2]);
@@ -38,12 +38,12 @@ static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIA
     printf("[I] Telemetry Controller Initiated :\n");
     if (_pData->LogIdentifier != 8)
     {
-        printf("\tbyte[      0] %d = Log Identifier (invalid)\n", _pData->LogIdentifier);
+        printf("\tbyte [      0] %d = Log Identifier (invalid)\n", _pData->LogIdentifier);
         return;
     }
     else
     {
-        printf("\tbyte[      0] %d = Log Identifier\n", _pData->LogIdentifier);
+        printf("\tbyte [      0] %d = Log Identifier\n", _pData->LogIdentifier);
     }
 
     printf("\tbyte [  7:  5] %02X%02X%02X = IEEE OUI Identifier\n", _pData->OrganizationID[0], _pData->OrganizationID[1], _pData->OrganizationID[2]);
@@ -96,7 +96,7 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
     protocolDataDescr   = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT)buffer;
     protocolData        = (PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT)query->AdditionalParameters;
 
-    query->PropertyId   = StorageDeviceProtocolSpecificProperty;
+    query->PropertyId   = StorageAdapterProtocolSpecificProperty;
     query->QueryType    = PropertyStandardQuery;
 
     cdw10.AsUlong   = 0; // clear
@@ -200,7 +200,7 @@ int iNVMeGetTelemetryControllerInitiated(HANDLE _hDevice)
     protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT)buffer;
     protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT)query->AdditionalParameters;
 
-    query->PropertyId = StorageDeviceProtocolSpecificProperty;
+    query->PropertyId = StorageAdapterProtocolSpecificProperty;
     query->QueryType = PropertyStandardQuery;
 
     cdw10.AsUlong   = 0; // clear
