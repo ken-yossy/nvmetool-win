@@ -169,7 +169,7 @@ static void PrintStatusResultsExDIn(int status, DWORD returned, PSCSI_PASS_THROU
 {
     if (status)
     {
-        vUtilPrintSystemError( GetLastError(), "(Unknown)" );
+        vPrintSystemError( GetLastError(), "(Unknown)" );
         return;
     }
 
@@ -190,7 +190,7 @@ static void PrintStatusResultsExDOut(int status, DWORD returned, PSCSI_PASS_THRO
 {
     if (status)
     {
-        vUtilPrintSystemError(GetLastError(), "(Unknown)");
+        vPrintSystemError(GetLastError(), "(Unknown)");
         return;
     }
 
@@ -516,7 +516,7 @@ static void PrintStatusResultsDIn(int status, DWORD returned, PSCSI_PASS_THROUGH
 {
     if (status)
     {
-        vUtilPrintSystemError( GetLastError(), "(Unknown)" );
+        vPrintSystemError( GetLastError(), "(Unknown)" );
         return;
     }
 
@@ -537,7 +537,7 @@ static void PrintStatusResultsDOut(int status, DWORD returned, PSCSI_PASS_THROUG
 {
     if (status)
     {
-        vUtilPrintSystemError(GetLastError(), "(Unknown)");
+        vPrintSystemError(GetLastError(), "(Unknown)");
         return;
     }
 
@@ -563,7 +563,7 @@ static BOOL TestViaSCSIPassThrough(HANDLE _hDevice, PULONG _alignmentMask, PUCHA
     {
         errorCode = GetLastError();
         fprintf(stderr, "[E] Error getting device and/or adapter properties.\n");
-        vUtilPrintSystemError( GetLastError(), "(Unknown)" );
+        vPrintSystemError( GetLastError(), "(Unknown)" );
     }
 
     return status;
@@ -591,7 +591,7 @@ static PUCHAR AllocateAlignedBuffer(ULONG size, ULONG AlignmentMask, PUCHAR *pUn
 
     if (ptr == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
     }
     return ptr;
 }

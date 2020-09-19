@@ -35,7 +35,7 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
         return iResult;
     }
 

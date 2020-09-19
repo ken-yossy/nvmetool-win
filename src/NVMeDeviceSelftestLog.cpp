@@ -203,7 +203,7 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError( GetLastError(), "malloc" );
+        vPrintSystemError( GetLastError(), "malloc" );
         goto error_exit;
     }
 

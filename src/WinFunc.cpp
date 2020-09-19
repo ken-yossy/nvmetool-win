@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-void vUtilPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc)
+void vPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc)
 {
     WCHAR lpMsgBuf[1024];
     ULONG count;
@@ -53,7 +53,7 @@ int iIssueDeviceIoControl(
 
     if (iRetIoControl == 0)
     {
-        vUtilPrintSystemError(GetLastError(), "DeviceIoControl");
+        vPrintSystemError(GetLastError(), "DeviceIoControl");
     }
     else
     {
@@ -80,7 +80,7 @@ HANDLE hIssueCreateFile(const char* _strDeviceNo)
 
     if (hDevice == INVALID_HANDLE_VALUE)
     {
-        vUtilPrintSystemError(GetLastError(), "CreateFile");
+        vPrintSystemError(GetLastError(), "CreateFile");
     }
     return hDevice;
 }

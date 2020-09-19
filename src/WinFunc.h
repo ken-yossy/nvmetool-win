@@ -2,7 +2,7 @@
 
 #include <windows.h>
 
-void vUtilPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc);
+void vPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc);
 
 int iIssueDeviceIoControl(HANDLE _hDevice,
     DWORD _dwControlCode,

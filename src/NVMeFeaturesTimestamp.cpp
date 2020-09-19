@@ -26,7 +26,7 @@ static int siNVMeGetFeaturesTimestamp(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
         return iResult;
     }
 

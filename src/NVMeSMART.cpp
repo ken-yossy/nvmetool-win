@@ -301,7 +301,7 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError( GetLastError(), "malloc" );
+        vPrintSystemError( GetLastError(), "malloc" );
         goto error_exit;
     }
 

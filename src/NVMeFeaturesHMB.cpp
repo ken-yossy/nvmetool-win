@@ -40,7 +40,7 @@ static int siNVMeGetFeaturesHMB(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _cdw10)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
         return iResult;
     }
 

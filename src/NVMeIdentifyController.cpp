@@ -64,7 +64,7 @@ int iNVMeIdentifyController(HANDLE _hDevice)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError( GetLastError(), "malloc" );
+        vPrintSystemError( GetLastError(), "malloc" );
         goto error_exit;
     }
 

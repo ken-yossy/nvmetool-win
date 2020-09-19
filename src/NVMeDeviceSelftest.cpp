@@ -64,7 +64,7 @@ static int siNVMeDST(HANDLE _hDevice, int _iAction)
     }
     else
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
     }
 
     if (buffer != NULL)

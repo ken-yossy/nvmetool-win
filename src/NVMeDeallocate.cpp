@@ -18,7 +18,7 @@ int iNVMeDeallocate(HANDLE _hDevice)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError( GetLastError(), "malloc" );
+        vPrintSystemError( GetLastError(), "malloc" );
         return -1;
     }
 

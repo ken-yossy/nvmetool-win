@@ -32,7 +32,7 @@ int iNVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11,
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
         goto error_exit;
     }
 

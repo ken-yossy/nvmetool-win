@@ -77,7 +77,7 @@ int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError( GetLastError(), "malloc" );
+        vPrintSystemError( GetLastError(), "malloc" );
         goto error_exit;
     }
 

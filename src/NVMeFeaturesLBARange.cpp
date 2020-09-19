@@ -111,7 +111,7 @@ static int siNVMeGetFeaturesLBARange(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _c
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "malloc");
+        vPrintSystemError(GetLastError(), "malloc");
         return iResult;
     }
 

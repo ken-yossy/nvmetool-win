@@ -386,7 +386,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice, int _iVerboseLevel)
 
     if (buffer == NULL)
     {
-        vUtilPrintSystemError( GetLastError(), "malloc" );
+        vPrintSystemError( GetLastError(), "malloc" );
         goto error_exit;
     }
 

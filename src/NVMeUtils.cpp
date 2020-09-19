@@ -17,7 +17,7 @@ char* strConvertUTF8toMultiByte(const char* _str)
     numChar = MultiByteToWideChar(CP_UTF8, 0, _str, -1, NULL, 0);
     if (numChar == 0)
     {
-        vUtilPrintSystemError(GetLastError(), "MultiByteToWideChar");
+        vPrintSystemError(GetLastError(), "MultiByteToWideChar");
         goto error_exit;
     }
 
@@ -25,13 +25,13 @@ char* strConvertUTF8toMultiByte(const char* _str)
     strTemp = (wchar_t*)calloc(numChar, sizeof(wchar_t));
     if (strTemp == NULL)
     {
-        vUtilPrintSystemError(GetLastError(), "calloc");
+        vPrintSystemError(GetLastError(), "calloc");
         goto error_exit;
     }
 
     if (MultiByteToWideChar(CP_UTF8, 0, _str, -1, (LPWSTR)strTemp, numChar) == 0)
     {
-        vUtilPrintSystemError(GetLastError(), "MultiByteToWideChar");
+        vPrintSystemError(GetLastError(), "MultiByteToWideChar");
         goto error_exit;
     }
 
@@ -40,7 +40,7 @@ char* strConvertUTF8toMultiByte(const char* _str)
     numChar = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)strTemp, -1, NULL, 0, NULL, NULL);
     if (numChar == 0)
     {
-        vUtilPrintSystemError(GetLastError(), "WideCharToMultiByte");
+        vPrintSystemError(GetLastError(), "WideCharToMultiByte");
         goto error_exit;
     }
 
@@ -48,7 +48,7 @@ char* strConvertUTF8toMultiByte(const char* _str)
     strDest = (char*)calloc(((long long)numChar)*2, sizeof(char));
     if (WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)strTemp, -1, (LPSTR)strDest, numChar, NULL, NULL) == 0)
     {
-        vUtilPrintSystemError(GetLastError(), "WideCharToMultiByte");
+        vPrintSystemError(GetLastError(), "WideCharToMultiByte");
     }
 
 error_exit:
