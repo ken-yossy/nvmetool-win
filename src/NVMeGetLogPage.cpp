@@ -1,9 +1,8 @@
-#include "WinFunc.h"
+#include <windows.h>
 #include <stdio.h>
 #include <nvme.h>
 
 #include "NVMeUtils.h"
-#include "NVMeGetLogPage.h"
 #include "NVMeSMART.h"
 #include "NVMeCommandSupportedAndEffects.h"
 #include "NVMeErrorInformation.h"

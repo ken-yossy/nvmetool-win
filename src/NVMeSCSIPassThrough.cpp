@@ -1,13 +1,13 @@
-#include "WinFunc.h"
-#include "NVMeUtils.h"
-
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <ntddscsi.h>
-#include <string.h>
 #include <intsafe.h>
 
 #define _NTSCSI_USER_MODE_
 #include <scsi.h>
+
+#include "WinFunc.h"
+#include "NVMeUtils.h"
 
 #define SPT_CDB_LENGTH 32
 #define SPT_SENSE_LENGTH 32

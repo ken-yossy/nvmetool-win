@@ -1,4 +1,6 @@
-#include "WinFunc.h"
+#include <windows.h>
+#include <stdio.h>
+#include <tchar.h>
 
 void vUtilPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc)
 {

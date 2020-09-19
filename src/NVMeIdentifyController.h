@@ -1,7 +1,7 @@
 #pragma once
 
 #include <windows.h>
-#include <cstdint>
+#include <stdint.h>
 #include <nvme.h>
 
 extern NVME_IDENTIFY_CONTROLLER_DATA g_stController;

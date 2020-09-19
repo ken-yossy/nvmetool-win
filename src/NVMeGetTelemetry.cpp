@@ -1,7 +1,8 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
-#include "NVMeUtils.h"
+
+#include "WinFunc.h"
 
 static void s_vPrintNVMeTelemetryHostInitiated(PNVME_TELEMETRY_HOST_INITIATED_LOG _pData)
 {

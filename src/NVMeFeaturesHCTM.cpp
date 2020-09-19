@@ -1,10 +1,9 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
 
+#include "WinFunc.h"
 #include "NVMeUtils.h"
-#include "NVMeGetFeatures.h"
-#include "NVMeSCSIPassThrough.h"
 #include "NVMeIdentifyController.h"
 
 typedef union {

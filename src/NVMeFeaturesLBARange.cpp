@@ -1,8 +1,8 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
 
-#include "NVMeUtils.h"
+#include "WinFunc.h"
 #include "NVMeGetFeatures.h"
 
 static void s_vNVMePrintLBARange(PNVME_LBA_RANGET_TYPE_ENTRY _pstData, int _iNumValid)

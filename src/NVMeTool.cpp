@@ -1,10 +1,8 @@
-﻿#include "WinFunc.h"
-#include <iostream>
-#include <nvme.h>
+﻿#include <windows.h>
+#include <stdio.h>
+#include <stdint.h>
 
-#include <string.h>
-#include <stdlib.h>
-
+#include "WinFunc.h"
 #include "NVMeSCSIPassThrough.h"
 #include "NVMeDeallocate.h"
 #include "NVMeIdentify.h"
@@ -24,7 +22,7 @@ NVME_SMART_INFO_LOG g_stSMARTLog;
 
 uint32_t g_uiRevision; // revision that this controller conforms to; format is same as VER field
 
-void vPrintUsage(char* _strProgName)
+static void s_vPrintUsage(char* _strProgName)
 {
     char strShortProgName[1024];
 
@@ -61,7 +59,7 @@ int main(int _argc, char* _argv[])
 
     if (_argc != 2)
     {
-        vPrintUsage(_argv[0]);
+        s_vPrintUsage(_argv[0]);
         return 0;
     }
 

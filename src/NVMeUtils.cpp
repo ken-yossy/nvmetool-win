@@ -1,6 +1,7 @@
-#include "WinFunc.h"
-#include <string>
+#include <windows.h>
+#include <stdio.h>
 
+#include "WinFunc.h"
 #include "NVMeUtils.h"
 
 char* strConvertUTF8toMultiByte(const char* _str)

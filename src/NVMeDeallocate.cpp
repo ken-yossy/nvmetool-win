@@ -1,3 +1,5 @@
+#include <windows.h>
+
 #include "WinFunc.h"
 
 int iNVMeDeallocate(HANDLE _hDevice)

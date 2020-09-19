@@ -1,6 +1,7 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
+
 #include "NVMeUtils.h"
 #include "NVMeIdentifyController.h"
 #include "NVMeIdentifyControllerData.h"

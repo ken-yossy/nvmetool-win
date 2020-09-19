@@ -1,8 +1,9 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <nvme.h>
 
-#include "NVMeUtils.h"
+#include "WinFunc.h"
 #include "NVMeGetFeatures.h"
 
 static int siNVMeGetFeaturesAPST(HANDLE _hDevice,

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <windows.h>
-#include <cstdint>
+#include <stdint.h>
 
 //
 // Information of SMART log: 512 bytes

@@ -1,9 +1,8 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
 
 #include "NVMeUtils.h"
-#include "NVMeGetFeatures.h"
 #include "NVMeFeaturesHCTM.h"
 #include "NVMeFeaturesVWC.h"
 

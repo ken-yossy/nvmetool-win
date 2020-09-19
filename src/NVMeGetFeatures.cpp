@@ -1,11 +1,12 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
 
+#include "WinFunc.h"
 #include "NVMeUtils.h"
 #include "NVMeSMART.h" // to use g_stSMARTLog
 #include "NVMeIdentifyController.h" // to use g_stController
-#include "NVMeGetFeatures.h"
+
 #include "NVMeFeaturesAPST.h"
 #include "NVMeFeaturesTimestamp.h"
 #include "NVMeFeaturesLBARange.h"

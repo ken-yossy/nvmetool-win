@@ -1,5 +1,5 @@
 #pragma once
 
-#include "WinFunc.h"
+#include <windows.h>
 
 int iNVMeSetFeaturesVWC(HANDLE _hDevice);

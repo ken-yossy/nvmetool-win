@@ -1,5 +1,8 @@
-#include "WinFunc.h"
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
+
+#include "WinFunc.h"
 
 int iNVMeIdentifyActiveNSIDList(HANDLE _hDevice)
 {

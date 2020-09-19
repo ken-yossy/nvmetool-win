@@ -1,9 +1,27 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
-#include "NVMeUtils.h"
-#include "NVMeIdentifyController.h"
-#include "NVMeFwSlotInformation.h"
+
+#include "WinFunc.h"
+
+typedef struct {
+    union {
+        struct {
+            UCHAR   ActiveSlot : 3;
+            UCHAR   Reserved0 : 1;
+            UCHAR   PendingActivateSlot : 3;
+            UCHAR   Reserved1 : 1;
+        } DUMMYSTRUCTNAME;
+
+        BYTE AsByte;
+    } AFI;
+
+    UCHAR    Reserved0[7];
+
+    UCHAR    FRS[7][8];
+    UCHAR    Reserved1[448];
+
+} NVME_FIRMWARE_SLOT_INFO_LOG12, * PNVME_FIRMWARE_SLOT_INFO_LOG12;
 
 static void s_vPrintNVMeFwSlotInformation(PNVME_FIRMWARE_SLOT_INFO_LOG12 _pData)
 {

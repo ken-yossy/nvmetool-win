@@ -1,8 +1,16 @@
-#include "WinFunc.h"
+#include <windows.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <nvme.h>
-#include <cstdint>
 
-#include "NVMeIdentifyNSIDDescriptor.h"
+#include "WinFunc.h"
+
+typedef struct {
+    uint8_t NIDT;
+    uint8_t NIDL;
+    uint8_t Reserved[2];
+    uint8_t NID[4092];
+} NVME_IDENTIFY_NSID_DESCRIPTOR, * PNVME_IDENTIFY_NSID_DESCRIPTOR;
 
 static void printNVMeIdentifyNSIDDescriptor(PNVME_IDENTIFY_NSID_DESCRIPTOR _pNSData, DWORD _dwNSID)
 {

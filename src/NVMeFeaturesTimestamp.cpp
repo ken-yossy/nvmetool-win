@@ -1,8 +1,8 @@
-#include "WinFunc.h"
-#include <iostream>
+#include <windows.h>
+#include <stdio.h>
 #include <nvme.h>
 
-#include "NVMeUtils.h"
+#include "WinFunc.h"
 #include "NVMeGetFeatures.h"
 
 static int siNVMeGetFeaturesTimestamp(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _cdw10, uint64_t *_pullResult)

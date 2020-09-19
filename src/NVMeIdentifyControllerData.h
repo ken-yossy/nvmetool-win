@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 #include <nvme.h>
 
 // Identify Controller data structure (upto v1.4) based on nvme.h
