@@ -178,7 +178,7 @@ static const char* strNVMCommand[256] =
     "(Vendor specific)", "(Vendor specific)", "(Vendor specific)", "(Vendor specific)", // FCh -- FFh
 };
 
-static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLevel)
+static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData)
 {
     printf("[I] Command Supported and Effect Log: Admin Command\n");
     for (int i = 0; i < 256; i++)
@@ -186,11 +186,6 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
         NVME_COMMAND_EFFECTS_DATA Data = _pData->ACS[i];
         if (Data.CSUPP == 0)
         {
-            if (_iVerboseLevel == 2)
-            {
-                printf("[I] Opecode = 0x%02X ", i);
-                printf(" [ %s ] Unsupported (bit 0: 0)\n", strAdminCommand[i]);
-            }
             continue;
         }
         else
@@ -261,11 +256,6 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
         NVME_COMMAND_EFFECTS_DATA Data = _pData->IOCS[i];
         if (Data.CSUPP == 0)
         {
-            if (_iVerboseLevel == 2)
-            {
-                printf("[I] Opecode = 0x%02X ", i);
-                printf(" [ %s ] Unsupported (bit 0: 0)\n", strNVMCommand[i]);
-            }
             continue;
         }
         else
@@ -330,44 +320,7 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData, int _iVerboseLev
     }
 }
 
-static void vPrintNVMeCSEDataSimple(PNVME_COMMAND_EFFECTS_LOG _pData)
-{
-    printf("[I] Command Supported and Effect Log: Admin Command\n");
-    printf("    | Opecode | Support | Command\n");
-    for (int i = 0; i < 256; i++)
-    {
-        NVME_COMMAND_EFFECTS_DATA Data = _pData->ACS[i];
-        printf("    | 0x%02X    |", i);
-        if (Data.CSUPP == 0)
-        {
-            printf("         |");
-        }
-        else
-        {
-            printf("    *    |");
-        }
-        printf(" %s\n", strAdminCommand[i]);
-    }
-
-    printf("\n[I] Command Supported and Effect Log: NVM Command\n");
-    printf("    | Opecode | Support | Command\n");
-    for (int i = 0; i < 256; i++)
-    {
-        NVME_COMMAND_EFFECTS_DATA Data = _pData->IOCS[i];
-        printf("    | 0x%02X    |", i);
-        if (Data.CSUPP == 0)
-        {
-            printf("         |");
-        }
-        else
-        {
-            printf("    *    |");
-        }
-        printf(" %s\n", strNVMCommand[i]);
-    }
-}
-
-int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice, int _iVerboseLevel)
+int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
 {
     int     iResult = -1;
     PVOID   buffer = NULL;
@@ -438,15 +391,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice, int _iVerboseLevel)
         goto error_exit;
     }
 
-    // Command Support and Effect Log Data
-    if (_iVerboseLevel == 0)
-    {
-        vPrintNVMeCSEDataSimple((PNVME_COMMAND_EFFECTS_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
-    }
-    else
-    {
-        vPrintNVMeCSEData((PNVME_COMMAND_EFFECTS_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset), _iVerboseLevel);
-    }
+    vPrintNVMeCSEData((PNVME_COMMAND_EFFECTS_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
     iResult = 0; // succeeded
 
 error_exit:

@@ -72,7 +72,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
             cCmd = cGetConsoleInput("\n# Get Log Page - Command Supported and Effects (Log Identifier 05h), Press 'y' to continue\n", strCmd);
             if (cCmd == 'y')
             {
-                iResult = iNVMeGetCommandSupportedAndEffects(_hDevice, 1);
+                iResult = iNVMeGetCommandSupportedAndEffects(_hDevice);
             }
         }
         else
