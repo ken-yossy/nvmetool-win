@@ -84,7 +84,7 @@ LPCSTR BusTypeStrings[] = {
 
 #define NUMBER_OF_BUS_TYPE_STRINGS (sizeof(BusTypeStrings)/sizeof(BusTypeStrings[0]))
 
-static VOID PrintSenseInfo(PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb)
+static void PrintSenseInfo(PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb)
 {
     UCHAR i;
 
@@ -105,8 +105,8 @@ static void PrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
     ULONG Cnt;
     UCHAR Str[32] = { 0 };
 
-    fprintf(stdout, "        00  01  02  03  04  05  06  07   08  09  0A  0B  0C  0D  0E  0F\n");
-    fprintf(stdout, "        ---------------------------------------------------------------\n");
+    printf("        00  01  02  03  04  05  06  07   08  09  0A  0B  0C  0D  0E  0F\n");
+    printf("        ---------------------------------------------------------------\n");
 
     int i = 0;
     for (Cnt = 0; Cnt < BufferLength; Cnt++)
@@ -114,11 +114,11 @@ static void PrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
         // print address
         if ((Cnt) % 16 == 0)
         {
-            fprintf(stdout, " 0x%03X  ", Cnt);
+            printf(" 0x%03X  ", Cnt);
         }
 
         // print hex data
-        fprintf(stdout, "%02X  ", DataBuffer[Cnt]);
+        printf("%02X  ", DataBuffer[Cnt]);
         if (isprint(DataBuffer[Cnt]))
         {
             Str[i] = DataBuffer[Cnt];
@@ -130,7 +130,7 @@ static void PrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
         i++;
         if ((Cnt + 1) % 8 == 0)
         {
-            fprintf(stdout, " ");
+            printf(" ");
             Str[i++] = ' ';
         }
 
@@ -139,10 +139,10 @@ static void PrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
         {
             Str[i++] = '\0';
             i = 0;
-            fprintf(stdout, "%s\n", Str);
+            printf("%s\n", Str);
         }
     }
-    fprintf(stdout, "\n\n");
+    printf("\n\n");
 }
 
 static void PrintSenseInfoEx(PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex)
@@ -180,8 +180,8 @@ static void PrintStatusResultsExDIn(int status, DWORD returned, PSCSI_PASS_THROU
     }
     else
     {
-        fprintf(stdout, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
-        fprintf(stdout, "DataOut buffer length: %Xh, DataIn buffer length: %Xh\n\n\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
+        printf("DataOut buffer length: %Xh, DataIn buffer length: %Xh\n\n\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
         PrintDataBuffer((PUCHAR)(psptwb_ex->ucDataBuf), length);
     }
 }
@@ -201,8 +201,8 @@ static void PrintStatusResultsExDOut(int status, DWORD returned, PSCSI_PASS_THRO
     }
     else
     {
-        fprintf(stdout, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
-        fprintf(stdout, "DataOut buffer length: %Xh, DataIn buffer length: %Xh\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
+        printf("DataOut buffer length: %Xh, DataIn buffer length: %Xh\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
     }
 }
 
@@ -244,9 +244,8 @@ static void PrintAdapterDescriptor(PSTORAGE_ADAPTER_DESCRIPTOR AdapterDescriptor
         trueMaximumTransferLength = PAGE_SIZE;
     }
 
-    fprintf(stdout, "\n            ***** STORAGE ADAPTER DESCRIPTOR DATA *****");
-    fprintf(stdout,
-        "              Version: %08x\n"
+    printf("\n            ***** STORAGE ADAPTER DESCRIPTOR DATA *****");
+    printf("              Version: %08x\n"
         "            TotalSize: %08x\n"
         "MaximumTransferLength: %08x (bytes)\n"
         " MaximumPhysicalPages: %08x\n"
@@ -273,7 +272,7 @@ static void PrintAdapterDescriptor(PSTORAGE_ADAPTER_DESCRIPTOR AdapterDescriptor
         AdapterDescriptor->BusMajorVersion,
         AdapterDescriptor->BusMinorVersion);
 
-    fprintf(stdout, "\n\n");
+    printf("\n\n");
 }
 
 static void PrintDeviceDescriptor(PSTORAGE_DEVICE_DESCRIPTOR DeviceDescriptor)
@@ -317,9 +316,8 @@ static void PrintDeviceDescriptor(PSTORAGE_DEVICE_DESCRIPTOR DeviceDescriptor)
         serialNumber += (ULONG_PTR)DeviceDescriptor->SerialNumberOffset;
     }
 
-    fprintf(stdout, "\n            ***** STORAGE DEVICE DESCRIPTOR DATA *****");
-    fprintf(stdout,
-        "              Version: %08x\n"
+    printf("\n            ***** STORAGE DEVICE DESCRIPTOR DATA *****");
+    printf("              Version: %08x\n"
         "            TotalSize: %08x\n"
         "           DeviceType: %08x\n"
         "   DeviceTypeModifier: %08x\n"
@@ -349,7 +347,7 @@ static void PrintDeviceDescriptor(PSTORAGE_DEVICE_DESCRIPTOR DeviceDescriptor)
         PrintDataBuffer(DeviceDescriptor->RawDeviceProperties, DeviceDescriptor->RawPropertiesLength);
     }
 
-    fprintf(stdout, "\n\n");
+    printf("\n\n");
 }
 
 static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PUCHAR SrbType)
@@ -527,8 +525,8 @@ static void PrintStatusResultsDIn(int status, DWORD returned, PSCSI_PASS_THROUGH
     }
     else
     {
-        fprintf(stderr, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
-        fprintf(stdout, "Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
+        printf("Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
         PrintDataBuffer((PUCHAR)(psptwb->ucDataBuf), length);
     }
 }
@@ -548,8 +546,8 @@ static void PrintStatusResultsDOut(int status, DWORD returned, PSCSI_PASS_THROUG
     }
     else
     {
-        fprintf(stderr, "Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
-        fprintf(stdout, "Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
+        printf("Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
     }
 }
 
@@ -925,7 +923,7 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
         break;
 
     default:
-        printf("\n[E] Command not implemented yet.\n");
+        fprintf(stderr, "\n[E] Command not implemented yet.\n");
         break;
     }
 

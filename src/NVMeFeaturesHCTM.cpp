@@ -72,7 +72,7 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
         if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
             (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
         {
-            printf("[E] NVMeSetFeature: Data descriptor header not valid.\n");
+            fprintf(stderr, "[E] NVMeSetFeature: Data descriptor header not valid.\n");
             iResult = -1; // error
         }
         else
@@ -100,9 +100,9 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
         return iResult;
     }
 
-    fprintf(stderr, "\n[I] Minimum Thermal Management Temperature is %d (K)", g_stController.MNTMT);
-    fprintf(stderr, "\n[I] Maximum Thermal Management Temperature is %d (K)", g_stController.MXTMT);
-    fprintf(stderr, "\n[I] You can speficy TMT1 and TMT2, satisfying TMT1 < TMT2, MNTMT <= TMT1, and TMT2 <= MXTMT\n");
+    printf("\n[I] Minimum Thermal Management Temperature is %d (K)", g_stController.MNTMT);
+    printf("\n[I] Maximum Thermal Management Temperature is %d (K)", g_stController.MXTMT);
+    printf("\n[I] You can speficy TMT1 and TMT2, satisfying TMT1 < TMT2, MNTMT <= TMT1, and TMT2 <= MXTMT\n");
 
     {
         char cCmd;
@@ -123,19 +123,19 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
 
     if (!(iTMT1 < iTMT2))
     {
-        printf("\n[E] Should be TMT1 < TMT2, you tried TMT1 = %d and TMT2 = %d, process aborted\n", iTMT1, iTMT2);
+        fprintf(stderr, "\n[E] Should be TMT1 < TMT2, you tried TMT1 = %d and TMT2 = %d, process aborted\n", iTMT1, iTMT2);
         return iResult;
     }
 
     if (!(g_stController.MNTMT <= iTMT1))
     {
-        printf("\n[E] Should be MNTMT <= TMT1, you tried TMT1 = %d against MNTMT = %d, process aborted\n", iTMT1, g_stController.MNTMT);
+        fprintf(stderr, "\n[E] Should be MNTMT <= TMT1, you tried TMT1 = %d against MNTMT = %d, process aborted\n", iTMT1, g_stController.MNTMT);
         return iResult;
     }
 
     if (!(iTMT2 <= g_stController.MXTMT))
     {
-        printf("\n[E] Should be TMT2 <= MXTMT, you tried TMT2 = %d against MXTMT = %d, process aborted\n", iTMT2, g_stController.MXTMT);
+        fprintf(stderr, "\n[E] Should be TMT2 <= MXTMT, you tried TMT2 = %d against MXTMT = %d, process aborted\n", iTMT2, g_stController.MXTMT);
         return iResult;
     }
 

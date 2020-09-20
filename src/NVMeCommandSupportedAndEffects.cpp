@@ -419,12 +419,12 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice, int _iVerboseLevel)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] getNVMeCommandSupportedAndEffects: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] getNVMeCommandSupportedAndEffects: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -433,7 +433,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice, int _iVerboseLevel)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < sizeof(NVME_COMMAND_EFFECTS_LOG))) {
-        printf("[E] getNVMeCommandSupportedAndEffects: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] getNVMeCommandSupportedAndEffects: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }

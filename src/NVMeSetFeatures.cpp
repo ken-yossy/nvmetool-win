@@ -45,10 +45,10 @@ int iNVMeSetFeatures(HANDLE _hDevice)
         break;
 
     default:
-        printf("\n[E] Feature is not implemented yet.\n");
+        fprintf(stderr, "\n[E] Feature is not implemented yet.\n");
         break;
     }
 
-    fprintf(stderr, "\n");
+    printf("\n");
     return iResult;
 }

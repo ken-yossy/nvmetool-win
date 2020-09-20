@@ -148,7 +148,7 @@ static int siNVMeGetFeaturesLBARange(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _c
         if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
             (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
         {
-            printf("[E] NVMeGetFeaturesTimestamp: Data descriptor header not valid.\n");
+            fprintf(stderr, "[E] NVMeGetFeaturesLBARange: Data descriptor header not valid.\n");
             iResult = -1; // error
         }
         else
@@ -168,7 +168,7 @@ static int siNVMeGetFeaturesLBARange(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _c
 
             if ((protocolData->FixedProtocolReturnData & 0x3F) == 0)
             {
-                printf("\t\t[W] No LBA Range Type data is registered, ignore.\n");
+                printf("\t\tNo LBA Range Type data is registered.\n");
                 // not error
             }
             else

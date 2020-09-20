@@ -58,7 +58,7 @@ int iNVMeIdentifyActiveNSIDList(HANDLE _hDevice)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     //
     // Validate the returned data.
@@ -81,16 +81,16 @@ int iNVMeIdentifyActiveNSIDList(HANDLE _hDevice)
 
     // Dump list
     {
-        fprintf(stderr, "[I] === Active Namespace ID list start ===\n");
+        printf("[I] === Active Namespace ID list start ===\n");
         PULONG aIDList = (PULONG)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
         for (int i = 0; i < 1024; i++)
         {
             if ( aIDList[i] )
             {
-                fprintf(stderr, "\t%4d\n", aIDList[i]);
+                printf("\t%4d\n", aIDList[i]);
             }
         }
-        fprintf(stderr, "[I] === Active Namespace ID list end ===\n");
+        printf("[I] === Active Namespace ID list end ===\n");
     }
 
     iResult = 0; // succeeded

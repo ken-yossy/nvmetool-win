@@ -43,12 +43,12 @@ static void s_vPrintUsage(char* _strProgName)
     }
 
     // cPtr holds the last occurrence of '\'
-    fprintf(stderr, "%s: Sample Utility tool for NVMe drive.\n\n", cPtr);
-    fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "  > %s <physical-drive-no>\n\n", cPtr);
-    fprintf(stderr, "Argument:\n");
-    fprintf(stderr, "  <physical-drive-no>: physical number of drive to be accessed\n");
-    fprintf(stderr, "    (you can be confirm it with \"Disk Management\" in Control Panel)\n\n");
+    printf("%s: Sample Utility tool for NVMe drive.\n\n", cPtr);
+    printf("Usage:\n");
+    printf("  > %s <physical-drive-no>\n\n", cPtr);
+    printf("Argument:\n");
+    printf("  <physical-drive-no>: physical number of drive to be accessed\n");
+    printf("    (you can be confirm it with \"Disk Management\" in Control Panel)\n\n");
 }
 
 int main(int _argc, char* _argv[])
@@ -80,7 +80,7 @@ int main(int _argc, char* _argv[])
         return iResult;
     }
 
-    fprintf(stderr, "[I] Getting controller identify data succeeded.\n\n");
+    printf("[I] Getting controller identify data succeeded.\n\n");
     g_uiRevision = uiPrintControllerBasicData();
 
     // retrieve fundamental SMART data
@@ -91,7 +91,7 @@ int main(int _argc, char* _argv[])
         return iResult;
     }
 
-    fprintf(stderr, "[I] Getting SMART information succeeded.\n\n");
+    printf("[I] Getting SMART information succeeded.\n\n");
 
     while (!bFinished)
     {
@@ -104,7 +104,7 @@ int main(int _argc, char* _argv[])
                 iResult = iNVMeDeallocate(hDevice);
                 if (iResult == 0)
                 {
-                    fprintf(stderr, "[I] Deallocation succeeded.\n\n");
+                    printf("[I] Deallocation succeeded.\n\n");
                 }
             }
             else
@@ -166,14 +166,14 @@ int main(int _argc, char* _argv[])
             break;
 
         default:
-            printf("\n[E] Command not implemented yet.\n");
+            fprintf(stderr, "\n[E] Command not implemented yet.\n");
             break;
         }
     }
 
     CloseHandle(hDevice);
 
-    fprintf(stderr, "Press any key to terminate program... ");
+    printf("Press any key to terminate program... ");
     getc(stdin); // wait...
 
     return iResult;

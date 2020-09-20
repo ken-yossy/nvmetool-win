@@ -27,7 +27,7 @@ static int siNVMeDoFormat(HANDLE _hDevice)
     }
     else
     {
-        fprintf(stderr, "[I] Issuing Format NVM command by DeviceIoControl(IOCTL_STORAGE_REINITIALIZE_MEDIA) is succeeded\n");
+        printf("[I] Issuing Format NVM command by DeviceIoControl(IOCTL_STORAGE_REINITIALIZE_MEDIA) is succeeded\n");
     }
 
     return iResult;
@@ -85,13 +85,13 @@ int iNVMeFormatNVM(HANDLE _hDevice)
 
     if (!g_stController.OACS.FormatNVM)
     {
-        printf("[W] This controller does not support Format NVM command, ignore\n");
+        fprintf(stderr, "[W] This controller does not support Format NVM command, ignore\n");
         return iResult;
     }
 
     if (!g_stController.FNA.CryptographicEraseSupported)
     {
-        printf("[W] This controller does not support cryptographic erase function for Format NVM command, ignore\n");
+        fprintf(stderr, "[W] This controller does not support cryptographic erase function for Format NVM command, ignore\n");
         return iResult;
     }
 

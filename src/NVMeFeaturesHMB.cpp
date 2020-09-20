@@ -76,7 +76,7 @@ static int siNVMeGetFeaturesHMB(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _cdw10)
         if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
             (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
         {
-            printf("[E] NVMeGetFeaturesHMB: Data descriptor header not valid.\n");
+            fprintf(stderr, "[E] NVMeGetFeaturesHMB: Data descriptor header not valid.\n");
             iResult = -1; // error
         }
         else

@@ -63,7 +63,7 @@ static int siNVMeGetFeaturesTimestamp(HANDLE _hDevice, NVME_CDW10_GET_FEATURES _
         if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
             (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
         {
-            printf("[E] NVMeGetFeaturesTimestamp: Data descriptor header not valid.\n");
+            fprintf(stderr, "[E] NVMeGetFeaturesTimestamp: Data descriptor header not valid.\n");
             iResult = -1; // error
         }
         else

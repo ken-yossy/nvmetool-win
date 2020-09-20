@@ -156,12 +156,12 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetErrorInformation: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetErrorInformation: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -170,7 +170,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1))) {
-        printf("[E] NVMeGetErrorInformation: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] NVMeGetErrorInformation: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }

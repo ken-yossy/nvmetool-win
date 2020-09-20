@@ -71,7 +71,7 @@ int iNVMeGetFeature32(HANDLE _hDevice, DWORD _dwFId, int _iType, DWORD _dwCDW11,
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetFeature: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetFeature: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -1121,7 +1121,7 @@ static int NVMeGetFeaturesNOPPME(HANDLE _hDevice)
 
     if (g_stController.CTRATT.NOPSPMode == 0)
     {
-        printf("\n[W] This controller does not support Non-Operational Power State Permissive Mode, skip\n");
+        fprintf(stderr, "\n[W] This controller does not support Non-Operational Power State Permissive Mode, skip\n");
         return result;
     }
 
@@ -1379,10 +1379,10 @@ int iNVMeGetFeatures(HANDLE _hDevice)
     case NVME_FEATURE_NVM_RESERVATION_NOTIFICATION_MASK:
     case NVME_FEATURE_NVM_RESERVATION_PERSISTANCE:
     default:
-        printf("\n[E] Feature %02Xh is not implemented yet.\n", iFId);
+        fprintf(stderr, "\n[E] Feature %02Xh is not implemented yet.\n", iFId);
         break;
     }
 
-    fprintf(stderr, "\n");
+    printf("\n");
     return iResult;
 }

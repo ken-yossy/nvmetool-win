@@ -551,7 +551,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     //
     // Validate the returned data.

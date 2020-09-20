@@ -66,7 +66,7 @@ static int siNVMeGetFeaturesAPST(HANDLE _hDevice,
         if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
             (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
         {
-            printf("[E] NVMeGetFeaturesAPST: Data descriptor header not valid.\n");
+            fprintf(stderr, "[E] NVMeGetFeaturesAPST: Data descriptor header not valid.\n");
             iResult = -1; // error
         }
         else

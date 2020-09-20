@@ -103,7 +103,7 @@ int iNVMeIdentifyController(HANDLE _hDevice)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||

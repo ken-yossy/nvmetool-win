@@ -334,12 +334,12 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetSMARTLog: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetSMARTLog: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -348,7 +348,7 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < sizeof(NVME_SMART_INFO_LOG))) {
-        printf("[E] NVMeGetSMARTLog: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] NVMeGetSMARTLog: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }

@@ -58,7 +58,7 @@ static int siNVMeSetFeaturesVWC(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
         if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
             (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
         {
-            printf("[E] NVMeSetFeature: Data descriptor header not valid.\n");
+            fprintf(stderr, "[E] NVMeSetFeature: Data descriptor header not valid.\n");
             iResult = -1; // error
         }
     }
@@ -135,7 +135,7 @@ int iNVMeSetFeaturesVWC(HANDLE _hDevice)
         break;
 
     default:
-        printf("\n[E] Value is not supported, process aborted.\n");
+        fprintf(stderr, "\n[E] Value is not supported, process aborted.\n");
         iResult = -1;
         break;
     }

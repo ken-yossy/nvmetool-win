@@ -191,7 +191,7 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress)
 
     if (!g_stController.OACS.DeviceSelfTest)
     {
-        printf("[W] This controller does not support Device Self-test command, ignore\n");
+        fprintf(stderr, "[W] This controller does not support Device Self-test command, ignore\n");
         return iResult;
     }
 
@@ -236,12 +236,12 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetDeviceSelftestLog: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetDeviceSelftestLog: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -250,7 +250,7 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < sizeof(NVME_DEVICE_SELF_TEST_RESULT_DATA))) {
-        printf("[E] NVMeGetDeviceSelftestLog: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] NVMeGetDeviceSelftestLog: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }

@@ -72,10 +72,10 @@ int iNVMeIdentify(HANDLE _hDevice)
 
 
     default:
-        printf("\n[E] Command not implemented yet.\n");
+        fprintf(stderr, "\n[E] Command not implemented yet.\n");
         break;
     }
 
-    fprintf(stderr, "\n");
+    printf("\n");
     return iResult;
 }

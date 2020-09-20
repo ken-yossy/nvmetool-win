@@ -98,12 +98,12 @@ int iNVMeGetFwSlotInformation(HANDLE _hDevice)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetFwSlotInformation: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetFwSlotInformation: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -112,7 +112,7 @@ int iNVMeGetFwSlotInformation(HANDLE _hDevice)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < sizeof(NVME_FIRMWARE_SLOT_INFO_LOG12))) {
-        printf("[E] NVMeGetFwSlotInformation: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] NVMeGetFwSlotInformation: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }

@@ -60,7 +60,7 @@ static int siNVMeDST(HANDLE _hDevice, int _iAction)
             &returnedLength,
             NULL
         );
-        fprintf(stderr, "\n");
+        printf("\n");
     }
     else
     {
@@ -85,7 +85,7 @@ int iNVMeDeviceSelftest(HANDLE _hDevice)
 
     if (!g_stController.OACS.DeviceSelfTest)
     {
-        printf("[W] This controller does not support Device Self-test command, ignore\n");
+        fprintf(stderr, "[W] This controller does not support Device Self-test command, ignore\n");
         return iResult;
     }
 
@@ -108,7 +108,7 @@ int iNVMeDeviceSelftest(HANDLE _hDevice)
     iResDSTLog = iNVMeGetDeviceSelftestLog(_hDevice, false, &bInProgress);
     if (iResDSTLog == -1)
     {
-        printf("[E] Device Self-test - Abort operation\n");
+        fprintf(stderr, "[E] Device Self-test - Abort operation\n");
         return iResult;
     }
 
@@ -117,7 +117,7 @@ int iNVMeDeviceSelftest(HANDLE _hDevice)
     case DST_CODE_SHORT_TEST:
         if (bInProgress)
         {
-            printf("[E] Device Self-test - Another test is in progress, skip operation\n");
+            fprintf(stderr, "[E] Device Self-test - Another test is in progress, skip operation\n");
         }
         else
         {
@@ -132,7 +132,7 @@ int iNVMeDeviceSelftest(HANDLE _hDevice)
     case DST_CODE_EXTENDED_TEST:
         if (bInProgress)
         {
-            printf("[E] Device Self-test - Another test is in progress, skip operation\n");
+            fprintf(stderr, "[E] Device Self-test - Another test is in progress, skip operation\n");
         }
         else
         {
@@ -157,16 +157,16 @@ int iNVMeDeviceSelftest(HANDLE _hDevice)
         }
         else
         {
-            printf("[E] Device Self-test - No test is in progress, skip operation\n");
+            fprintf(stderr, "[E] Device Self-test - No test is in progress, skip operation\n");
         }
         break;
 
     default:
-        printf("\n[E] Unsupported code, ignore.\n");
+        fprintf(stderr, "\n[E] Unsupported code, ignore.\n");
         break;
     }
 
-    fprintf(stderr, "\n");
+    printf("\n");
     return iResult;
 }
 

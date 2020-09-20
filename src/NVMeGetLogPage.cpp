@@ -77,7 +77,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
         else
         {
-            printf("\n[E] This controller does not support Command Supported and Effects log page, ignore\n");
+            fprintf(stderr, "\n[E] This controller does not support Command Supported and Effects log page, ignore\n");
         }
         break;
 
@@ -93,7 +93,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
         else
         {
-            printf("\n[E] This controller does not support Drive Self-test command, ignore\n");
+            fprintf(stderr, "\n[E] This controller does not support Drive Self-test command, ignore\n");
         }
         break;
 
@@ -103,7 +103,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 
             if (g_stController.LPA.TelemetrySupport == 0)
             {
-                printf("\n[W] This controller does not support Telemetry function, skip\n");
+                fprintf(stderr, "\n[W] This controller does not support Telemetry function, skip\n");
                 break;
             }
 
@@ -121,7 +121,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
             }
             else
             {
-                printf("\n[E] Unknown input, abort.\n");
+                fprintf(stderr, "\n[E] Unknown input, abort.\n");
                 break;
             }
 
@@ -138,7 +138,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 
         if (g_stController.LPA.TelemetrySupport == 0)
         {
-            printf("\n[W] This controller does not support Telemetry function, skip\n");
+            fprintf(stderr, "\n[W] This controller does not support Telemetry function, skip\n");
             break;
         }
 
@@ -151,10 +151,10 @@ int iNVMeGetLogPage(HANDLE _hDevice)
     break;
 
     default:
-        printf("\n[E] Command not implemented yet.\n");
+        fprintf(stderr, "\n[E] Command not implemented yet.\n");
         break;
     }
 
-    fprintf(stderr, "\n");
+    printf("\n");
     return iResult;
 }

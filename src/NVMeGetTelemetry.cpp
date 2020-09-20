@@ -133,12 +133,12 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetTelemetryHostInitiated: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetTelemetryHostInitiated: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -147,7 +147,7 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < NVME_TELEMETRY_DATA_BLOCK_SIZE)) {
-        printf("[E] NVMeGetTelemetryHostInitiated: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] NVMeGetTelemetryHostInitiated: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -236,12 +236,12 @@ int iNVMeGetTelemetryControllerInitiated(HANDLE _hDevice)
 
     if (iResult) goto error_exit;
 
-    fprintf(stderr, "\n");
+    printf("\n");
 
     // Validate the returned data.
     if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
         (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-        printf("[E] NVMeGetTelemetryControllerInitiated: Data descriptor header not valid.\n");
+        fprintf(stderr, "[E] NVMeGetTelemetryControllerInitiated: Data descriptor header not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
@@ -250,7 +250,7 @@ int iNVMeGetTelemetryControllerInitiated(HANDLE _hDevice)
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
         (protocolData->ProtocolDataLength < sizeof(NVME_TELEMETRY_HOST_INITIATED_LOG))) {
-        printf("[E] NVMeGetTelemetryControllerInitiated: ProtocolData Offset/Length not valid.\n");
+        fprintf(stderr, "[E] NVMeGetTelemetryControllerInitiated: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }

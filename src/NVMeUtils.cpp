@@ -81,8 +81,8 @@ void printASCII(const char* _strLabel, const char* _strData, bool _bNewLine)
 //
 char cGetConsoleInput(const char* _strPrompt, char* _strInput)
 {
-    fprintf(stderr, "%s\n", _strPrompt);
-    fprintf(stderr, "> ");
+    printf("%s\n", _strPrompt);
+    printf("> ");
     fgets(_strInput, 128, stdin);
 
     return _strInput[0];
@@ -95,8 +95,8 @@ char cGetConsoleInput(const char* _strPrompt, char* _strInput)
 //
 int iGetConsoleInputHex(const char* _strPrompt, char* _strInput)
 {
-    fprintf(stderr, "%s\n", _strPrompt);
-    fprintf(stderr, "> ");
+    printf("%s\n", _strPrompt);
+    printf("> ");
     fgets(_strInput, 128, stdin);
 
     int iRet = 0;
@@ -114,8 +114,8 @@ int iGetConsoleInputHex(const char* _strPrompt, char* _strInput)
 //
 int iGetConsoleInputDec(const char* _strPrompt, char* _strInput)
 {
-    fprintf(stderr, "%s\n", _strPrompt);
-    fprintf(stderr, "> ");
+    printf("%s\n", _strPrompt);
+    printf("> ");
     fgets(_strInput, 128, stdin);
 
     int iRet = 0;
@@ -223,7 +223,7 @@ int eGetCommandFromConsole(void)
 
     case 'z':
     case 'Z':
-        fprintf(stderr, "\n# Format NVM : CAUTION!! all data are erased on the target drive");
+        printf("\n# Format NVM : CAUTION!! all data are erased on the target drive");
         cCmd = cGetConsoleInput("\n# Format NVM : Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
@@ -244,6 +244,6 @@ int eGetCommandFromConsole(void)
         break;
     }
 
-    fprintf(stderr, "\n");
+    printf("\n");
     return iMajorCmd;
 }
