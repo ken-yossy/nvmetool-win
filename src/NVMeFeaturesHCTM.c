@@ -117,7 +117,7 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
         if ((cCmd != 'y') && (cCmd != 'Y'))
         {
             printf("\n[I] Process aborted\n");
-            return false;
+            return 0;
         }
     }
 
@@ -151,9 +151,9 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
         iResult = siNVMeSetFeaturesHCTM(_hDevice, cdw10.AsUlong, cdw11.AsUlong);
         if (iResult != 0)
         {
-            return false;
+            return 0;
         }
     }
 
-    return true;
+    return 1;
 }

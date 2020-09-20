@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <nvme.h>
 
 #include "WinFunc.h"
@@ -103,7 +104,7 @@ int iNVMeDeviceSelftest(HANDLE _hDevice)
 
     int iStc = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     int iResDSTLog = -1;
-    bool bInProgress = false;
+    bool bInProgress = 0;
 
     iResDSTLog = iNVMeGetDeviceSelftestLog(_hDevice, false, &bInProgress);
     if (iResDSTLog == -1)

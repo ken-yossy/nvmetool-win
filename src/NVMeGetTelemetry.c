@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <nvme.h>
 
 #include "WinFunc.h"
@@ -102,7 +103,7 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 
     cdw10.AsUlong   = 0; // clear
     cdw10.LID       = NVME_LOG_PAGE_TELEMETRY_HOST_INITIATED;
-    cdw10.LSP       = ( _bCreate == true ) ? 1 : 0;
+    cdw10.LSP       = (_bCreate == true) ? 1 : 0;
     cdw10.NUMDL     = NVME_TELEMETRY_DATA_BLOCK_SIZE >> 2; // 512 / 4 (in NVMe, DWORD is 4 byte)
 
     cdw11.AsUlong   = 0;

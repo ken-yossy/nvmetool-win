@@ -101,88 +101,88 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WinFunc.cpp">
+    <ClCompile Include="NVMeCommandSupportedAndEffects.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeSCSIPassThrough.cpp">
+    <ClCompile Include="NVMeDeallocate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeTool.cpp">
+    <ClCompile Include="NVMeDeviceSelftest.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeDeallocate.cpp">
+    <ClCompile Include="NVMeDeviceSelftestLog.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeIdentifyNamespace.cpp">
+    <ClCompile Include="NVMeErrorInformation.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeIdentifyController.cpp">
+    <ClCompile Include="NVMeFeaturesAPST.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeCommandSupportedAndEffects.cpp">
+    <ClCompile Include="NVMeFeaturesHCTM.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeSMART.cpp">
+    <ClCompile Include="NVMeFeaturesHMB.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeUtils.cpp">
+    <ClCompile Include="NVMeFeaturesLBARange.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeGetLogPage.cpp">
+    <ClCompile Include="NVMeFeaturesTimestamp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeIdentify.cpp">
+    <ClCompile Include="NVMeFeaturesVWC.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeErrorInformation.cpp">
+    <ClCompile Include="NVMeFormatNVM.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeGetFeatures.cpp">
+    <ClCompile Include="NVMeFwSlotInformation.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFeaturesHCTM.cpp">
+    <ClCompile Include="NVMeGetFeatures.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeSetFeatures.cpp">
+    <ClCompile Include="NVMeGetLogPage.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFeaturesVWC.cpp">
+    <ClCompile Include="NVMeGetTelemetry.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFwSlotInformation.cpp">
+    <ClCompile Include="NVMeIdentify.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeDeviceSelftestLog.cpp">
+    <ClCompile Include="NVMeIdentifyActiveNSIDList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeDeviceSelftest.cpp">
+    <ClCompile Include="NVMeIdentifyController.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFormatNVM.cpp">
+    <ClCompile Include="NVMeIdentifyControllerData.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeIdentifyActiveNSIDList.cpp">
+    <ClCompile Include="NVMeIdentifyNamespace.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFeaturesAPST.cpp">
+    <ClCompile Include="NVMeIdentifyNSIDDescriptor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeIdentifyControllerData.cpp">
+    <ClCompile Include="NVMeSCSIPassThrough.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeIdentifyNSIDDescriptor.cpp">
+    <ClCompile Include="NVMeSetFeatures.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeGetTelemetry.cpp">
+    <ClCompile Include="NVMeSMART.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFeaturesTimestamp.cpp">
+    <ClCompile Include="NVMeTool.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFeaturesLBARange.cpp">
+    <ClCompile Include="NVMeUtils.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NVMeFeaturesHMB.cpp">
+    <ClCompile Include="WinFunc.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

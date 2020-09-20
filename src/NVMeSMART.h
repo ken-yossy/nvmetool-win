@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 //
 // Information of SMART log: 512 bytes

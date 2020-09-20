@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <nvme.h>
 
 #include "NVMeUtils.h"
@@ -54,7 +55,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         cCmd = cGetConsoleInput("\n# Get Log Page - SMART / Health Information (Log Identifier 02h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iResult = iNVMeGetSMART(_hDevice, true);
+            iResult = iNVMeGetSMART(_hDevice, 1);
         }
         break;
 
@@ -134,8 +135,6 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 
     case NVME_LOG_PAGE_TELEMETRY_CTLR_INITIATED:
     {
-        bool bCreate = false;
-
         if (g_stController.LPA.TelemetrySupport == 0)
         {
             fprintf(stderr, "\n[W] This controller does not support Telemetry function, skip\n");

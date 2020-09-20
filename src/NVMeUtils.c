@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "WinFunc.h"
 #include "NVMeUtils.h"

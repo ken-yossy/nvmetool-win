@@ -1,5 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <nvme.h>
 
 #include "NVMeUtils.h"
@@ -1487,7 +1489,7 @@ void vPrintNVMeIdentifyControllerData(void)
     {
         char buf[21];
         ZeroMemory(buf, 21);
-        strncpy_s(buf, (const char*)(pstController->SN), 20);
+        strncpy_s(buf, _countof(buf), (const char*)(pstController->SN), 20);
         buf[20] = '\0';
         printASCII("[M] SerialNumber (SN): ", (const char*)buf, true);
     }
@@ -1495,7 +1497,7 @@ void vPrintNVMeIdentifyControllerData(void)
     {
         char buf[41];
         ZeroMemory(buf, 41);
-        strncpy_s(buf, (const char*)(pstController->MN), 40);
+        strncpy_s(buf, _countof(buf), (const char*)(pstController->MN), 40);
         buf[40] = '\0';
         printASCII("[M] Model Number (MN): ", (const char*)buf, true);
     }
@@ -1503,7 +1505,7 @@ void vPrintNVMeIdentifyControllerData(void)
     {
         char buf[9];
         ZeroMemory(buf, 9);
-        strncpy_s(buf, (const char*)(pstController->FR), 8);
+        strncpy_s(buf, _countof(buf), (const char*)(pstController->FR), 8);
         buf[8] = '\0';
         printASCII("[M] Firmware Revision (FR): ", (const char*)buf, true);
     }

@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
 #include <nvme.h>
 
 #include "WinFunc.h"
@@ -13,7 +15,7 @@ uint32_t uiPrintControllerBasicData(void)
     {
         char buf[21];
         ZeroMemory(buf, 21);
-        strncpy_s(buf, (const char*)(g_stController.SN), 20);
+        strncpy_s(buf, _countof(buf), (const char*)(g_stController.SN), 20);
         buf[20] = '\0';
         printASCII("[M] SerialNumber (SN): ", (const char*)buf, true);
     }
@@ -21,7 +23,7 @@ uint32_t uiPrintControllerBasicData(void)
     {
         char buf[41];
         ZeroMemory(buf, 41);
-        strncpy_s(buf, (const char*)(g_stController.MN), 40);
+        strncpy_s(buf, _countof(buf), (const char*)(g_stController.MN), 40);
         buf[40] = '\0';
         printASCII("[M] Model Number (MN): ", (const char*)buf, true);
     }
@@ -29,7 +31,7 @@ uint32_t uiPrintControllerBasicData(void)
     {
         char buf[9];
         ZeroMemory(buf, 9);
-        strncpy_s(buf, (const char*)(g_stController.FR), 8);
+        strncpy_s(buf, _countof(buf), (const char*)(g_stController.FR), 8);
         buf[8] = '\0';
         printASCII("[M] Firmware Revision (FR): ", (const char*)buf, true);
     }
@@ -37,7 +39,7 @@ uint32_t uiPrintControllerBasicData(void)
     {
         char buf[16];
         ZeroMemory(buf, 16);
-        snprintf(buf, 16, "0x%08x\0", (g_stController.VER));
+        snprintf(buf, _countof(buf), "0x%08x\0", (g_stController.VER));
         printASCII("[M] Version (VER): ", (const char*)buf, false);
         printf(" (NVMe Revision %d.%d.%d)\n", (g_stController.VER >> 16) & 0xFFFF, (g_stController.VER >> 8) & 0xFF, g_stController.VER & 0xFF);
     }

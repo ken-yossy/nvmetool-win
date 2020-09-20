@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+#include <stdbool.h>
 #include <nvme.h>
 
 #define NVME_ADMIN_COMMAND_SET  0

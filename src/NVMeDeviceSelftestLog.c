@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <nvme.h>
 
 #include "WinFunc.h"
@@ -187,7 +188,7 @@ int iNVMeGetDeviceSelftestLog(HANDLE _hDevice, bool _bPrint, bool *_bInProgress)
     PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
     PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
 
-    (*_bInProgress) = false;
+    (*_bInProgress) = 0;
 
     if (!g_stController.OACS.DeviceSelfTest)
     {
