@@ -9,7 +9,7 @@
 #include "NVMeUtils.h"
 #include "NVMeIdentifyController.h"
 
-uint32_t uiPrintControllerBasicData(void)
+void vPrintControllerBasicData(void)
 {
     // These fields are common among revisions...
     {
@@ -43,8 +43,6 @@ uint32_t uiPrintControllerBasicData(void)
         printASCII("[M] Version (VER): ", (const char*)buf, false);
         printf(" (NVMe Revision %d.%d.%d)\n", (g_stController.VER >> 16) & 0xFFFF, (g_stController.VER >> 8) & 0xFF, g_stController.VER & 0xFF);
     }
-
-    return g_stController.VER;
 }
 
 int iNVMeIdentifyController(HANDLE _hDevice)

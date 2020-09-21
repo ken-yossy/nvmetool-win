@@ -20,8 +20,6 @@
 NVME_IDENTIFY_CONTROLLER_DATA g_stController;
 NVME_SMART_INFO_LOG g_stSMARTLog;
 
-uint32_t g_uiRevision; // revision that this controller conforms to; format is same as VER field
-
 static void s_vPrintUsage(char* _strProgName)
 {
     char strShortProgName[1024];
@@ -81,7 +79,7 @@ int main(int _argc, char* _argv[])
     }
 
     printf("[I] Getting controller identify data succeeded.\n\n");
-    g_uiRevision = uiPrintControllerBasicData();
+    vPrintControllerBasicData();
 
     // retrieve fundamental SMART data
     iResult = iNVMeGetSMART(hDevice, false);

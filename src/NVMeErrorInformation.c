@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <nvme.h>
 
 #include "WinFunc.h"
