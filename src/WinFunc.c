@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include <stdbool.h>
 
 void vPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc)
 {
@@ -83,5 +84,48 @@ HANDLE hIssueCreateFile(const char* _strDeviceNo)
         vPrintSystemError(GetLastError(), "CreateFile");
     }
     return hDevice;
+}
+
+static DWORD s_dwOSBuildNumber = 0;
+
+bool bCanUseGetDeviceInternalLog(void)
+{
+    // if osInfo.dwBuildNumber < 19041, it's before Windows 10 May 2020 Update (2004)
+    return ( s_dwOSBuildNumber < 19041 ) ? false : true;
+}
+
+typedef NTSTATUS (WINAPI* PRtlGetVersion)(PRTL_OSVERSIONINFOEXW _pInfo);
+
+void vGetOSVersion(void)
+{
+    RTL_OSVERSIONINFOEXW osInfo;
+    ZeroMemory(&osInfo, sizeof(RTL_OSVERSIONINFOEXW));
+    osInfo.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOEXW);
+
+    HMODULE mod = GetModuleHandle(_T("ntdll.dll"));
+    if (mod == 0)
+    {
+        vPrintSystemError(GetLastError(), "GetModuleHandle");
+        return;
+    }
+
+    PRtlGetVersion fpGetOSVer = (PRtlGetVersion)GetProcAddress(mod, "RtlGetVersion");
+    if (fpGetOSVer == NULL)
+    {
+        vPrintSystemError(GetLastError(), "GetProcAddress");
+        return;
+    }
+
+    fpGetOSVer(&osInfo);
+
+    // checking OS version (Windows 10)
+    // see also https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_osversioninfoexw
+    if ( (osInfo.dwMajorVersion == 10) &&
+         (osInfo.dwMinorVersion ==  0) &&
+         (osInfo.wProductType == VER_NT_WORKSTATION) ) // not Windows Server 2016/2019
+    {
+        s_dwOSBuildNumber = osInfo.dwBuildNumber;
+        printf("[I] Running on Windows %d build %d", osInfo.dwMajorVersion, s_dwOSBuildNumber);
+    }
 }
 

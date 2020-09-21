@@ -1,7 +1,10 @@
 #pragma once
 
 #include <windows.h>
+#include <stdbool.h>
 
+void vGetOSVersion(void);
+bool bCanUseGetDeviceInternalLog(void);
 void vPrintSystemError(unsigned long _ulErrorCode, const char* _strFunc);
 
 int iIssueDeviceIoControl(HANDLE _hDevice,

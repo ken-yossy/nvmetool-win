@@ -61,6 +61,8 @@ int main(int _argc, char* _argv[])
         return 0;
     }
 
+    vGetOSVersion();
+
     // Get HANDLE object for NVMe SSD
     // We need change UAC setting of this application, to access device with right of administrator
     // see also https://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/ac055958-d438-4593-a2a4-6b130b563747/createfile-on-c-with-read-only-returns-quotaccess-deniedquot-on-win7-it-is-ok-on-xp
