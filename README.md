@@ -39,7 +39,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        7Ch | Doorbell Buffer Config      |             | Not supported     |
 |        80h | Format NVM                  | x           | Only for data drive. Need to support Format NVM command and cryptographic erase is supported along Format NVM (bit 2 of the FNA field in Identify Controller data structure) |
 |        81h | Security Send               |             |                   |
-|        82h | Security Receive            |             |                   |
+|        82h | Security Receive            | x           | Getting TCG Level 0 Discovery Data for example in this tool |
 |        84h | Sanitize                    |             | 2                 |
 |        86h | Get LBA Status              |             | Not supported     |
 | C0h -- FFh | _Vendor Specific_           |             |                   |
