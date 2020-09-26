@@ -49,6 +49,7 @@ typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX
 
 #define CDB6GENERIC_LENGTH                   6
 #define CDB10GENERIC_LENGTH                  10
+#define CDB12GENERIC_LENGTH                  12
 #define SETBITON                             1
 #define SETBITOFF                            0
 
@@ -802,99 +803,47 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
 static int s_iGetLevel0DiscoveryData(HANDLE _hDevice)
 {
     SCSI_PASS_THROUGH_WITH_BUFFERS sptwb;
-    SCSI_PASS_THROUGH_WITH_BUFFERS_EX sptwb_ex;
-    int     iResult = -1;
-    ULONG length = 0, errorCode = 0, returned = 0, sectorSize = 512;
-    ULONG alignmentMask = 0; // default == no alignment requirement
-    UCHAR srbType = 0; // default == SRB_TYPE_SCSI_REQUEST_BLOCK
+    int iResult = -1;
+    ULONG length = 0, returned = 0;
+    ULONG alignmentMask = 0;    // default == no alignment requirement
+    UCHAR srbType = 0;          // default == SRB_TYPE_SCSI_REQUEST_BLOCK, but not used...
 
     if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false) return false;
 
-    if (srbType)
-    {
-        ZeroMemory(&sptwb_ex, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX));
-        sptwb_ex.spt.Version    = 0;
-        sptwb_ex.spt.Length     = sizeof(SCSI_PASS_THROUGH_EX);
-        sptwb_ex.spt.ScsiStatus = 0;
-        sptwb_ex.spt.CdbLength  = 12; // Size of CDB for "SECURITY PROTOCOL IN" command is 12 bytes
+    ZeroMemory(&sptwb, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS));
+    sptwb.spt.Length    = sizeof(SCSI_PASS_THROUGH);
+    sptwb.spt.PathId    = 0;
+    sptwb.spt.TargetId  = 0;
+    sptwb.spt.Lun       = 0;
 
-        sptwb_ex.spt.StorAddressLength      = sizeof(STOR_ADDR_BTL8);
-        sptwb_ex.spt.SenseInfoLength        = SPT_SENSE_LENGTH;
-        sptwb_ex.spt.DataOutTransferLength  = 0;
-        sptwb_ex.spt.DataInTransferLength   = 512;
+    sptwb.spt.CdbLength         = CDB12GENERIC_LENGTH;
+    sptwb.spt.SenseInfoLength   = SPT_SENSE_LENGTH;
+    sptwb.spt.SenseInfoOffset   = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
+    sptwb.spt.DataIn            = SCSI_IOCTL_DATA_IN;
 
-        sptwb_ex.spt.DataDirection      = SCSI_IOCTL_DATA_IN;
-        sptwb_ex.spt.TimeOutValue       = 5;
-        sptwb_ex.spt.StorAddressOffset  = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, StorAddress);
-        sptwb_ex.StorAddress.Type       = STOR_ADDRESS_TYPE_BTL8;
+    sptwb.spt.DataTransferLength    = SPTWB_DATA_LENGTH;
+    sptwb.spt.TimeOutValue          = 5;
+    sptwb.spt.DataBufferOffset      = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
 
-        sptwb_ex.StorAddress.Port           = 0;
-        sptwb_ex.StorAddress.AddressLength  = STOR_ADDR_BTL8_ADDRESS_LENGTH;
-        sptwb_ex.StorAddress.Path           = 0;
-        sptwb_ex.StorAddress.Target         = 0;
-        sptwb_ex.StorAddress.Lun            = 0;
+    sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // CDB[0] Opcode (A2h for "SECURITY PROTOCOL IN" command)
+    sptwb.spt.Cdb[1] = 1;       // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
+    sptwb.spt.Cdb[3] = 1;       // CDB[3:2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
+    sptwb.spt.Cdb[4] = 0x80;    // CDB[4] bit 7: INC_512 = 1
+    sptwb.spt.Cdb[9] = 1;       // CDB[6:9] : Allocation Length (`1' means 1x512 byte)
 
-        sptwb_ex.spt.SenseInfoOffset        = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucSenseBuf);
-        sptwb_ex.spt.DataOutBufferOffset    = 0;
-        sptwb_ex.spt.DataInBufferOffset     = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucDataBuf);
+    length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) + sptwb.spt.DataTransferLength;
 
-        sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // CDB[0] = A2h (Opcode of "SECURITY PROTOCOL IN" command)
-        sptwb.spt.Cdb[1] = 1;       // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
-        sptwb.spt.Cdb[3] = 1;       // CDB[2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
-        sptwb.spt.Cdb[4] = 0x80;    // CDB[4] bit 7: INC_512
-        sptwb.spt.Cdb[9] = 1;       // CDB[6:9] = 0x1 : Allocation Length is 1x512 byte (TCG spec allows smaller size than the size of Level 0 Discovery data)
+    iResult = iIssueDeviceIoControl(
+        _hDevice,
+        IOCTL_SCSI_PASS_THROUGH,
+        &sptwb,
+        sizeof(SCSI_PASS_THROUGH),
+        &sptwb,
+        length,
+        &returned,
+        NULL);
 
-        length = sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX);
-
-        iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH_EX,
-            &sptwb_ex,
-            length,
-            &sptwb_ex,
-            length,
-            &returned,
-            FALSE);
-
-        PrintStatusResultsExDIn(iResult, returned, &sptwb_ex, sptwb_ex.spt.DataInTransferLength);
-    }
-    else
-    {
-        ZeroMemory(&sptwb, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS));
-        sptwb.spt.Length    = sizeof(SCSI_PASS_THROUGH);
-        sptwb.spt.PathId    = 0;
-        sptwb.spt.TargetId  = 0;
-        sptwb.spt.Lun       = 0;
-
-        sptwb.spt.CdbLength         = 12;
-        sptwb.spt.SenseInfoLength   = SPT_SENSE_LENGTH;
-        sptwb.spt.SenseInfoOffset   = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
-        sptwb.spt.DataIn            = SCSI_IOCTL_DATA_IN;
-
-        sptwb.spt.DataTransferLength    = 512;
-        sptwb.spt.TimeOutValue          = 5;
-        sptwb.spt.DataBufferOffset      = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
-
-        sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // same as above
-        sptwb.spt.Cdb[1] = 1;
-        sptwb.spt.Cdb[3] = 1;
-        sptwb.spt.Cdb[4] = 0x80;
-        sptwb.spt.Cdb[9] = 1;
-
-        length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) + sptwb.spt.DataTransferLength;
-
-        iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH,
-            &sptwb,
-            sizeof(SCSI_PASS_THROUGH),
-            &sptwb,
-            length,
-            &returned,
-            FALSE);
-
-        PrintStatusResultsDIn(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
-    }
+    PrintStatusResultsDIn(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
     return iResult;
 }
 
