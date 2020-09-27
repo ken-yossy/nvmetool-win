@@ -447,7 +447,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[O] NVM Capacity (NVMCAP): %lld (bytes)\n", (uint64_t)(_pNSData->NVMCAP));
 
     printf("[O] Namespace Globally Unique Identifier (NGUID):\n");
-    printf("\tbyte [ 15: 11] %02X%02X%02X%02X%02X (Extension identifer assigned by the vendor)\n",
+    printf("\tbyte [ 15: 11] %02X%02X%02X%02X%02X (Extension identifier assigned by the vendor)\n",
         _pNSData->NGUID[11], _pNSData->NGUID[12], _pNSData->NGUID[13], _pNSData->NGUID[14], _pNSData->NGUID[15]); // Bytes [119:115] (5 byte, 40 bit = Extension identifer assigned by the organization
     printf("\tbyte [ 10:  8] %02X%02X%02X (Organizationally Unique Identifier (OUI))\n",
         _pNSData->NGUID[8], _pNSData->NGUID[9], _pNSData->NGUID[10]); // Bytes [114:112] (3 byte, 24 bit = Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority
@@ -455,7 +455,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
         _pNSData->NGUID[0], _pNSData->NGUID[1], _pNSData->NGUID[2], _pNSData->NGUID[3], _pNSData->NGUID[4], _pNSData->NGUID[5], _pNSData->NGUID[6], _pNSData->NGUID[7]); // Bytes [111:104] (8 byte, 64 bit = Vendor specific extension identifier
 
     printf("[O] IEEE Extended Unique Identifier (EUI64):\n");
-    printf("\tbyte [  7:  3] %02X%02X%02X%02X%02X (Extension identifer assigned by the vendor)\n",
+    printf("\tbyte [  7:  3] %02X%02X%02X%02X%02X (Extension identifier assigned by the vendor)\n",
         _pNSData->EUI64[3], _pNSData->EUI64[4], _pNSData->EUI64[5], _pNSData->EUI64[6], _pNSData->EUI64[7]); // Bytes [127:123] (5 byte, 40 bit = Extension identifer assigned by the organization
     printf("\tbyte [  2:  0] %02X%02X%02X (Organizationally Unique Identifier (OUI))\n",
         _pNSData->EUI64[0], _pNSData->EUI64[1], _pNSData->EUI64[2]); // Bytes [122:120] (3 byte, 24 bit = Organizationally Unique Identifier (OUI) value assigned by the IEEE Registration Authority

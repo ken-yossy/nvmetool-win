@@ -1491,7 +1491,7 @@ void vPrintNVMeIdentifyControllerData(void)
         ZeroMemory(buf, 21);
         strncpy_s(buf, _countof(buf), (const char*)(pstController->SN), 20);
         buf[20] = '\0';
-        printASCII("[M] SerialNumber (SN): ", (const char*)buf, true);
+        printASCII("[M] Serial Number (SN): ", (const char*)buf, true);
     }
 
     {
