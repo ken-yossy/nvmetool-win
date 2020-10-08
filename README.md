@@ -119,7 +119,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 | 82h -- BFh | _Reserved_                     |      | |
 | C0h -- FFh | _Vendor Specific_              |      | |
 
-Note 1: If you want to set `Create Telemetry Host-Initiated Data` to `1`, you need Windows 10 version 2004 (build 10041) or later. And to do this, this tool uses `IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG` described in [9].
+Note 1: If you want to set `Create Telemetry Host-Initiated Data` to `1`, you need Windows 10 version 2004 (build 10041) or later. And to do this, this tool uses `IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG` described in [9]. But I don't know products (SSDs) that can respond this type of request (command)...
 
 ## Feature Identifier (FID) for Get/Set Features command
 
