@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <nvme.h>
 
+#include "WinFunc.h"
 #include "NVMeUtils.h"
 #include "NVMeSMART.h"
 #include "NVMeCommandSupportedAndEffects.h"
@@ -110,7 +111,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 
             printf("\n# Get Log Page - Telemetry Host-Initiated (Log Identifier 07h)\n");
             printf("\tNot create telemetry host-initiated data, Press 0\n");
-            cCmd = cGetConsoleInput("\tNot create telemetry host-initiated data, Press 1\n", strCmd);
+            cCmd = cGetConsoleInput("\t    Create telemetry host-initiated data, Press 1\n", strCmd);
             if (cCmd == '1')
             {
                 cCmd = cGetConsoleInput("\n# Get Log Page - Telemetry Host-Initiated (Log Identifier 07h) with creating new telemetry data, Press 'y' to continue\n", strCmd);
@@ -128,7 +129,20 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 
             if (cCmd == 'y')
             {
-                iResult = iNVMeGetTelemetryHostInitiated(_hDevice, bCreate);
+                char cOpt = 'n';
+                if (bCreate && bCanUseGetDeviceInternalLog())
+                {
+                    cOpt = cGetConsoleInput("#\t[EXPERIMENTAL] Using IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG is supported; if you want to use it, press 'y'\n", strCmd);
+                }
+
+                if (cOpt == 'y')
+                {
+                    iResult = iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(_hDevice, bCreate);
+                }
+                else
+                {
+                    iResult = iNVMeGetTelemetryHostInitiated(_hDevice, bCreate);
+                }
             }
         }
         break;

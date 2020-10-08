@@ -5,6 +5,51 @@
 
 #include "WinFunc.h"
 
+static void s_vPrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
+{
+    ULONG Cnt;
+    UCHAR Str[32] = { 0 };
+
+    printf("        00  01  02  03  04  05  06  07   08  09  0A  0B  0C  0D  0E  0F\n");
+    printf("        ---------------------------------------------------------------\n");
+
+    int i = 0;
+    for (Cnt = 0; Cnt < BufferLength; Cnt++)
+    {
+        // print address
+        if ((Cnt) % 16 == 0)
+        {
+            printf(" 0x%03X  ", Cnt);
+        }
+
+        // print hex data
+        printf("%02X  ", DataBuffer[Cnt]);
+        if (isprint(DataBuffer[Cnt]))
+        {
+            Str[i] = DataBuffer[Cnt];
+        }
+        else
+        {
+            Str[i] = '.';
+        }
+        i++;
+        if ((Cnt + 1) % 8 == 0)
+        {
+            printf(" ");
+            Str[i++] = ' ';
+        }
+
+        // print ascii character if printable
+        if ((Cnt + 1) % 16 == 0)
+        {
+            Str[i++] = '\0';
+            i = 0;
+            printf("%s\n", Str);
+        }
+    }
+    printf("\n\n");
+}
+
 static void s_vPrintNVMeTelemetryHostInitiated(PNVME_TELEMETRY_HOST_INITIATED_LOG _pData)
 {
     printf("[I] Telemetry Host Initiated :\n");
@@ -33,6 +78,8 @@ static void s_vPrintNVMeTelemetryHostInitiated(PNVME_TELEMETRY_HOST_INITIATED_LO
     }
 
     printf("\tbyte [    383] %u = Telemetry Controller-Initiated Data Generation Number\n", _pData->ControllerInitiatedDataGenerationNumber);
+    printf("\tbyte [511:384] Reason Identifier:\n\n");
+    s_vPrintDataBuffer(_pData->ReasonIdentifier, 128);
 }
 
 static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIATED_LOG _pData)
@@ -63,6 +110,8 @@ static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIA
     }
 
     printf("\tbyte [    383] %u = Telemetry Controller-Initiated Data Generation Number\n", _pData->ControllerInitiatedDataGenerationNumber);
+    printf("\tbyte [511:384] Reason Identifier:\n\n");
+    s_vPrintDataBuffer(_pData->ReasonIdentifier, 128);
 }
 
 int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
@@ -271,3 +320,81 @@ error_exit:
 
     return iResult;
 }
+
+#include <ntddstor.h>
+
+#define STATUS_DATA_HEADER_LENGTH 512
+
+static void s_vPrintDeviceInternalStatusData(PDEVICE_INTERNAL_STATUS_DATA _pData)
+{
+    printf("[I] Device Internal Status Data:\n");
+    printf("[I]\t          Version = 0x%08X\n", _pData->Version);
+    printf("[I]\t             Size = 0x%08X\n", _pData->Size);
+    printf("[I]\t      T10VendorId = 0x%016llX\n", _pData->T10VendorId);
+    printf("[I]\t   DataSet1Length = 0x%08X\n", _pData->DataSet1Length);
+    printf("[I]\t   DataSet2Length = 0x%08X\n", _pData->DataSet2Length);
+    printf("[I]\t   DataSet3Length = 0x%08X\n", _pData->DataSet3Length);
+    printf("[I]\t   DataSet4Length = 0x%08X\n", _pData->DataSet4Length);
+    printf("[I]\tStatusDataVersion = 0x%08X\n", _pData->StatusDataVersion);
+
+    printf("[I]\t ReasonIdentifier:\n\n");
+    s_vPrintDataBuffer(_pData->ReasonIdentifier, 128);
+
+    printf("[I]\t StatusDataLength = 0x%08X\n", _pData->StatusDataLength);
+    printf("[I]\t StatusData:\n\n");
+    s_vPrintDataBuffer(_pData->StatusData, STATUS_DATA_HEADER_LENGTH);
+}
+
+int iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(HANDLE _hDevice)
+{
+    int     iResult = -1;
+    ULONG   returnedLength = 0;
+
+    GET_DEVICE_INTERNAL_STATUS_DATA_REQUEST request;
+    PDEVICE_INTERNAL_STATUS_DATA outBuffer = NULL;
+    ULONG outBufferLength = 0;
+
+    // Allocate buffer for use.
+    outBufferLength = FIELD_OFFSET(DEVICE_INTERNAL_STATUS_DATA, StatusData) + STATUS_DATA_HEADER_LENGTH;
+    outBuffer = malloc(outBufferLength);
+    if (outBuffer == NULL)
+    {
+        vPrintSystemError(GetLastError(), "malloc");
+        goto error_exit;
+    }
+
+    ZeroMemory(&request, sizeof(GET_DEVICE_INTERNAL_STATUS_DATA_REQUEST));
+    ZeroMemory(outBuffer, outBufferLength);
+
+    // from https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddstor/ns-ntddstor-get_device_internal_status_data_request
+    request.Version = sizeof(GET_DEVICE_INTERNAL_STATUS_DATA_REQUEST);
+    request.Size = sizeof(GET_DEVICE_INTERNAL_STATUS_DATA_REQUEST);
+    request.RequestDataType = DeviceCurrentInternalStatusDataHeader;
+
+    // Send request down.
+    iResult = iIssueDeviceIoControl(_hDevice,
+        IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG,
+        &request,
+        sizeof(GET_DEVICE_INTERNAL_STATUS_DATA_REQUEST),
+        outBuffer,
+        outBufferLength,
+        &returnedLength,
+        NULL
+    );
+
+    if (iResult) goto error_exit;
+
+    printf("\n");
+    s_vPrintDeviceInternalStatusData(outBuffer);
+
+error_exit:
+
+    if (outBuffer != NULL)
+    {
+        free(outBuffer);
+    }
+
+    return iResult;
+}
+
+

@@ -108,9 +108,9 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        02h | SMART / Health Information     | x    | CNTID = 0, NSID = 0xFFFFFFFh |
 |        03h | Firmware Slot Information      | x    | |
 |        05h | Command Supported and Effects  | x    | |
-|        06h | Device Self-test               | x    | Need to support Device Self-test command |
-|        07h | Telemetry Host-initiated       | x    | Need to support Telemetry. `Create Telemetry Host-Initiated Data` seems not working (dependent on device?). Not support getting "Telemetry Host-Initiated Data Block"s |
-|        08h | Telemetry Controller-initiated | x    | Need to support Telemetry. Not support getting "Telemetry Controller-Initiated Data Block"s |
+|        06h | Device Self-test               | x    | |
+|        07h | Telemetry Host-initiated       | x    | Getting header only. see also Note 1. |
+|        08h | Telemetry Controller-initiated | x    | Getting header only. |
 | 09h -- 6Fh | _Reserved_                     |      | |
 |        70h | Discovery                      |      | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          |      | |
@@ -118,6 +118,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        81h | Sanitize Status                |      | Probably can issue only in WinPE mode [8] |
 | 82h -- BFh | _Reserved_                     |      | |
 | C0h -- FFh | _Vendor Specific_              |      | |
+
+Note 1: If you want to set `Create Telemetry Host-Initiated Data` to `1`, you need Windows 10 version 2004 (build 10041) or later. And to do this, this tool uses `IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG` described in [9].
 
 ## Feature Identifier (FID) for Get/Set Features command
 
