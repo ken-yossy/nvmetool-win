@@ -147,7 +147,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Eh | Timestamp                          | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        0Fh | Keep Alive Timer                   |  /               |      |
 |        10h | Host Controlled Thermal Management | x /              |      |
-|        11h | Non-operational Power State Config | -- /             | error code = 1 (Incorrect function.) |
+|        11h | Non-operational Power State Config | x /              |      |
 | 12h -- 77h | _Reserved_                         |  /               |      |
 | 78h -- 7Fh | _Refer to the NVMe-MI spec._       |  /               |      |
 |        80h | Software Progress Marker           | x /              |      |
@@ -205,10 +205,10 @@ These commands should be issued with highest care.
 Confirmed on the following software environment:
 
 * Operating system and device driver
-  * Windows 10 Professional 64bit (Version 1909, Build 18363.900)
-  * stornvme.sys (version 10.0.18362.693, WinBuild 160101.0800)
+  * Windows 10 Professional 64bit (Version 2004, Build 20231.1000)
+  * stornvme.sys (version 10.0.20231.1000, WinBuild 160101.0800)
 * Developping environment
-  * Microsoft Visual Studio Community 2019 (Version 16.6.2)
+  * Microsoft Visual Studio Community 2019 (Version 16.7.6)
     * Microsoft Visual C++ 2019
     * Windows Driver Kit (10.0.19030.1000)
 
