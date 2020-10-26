@@ -5,6 +5,51 @@
 #include "WinFunc.h"
 #include "NVMeUtils.h"
 
+void PrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
+{
+    ULONG Cnt;
+    UCHAR Str[32] = { 0 };
+
+    printf("        00  01  02  03  04  05  06  07   08  09  0A  0B  0C  0D  0E  0F\n");
+    printf("        ---------------------------------------------------------------\n");
+
+    int i = 0;
+    for (Cnt = 0; Cnt < BufferLength; Cnt++)
+    {
+        // print address
+        if ((Cnt) % 16 == 0)
+        {
+            printf(" 0x%03X  ", Cnt);
+        }
+
+        // print hex data
+        printf("%02X  ", DataBuffer[Cnt]);
+        if (isprint(DataBuffer[Cnt]))
+        {
+            Str[i] = DataBuffer[Cnt];
+        }
+        else
+        {
+            Str[i] = '.';
+        }
+        i++;
+        if ((Cnt + 1) % 8 == 0)
+        {
+            printf(" ");
+            Str[i++] = ' ';
+        }
+
+        // print ascii character if printable
+        if ((Cnt + 1) % 16 == 0)
+        {
+            Str[i++] = '\0';
+            i = 0;
+            printf("%s\n", Str);
+        }
+    }
+    printf("\n\n");
+}
+
 char* strConvertUTF8toMultiByte(const char* _str)
 {
     int numChar = 0;

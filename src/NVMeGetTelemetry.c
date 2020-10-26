@@ -4,51 +4,7 @@
 #include <nvme.h>
 
 #include "WinFunc.h"
-
-static void s_vPrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength)
-{
-    ULONG Cnt;
-    UCHAR Str[32] = { 0 };
-
-    printf("        00  01  02  03  04  05  06  07   08  09  0A  0B  0C  0D  0E  0F\n");
-    printf("        ---------------------------------------------------------------\n");
-
-    int i = 0;
-    for (Cnt = 0; Cnt < BufferLength; Cnt++)
-    {
-        // print address
-        if ((Cnt) % 16 == 0)
-        {
-            printf(" 0x%03X  ", Cnt);
-        }
-
-        // print hex data
-        printf("%02X  ", DataBuffer[Cnt]);
-        if (isprint(DataBuffer[Cnt]))
-        {
-            Str[i] = DataBuffer[Cnt];
-        }
-        else
-        {
-            Str[i] = '.';
-        }
-        i++;
-        if ((Cnt + 1) % 8 == 0)
-        {
-            printf(" ");
-            Str[i++] = ' ';
-        }
-
-        // print ascii character if printable
-        if ((Cnt + 1) % 16 == 0)
-        {
-            Str[i++] = '\0';
-            i = 0;
-            printf("%s\n", Str);
-        }
-    }
-    printf("\n\n");
-}
+#include "NVMeUtils.h"
 
 static void s_vPrintNVMeTelemetryHostInitiated(PNVME_TELEMETRY_HOST_INITIATED_LOG _pData)
 {
@@ -79,7 +35,7 @@ static void s_vPrintNVMeTelemetryHostInitiated(PNVME_TELEMETRY_HOST_INITIATED_LO
 
     printf("\tbyte [    383] %u = Telemetry Controller-Initiated Data Generation Number\n", _pData->ControllerInitiatedDataGenerationNumber);
     printf("\tbyte [511:384] Reason Identifier:\n\n");
-    s_vPrintDataBuffer(_pData->ReasonIdentifier, 128);
+    PrintDataBuffer(_pData->ReasonIdentifier, 128);
 }
 
 static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIATED_LOG _pData)
@@ -111,7 +67,7 @@ static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIA
 
     printf("\tbyte [    383] %u = Telemetry Controller-Initiated Data Generation Number\n", _pData->ControllerInitiatedDataGenerationNumber);
     printf("\tbyte [511:384] Reason Identifier:\n\n");
-    s_vPrintDataBuffer(_pData->ReasonIdentifier, 128);
+    PrintDataBuffer(_pData->ReasonIdentifier, 128);
 }
 
 int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
@@ -338,11 +294,11 @@ static void s_vPrintDeviceInternalStatusData(PDEVICE_INTERNAL_STATUS_DATA _pData
     printf("[I]\tStatusDataVersion = 0x%08X\n", _pData->StatusDataVersion);
 
     printf("[I]\t ReasonIdentifier:\n\n");
-    s_vPrintDataBuffer(_pData->ReasonIdentifier, 128);
+    PrintDataBuffer(_pData->ReasonIdentifier, 128);
 
     printf("[I]\t StatusDataLength = 0x%08X\n", _pData->StatusDataLength);
     printf("[I]\t StatusData:\n\n");
-    s_vPrintDataBuffer(_pData->StatusData, STATUS_DATA_HEADER_LENGTH);
+    PrintDataBuffer(_pData->StatusData, STATUS_DATA_HEADER_LENGTH);
 }
 
 int iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(HANDLE _hDevice)

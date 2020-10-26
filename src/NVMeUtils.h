@@ -28,4 +28,5 @@ int eGetCommandFromConsole(void);
 int iGetConsoleInputHex(const char* _strPrompt, char* _strInput);
 int iGetConsoleInputDec(const char* _strPrompt, char* _strInput);
 char cGetConsoleInput(const char* _strPrompt, char* _strInput);
+void PrintDataBuffer(PUCHAR DataBuffer, ULONG BufferLength);
 
