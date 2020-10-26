@@ -84,8 +84,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 | ---------: | :---------------------------------------------------|:-----|:-----|
 |        00h | Namespace                                           | x    | NSID = 1 |
 |        01h | Controller                                          | x    | CNTID = 0 |
-|        02h | Active Namespace ID list                            | ?    | returned value seems to be something wrong... |
-|        03h | Namespace Identification Descriptor list            | ?    | returned value seems to be something wrong... |
+|        02h | Active Namespace ID list                            |      | returned data seems to be the data for Identify Namespace |
+|        03h | Namespace Identification Descriptor list            |      | returned data seems to be the data for Identify Namespace |
 | 04h -- 0Fh | _Reserved_                                          |      | |
 |        10h | Allocated Namespace ID list                         |      | Probably can issue only in WinPE mode [8]            |
 |        11h | Specified allocated namespace                       |      | Probably can issue only in WinPE mode [8]            |
