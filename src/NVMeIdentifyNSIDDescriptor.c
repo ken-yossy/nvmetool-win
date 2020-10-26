@@ -88,7 +88,7 @@ int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID)
     protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
     protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
 
-    query->PropertyId = StorageAdapterProtocolSpecificProperty;
+    query->PropertyId = StorageDeviceProtocolSpecificProperty;
     query->QueryType = PropertyStandardQuery;
 
     protocolData->ProtocolType = ProtocolTypeNvme;
