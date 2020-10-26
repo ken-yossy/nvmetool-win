@@ -34,7 +34,7 @@ int iNVMeIdentifyActiveNSIDList(HANDLE _hDevice)
     protocolDataDescr   = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
     protocolData        = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
 
-    query->PropertyId   = StorageAdapterProtocolSpecificProperty;
+    query->PropertyId   = StorageDeviceProtocolSpecificProperty;
     query->QueryType    = PropertyStandardQuery;
 
     protocolData->ProtocolType                  = ProtocolTypeNvme;
@@ -87,7 +87,11 @@ int iNVMeIdentifyActiveNSIDList(HANDLE _hDevice)
         {
             if ( aIDList[i] )
             {
-                printf("\t%4d\n", aIDList[i]);
+                printf("\t%08Xh\n", aIDList[i]);
+            }
+            else
+            {
+                break;
             }
         }
         printf("[I] === Active Namespace ID list end ===\n");
