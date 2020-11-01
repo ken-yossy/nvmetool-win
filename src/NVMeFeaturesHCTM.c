@@ -45,7 +45,7 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
     protocolDataDescr   = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT)buffer;
     protocolData        = (PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT)query->AdditionalParameters;
 
-    query->PropertyId   = StorageAdapterProtocolSpecificProperty;
+    query->PropertyId   = StorageDeviceProtocolSpecificProperty;
     query->SetType      = PropertyStandardSet;
 
     protocolData->ProtocolType          = ProtocolTypeNvme;
@@ -68,17 +68,7 @@ static int siNVMeSetFeaturesHCTM(HANDLE _hDevice, DWORD _cdw10, DWORD _cdw11)
 
     if (iResult == 0)
     {
-        // Validate the returned data.
-        if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
-            (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
-        {
-            fprintf(stderr, "[E] NVMeSetFeature: Data descriptor header not valid.\n");
-            iResult = -1; // error
-        }
-        else
-        {
-            printf("[I] Command Set Features succeeded.\n");
-        }
+        printf("\n[I] Command Set Features succeeded.\n");
     }
 
     if (buffer != NULL)
@@ -100,8 +90,8 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
         return iResult;
     }
 
-    printf("\n[I] Minimum Thermal Management Temperature is %d (K)", g_stController.MNTMT);
-    printf("\n[I] Maximum Thermal Management Temperature is %d (K)", g_stController.MXTMT);
+    printf("\n[I] Minimum Thermal Management Temperature (MNTMT) is %d (K)", g_stController.MNTMT);
+    printf("\n[I] Maximum Thermal Management Temperature (MXTMT) is %d (K)", g_stController.MXTMT);
     printf("\n[I] You can speficy TMT1 and TMT2, satisfying TMT1 < TMT2, MNTMT <= TMT1, and TMT2 <= MXTMT\n");
 
     {
@@ -109,8 +99,8 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
         char strCmd[256];
         char strPrompt[1024];
 
-        iTMT1 = iGetConsoleInputDec("\n# Input Thermal Management Temperature 1 (TMT1) in Kelvin (lower temperature)", strCmd);
-        iTMT2 = iGetConsoleInputDec("\n# Input Thermal Management Temperature 1 (TMT2) in Kelvin (higher temperature)", strCmd);
+        iTMT1 = iGetConsoleInputDec("\n# Input Thermal Management Temperature 1 (TMT1) in Kelvin (lower temperature)\n", strCmd);
+        iTMT2 = iGetConsoleInputDec("\n# Input Thermal Management Temperature 2 (TMT2) in Kelvin (higher temperature)\n", strCmd);
 
         sprintf_s(strPrompt, 1024, "\n# You specified TMT1 = %d (K) and TMT2 = %d (K), press 'y' to continue\n", iTMT1, iTMT2);
         cCmd = cGetConsoleInput(strPrompt, strCmd);
@@ -140,7 +130,7 @@ int iNVMeSetFeaturesHCTM(HANDLE _hDevice)
     }
 
     {
-        NVME_CDW10_SET_FEATURES cdw10;
+        NVME_CDW10_SET_FEATURES cdw10 = {0};
         NVME_CDW11_FEATURE_HCTM cdw11;
 
         cdw10.FID   = NVME_FEATURE_HOST_CONTROLLED_THERMAL_MANAGEMENT;

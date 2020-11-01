@@ -146,7 +146,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Dh | Host Memory Buffer                 | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        0Eh | Timestamp                          | -- /             | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        0Fh | Keep Alive Timer                   |  /               |      |
-|        10h | Host Controlled Thermal Management | x /              |      |
+|        10h | Host Controlled Thermal Management | x / x            | "SV = 1" is not supported |
 |        11h | Non-operational Power State Config | x /              |      |
 | 12h -- 77h | _Reserved_                         |  /               |      |
 | 78h -- 7Fh | _Refer to the NVMe-MI spec._       |  /               |      |
