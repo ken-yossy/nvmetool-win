@@ -112,147 +112,147 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     printf("[M] Namespace Features (NSFEAT):\n");
     if (_pNSData->NSFEAT.SkipReuseUI)
     {
-        printf("\tbit [      3] 1 = NGUID and EUI64 is never reused.\n");
+        printf("\tbit [      3] 1 = NGUID and EUI64 is never reused\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = NGUID and EUI64 may be reused.\n");
+        printf("\tbit [      3] 0 = NGUID and EUI64 may be reused\n");
     }
 
     if (_pNSData->NSFEAT.DeallocatedOrUnwrittenError)
     {
-        printf("\tbit [      2] 1 = Supports the Deallocated or Unwritten Logical Block error.\n");
+        printf("\tbit [      2] 1 = Supports Deallocated or Unwritten Logical Block error\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = Does not support the Deallocated or Unwritten Logical Block error.\n");
+        printf("\tbit [      2] 0 = Does not support Deallocated or Unwritten Logical Block error\n");
     }
 
     if (_pNSData->NSFEAT.NameSpaceAtomicWriteUnit)
     {
-        printf("\tbit [      1] 1 = Use NAWUN, NAWUPF, and NACWU.\n");
+        printf("\tbit [      1] 1 = Use NAWUN, NAWUPF, and NACWU\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = Use AWUN, AWUPF, and ACWU.\n");
+        printf("\tbit [      1] 0 = Use AWUN, AWUPF, and ACWU\n");
     }
 
     if (_pNSData->NSFEAT.ThinProvisioning)
     {
-        printf("\tbit [      0] 1 = Supports thin provisioning.\n");
+        printf("\tbit [      0] 1 = Supports thin provisioning\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = Does not support thin provisioning.\n");
+        printf("\tbit [      0] 0 = Does not support thin provisioning\n");
     }
 
-    printf("[M] Number of LBA Formats (NLBAF): %d = Supports %d format(s).\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
+    printf("[M] Number of LBA Formats (NLBAF): %d = Supports %d format(s)\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
 
     printf("[M] Formatted LBA Size (FLBAS):\n");
     if (_pNSData->FLBAS.MetadataInExtendedDataLBA)
     {
-        printf("\tbit [      4] 1 = The metadata is transferred at the end of the data LBA, creating an extended data LBA.\n");
+        printf("\tbit [      4] 1 = The metadata is transferred at the end of the data LBA, creating an extended data LBA\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = All of the metadata is transferred as a separate contiguous buffer of data.\n");
+        printf("\tbit [      4] 0 = All of the metadata is transferred as a separate contiguous buffer of data\n");
     }
-    printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d).\n", _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex);
+    printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex);
 
     printf("[M] Metadata Capabilities (MC):\n");
     if (_pNSData->MC.MetadataInSeparateBuffer)
     {
-        printf("\tbit [      1] 1 = Supports the metadata being transferred as part of a separate buffer.\n");
+        printf("\tbit [      1] 1 = Supports the metadata being transferred as part of a separate buffer\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = Does not support the metadata being transferred as part of a separate buffer.\n");
+        printf("\tbit [      1] 0 = Does not support the metadata being transferred as part of a separate buffer\n");
     }
     if (_pNSData->MC.MetadataInExtendedDataLBA)
     {
-        printf("\tbit [      0] 1 = Supports the metadata being transferred as part of an extended data LBA.\n");
+        printf("\tbit [      0] 1 = Supports the metadata being transferred as part of an extended data LBA\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = Does not support the metadata being transferred as part of an extended data LBA.\n");
+        printf("\tbit [      0] 0 = Does not support the metadata being transferred as part of an extended data LBA\n");
     }
 
     printf("[M] End-to-end Data Protection Capabilities (DPC):\n");
     if (_pNSData->DPC.InfoAtEndOfMetadata)
     {
-        printf("\tbit [      4] 1 = Supports protection information transferred as the last eight bytes of metadata.\n");
+        printf("\tbit [      4] 1 = Supports protection information transferred as the last eight bytes of metadata\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = Does not support protection information transferred as the last eight bytes of metadata.\n");
+        printf("\tbit [      4] 0 = Does not support protection information transferred as the last eight bytes of metadata\n");
     }
     if (_pNSData->DPC.InfoAtBeginningOfMetadata)
     {
-        printf("\tbit [      3] 1 = Supports protection information transferred as the first eight bytes of metadata.\n");
+        printf("\tbit [      3] 1 = Supports protection information transferred as the first eight bytes of metadata\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = Does not support protection information transferred as the first eight bytes of metadata.\n");
+        printf("\tbit [      3] 0 = Does not support protection information transferred as the first eight bytes of metadata\n");
     }
     if (_pNSData->DPC.ProtectionInfoType3)
     {
-        printf("\tbit [      2] 1 = Supports Protection Information Type 3.\n");
+        printf("\tbit [      2] 1 = Supports Protection Information Type 3\n");
     }
     else
     {
-        printf("\tbit [      2] 0 = Does not support Protection Information Type 3.\n");
+        printf("\tbit [      2] 0 = Does not support Protection Information Type 3\n");
     }
     if (_pNSData->DPC.ProtectionInfoType2)
     {
-        printf("\tbit [      1] 1 = Supports Protection Information Type 2.\n");
+        printf("\tbit [      1] 1 = Supports Protection Information Type 2\n");
     }
     else
     {
-        printf("\tbit [      1] 0 = Does not support Protection Information Type 2.\n");
+        printf("\tbit [      1] 0 = Does not support Protection Information Type 2\n");
     }
     if (_pNSData->DPC.ProtectionInfoType1)
     {
-        printf("\tbit [      0] 1 = Supports Protection Information Type 1.\n");
+        printf("\tbit [      0] 1 = Supports Protection Information Type 1\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = Does not support Protection Information Type 1.\n");
+        printf("\tbit [      0] 0 = Does not support Protection Information Type 1\n");
     }
 
     printf("[M] End-to-end Data Protection Settings (DPS):\n");
     if (_pNSData->DPS.InfoAtBeginningOfMetadata)
     {
-        printf("\tbit [      3] 1 = The protection information, if enabled, is transferred as the first eight bytes of metadata.\n");
+        printf("\tbit [      3] 1 = The protection information, if enabled, is transferred as the first eight bytes of metadata\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = The protection information, if enabled, is transferred as the last eight bytes of metadata.\n");
+        printf("\tbit [      3] 0 = The protection information, if enabled, is transferred as the last eight bytes of metadata\n");
     }
     if (_pNSData->DPS.ProtectionInfoTypeEnabled == 0)
     {
-        printf("\tbit [  2:  0] 0 = Protection information is not enabled.\n");
+        printf("\tbit [  2:  0] 0 = Protection information is not enabled\n");
     }
     else if (_pNSData->DPS.ProtectionInfoTypeEnabled == 1)
     {
-        printf("\tbit [  2:  0] 1 = Protection information is enabled, Type 1.\n");
+        printf("\tbit [  2:  0] 1 = Protection information is enabled, Type 1\n");
     }
     else if (_pNSData->DPS.ProtectionInfoTypeEnabled == 2)
     {
-        printf("\tbit [  2:  0] 2 = Protection information is enabled, Type 2.\n");
+        printf("\tbit [  2:  0] 2 = Protection information is enabled, Type 2\n");
     }
     else // if (_pNSData->DPS.ProtectionInfoTypeEnabled == 3)
     {
-        printf("\tbit [  2:  0] 3 = Protection information is enabled, Type 3.\n");
+        printf("\tbit [  2:  0] 3 = Protection information is enabled, Type 3\n");
     }
 
     printf("[O] Namespace Multi-path I/O and Namespace Sharing Capabilities (NMIC):\n");
     if (_pNSData->NMIC.SharedNameSpace)
     {
-        printf("\tbit [      0] 1 = May be attached to two or more controllers in the NVM subsystem concurrently.\n");
+        printf("\tbit [      0] 1 = May be attached to two or more controllers in the NVM subsystem concurrently\n");
     }
     else
     {
-        printf("\tbit [      0] 0 = Is a private namespace and is able to be attached to only one controller at a time.\n");
+        printf("\tbit [      0] 0 = Is a private namespace and is able to be attached to only one controller at a time\n");
     }
 
     printf("[O] Reservation Capabilities (RESCAP):\n");
@@ -271,102 +271,102 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     {
         if (_pNSData->RESCAP.IgnoreExistingKey)
         {
-            printf("\tbit [      7] 1 = Ignore Existing Key is used as defined in revision 1.3 or later of this specification.\n");
+            printf("\tbit [      7] 1 = Ignore Existing Key is used as defined in revision 1.3 or later of this specification\n");
         }
         else
         {
-            printf("\tbit [      7] 0 = Ignore Existing Key is used as defined in revision 1.2.1 or earlier of this specification.\n");
+            printf("\tbit [      7] 0 = Ignore Existing Key is used as defined in revision 1.2.1 or earlier of this specification\n");
         }
         if (_pNSData->RESCAP.ExclusiveAccessAllRegistrantsReservation)
         {
-            printf("\tbit [      6] 1 = Supports the Exclusive Access - All Registrants reservation type.\n");
+            printf("\tbit [      6] 1 = Supports Exclusive Access - All Registrants reservation type\n");
         }
         else
         {
-            printf("\tbit [      6] 0 = Does not support the Exclusive Access - All Registrants reservation type.\n");
+            printf("\tbit [      6] 0 = Does not support Exclusive Access - All Registrants reservation type\n");
         }
         if (_pNSData->RESCAP.WriteExclusiveAllRegistrantsReservation)
         {
-            printf("\tbit [      5] 1 = Supports the Write Exclusive - All Registrants reservation type.\n");
+            printf("\tbit [      5] 1 = Supports Write Exclusive - All Registrants reservation type\n");
         }
         else
         {
-            printf("\tbit [      5] 0 = Does not support the Write Exclusive - All Registrants reservation type.\n");
+            printf("\tbit [      5] 0 = Does not support Write Exclusive - All Registrants reservation type\n");
         }
         if (_pNSData->RESCAP.ExclusiveAccessRegistrantsOnlyReservation)
         {
-            printf("\tbit [      4] 1 = Supports the Exclusive Access - Registrants Only reservation type.\n");
+            printf("\tbit [      4] 1 = Supports Exclusive Access - Registrants Only reservation type\n");
         }
         else
         {
-            printf("\tbit [      4] 0 = Does not support the Exclusive Access - Registrants Only reservation type.\n");
+            printf("\tbit [      4] 0 = Does not support Exclusive Access - Registrants Only reservation type\n");
         }
         if (_pNSData->RESCAP.WriteExclusiveRegistrantsOnlyReservation)
         {
-            printf("\tbit [      3] 1 = Supports the Write Exclusive - Registrants Only reservation type.\n");
+            printf("\tbit [      3] 1 = Supports Write Exclusive - Registrants Only reservation type\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = Does not support the Write Exclusive - Registrants Only reservation type.\n");
+            printf("\tbit [      3] 0 = Does not support Write Exclusive - Registrants Only reservation type\n");
         }
         if (_pNSData->RESCAP.ExclusiveAccessReservation)
         {
-            printf("\tbit [      2] 1 = Supports the Exclusive Access reservation type.\n");
+            printf("\tbit [      2] 1 = Supports Exclusive Access reservation type\n");
         }
         else
         {
-            printf("\tbit [      2] 0 = Does not support the Exclusive Access reservation type.\n");
+            printf("\tbit [      2] 0 = Does not support Exclusive Access reservation type\n");
         }
         if (_pNSData->RESCAP.WriteExclusiveReservation)
         {
-            printf("\tbit [      1] 1 = Supports the Write Exclusive reservation type.\n");
+            printf("\tbit [      1] 1 = Supports Write Exclusive reservation type\n");
         }
         else
         {
-            printf("\tbit [      1] 0 = Does not support the Write Exclusive reservation type.\n");
+            printf("\tbit [      1] 0 = Does not support Write Exclusive reservation type\n");
         }
         if (_pNSData->RESCAP.PersistThroughPowerLoss)
         {
-            printf("\tbit [      0] 1 = Supports the Persist Through Power Loss capability.\n");
+            printf("\tbit [      0] 1 = Supports Persist Through Power Loss capability\n");
         }
         else
         {
-            printf("\tbit [      0] 0 = Does not support the Persist Through Power Loss capability.\n");
+            printf("\tbit [      0] 0 = Does not support Persist Through Power Loss capability\n");
         }
     }
 
     printf("[O] Format Progress Indicator (FPI):\n");
     if (_pNSData->FPI.Supported)
     {
-        printf("\tbit [      7] 1 = Supports the Format Progress Indicator defined by bits 6:0 in this field.\n");
-        printf("\tbit [  6:  0] %d = the percentage of the Format NVM command that remains to be completed (%%).\n", _pNSData->FPI.PercentageRemained);
+        printf("\tbit [      7] 1 = Supports Format Progress Indicator defined by bits 6:0 in this field\n");
+        printf("\tbit [  6:  0] %d = the percentage of Format NVM command that remains to be completed (%%)\n", _pNSData->FPI.PercentageRemained);
     }
     else
     {
-        printf("\tbit [      7] 0 = Does not support the Format Progress Indicator.\n");
+        printf("\tbit [      7] 0 = Does not support Format Progress Indicator\n");
     }
 
     printf("[O] Deallocate Logical Block Features (DLFEAT):\n");
     if (_pNSData->DLFEAT.IsGuardFieldCRC)
     {
-        printf("\tbit [      4] 1 = The Guard field for deallocated logical blocks that contain protection information is set to the CRC for the value read from the deallocated logical block and its metadata (excluding protection information).\n");
+        printf("\tbit [      4] 1 = Guard field for deallocated logical blocks that contain protection information is set to the CRC for the value read from the deallocated logical block and its metadata (excluding protection information).\n");
     }
     else
     {
-        printf("\tbit [      4] 0 = The Guard field for the deallocated logical blocks that contain protection information is set to FFFFh.\n");
+        printf("\tbit [      4] 0 = Guard field for the deallocated logical blocks that contain protection information is set to FFFFh.\n");
     }
     if (_pNSData->DLFEAT.DeallocateInWriteZero)
     {
-        printf("\tbit [      3] 1 = Supports the Deallocate bit in the Write Zeroes command for this namespace.\n");
+        printf("\tbit [      3] 1 = Supports Deallocate bit in Write Zeroes command for this namespace.\n");
     }
     else
     {
-        printf("\tbit [      3] 0 = Does not support the Deallocate bit in the Write Zeroes command for this namespace.\n");
+        printf("\tbit [      3] 0 = Does not support Deallocate bit in Write Zeroes command for this namespace.\n");
     }
     switch (_pNSData->DLFEAT.ReadBehavior)
     {
     case 0:
-        printf("\tbit [  2:  0] 0 = The read behavior is not reported.\n");
+        printf("\tbit [  2:  0] 0 = Read behavior for a deallocatd logical block is not reported.\n");
         break;
 
     case 1:
@@ -418,7 +418,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("0 (There are no atomic boundaries for normal write operations.)\n");
+        printf("0 (There are no atomic boundaries for normal write operations)\n");
     }
 
     printf("[O] Namespace Atomic Boundary Offset (NABO): %d\n", _pNSData->NABO);
@@ -430,7 +430,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("0 (There are no atomic boundaries for power fail or error conditions.)\n");
+        printf("0 (There are no atomic boundaries for power fail or error conditions)\n");
     }
 
     printf("[O] Namespace Optimal IO Boundary (NOIOB): ");
@@ -440,7 +440,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
     }
     else
     {
-        printf("0 (No optimal IO boundary is reported.)\n");
+        printf("0 (No optimal IO boundary is reported)\n");
     }
 
     // TODO: we ignore upper 8 bytes of _pNSData->NVMCAP[8] ... when it becomes to be needed?
