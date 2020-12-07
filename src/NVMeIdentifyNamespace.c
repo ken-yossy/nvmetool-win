@@ -17,7 +17,8 @@ typedef struct
         uint8_t NameSpaceAtomicWriteUnit : 1;   // bit [    1]
         uint8_t DeallocatedOrUnwrittenError : 1;// bit [    2]
         uint8_t SkipReuseUI : 1;                // bit [    3]
-        uint8_t Reserved : 4;
+        uint8_t OptPerf : 1;                    // bit [    4] <rev1.4>
+        uint8_t Reserved : 3;
     } NSFEAT;                           // byte [       24] M - Namespace Features (NSFEAT)
 
     uint8_t   NLBAF;                    // byte [       25] M - Number of LBA Formats (NLBAF)
@@ -89,8 +90,25 @@ typedef struct
     uint16_t    NABSPF;                 // byte [  45:  44] O - Namespace Atomic Boundary Size Power Fail (NABSPF)
     uint16_t    NOIOB;                  // byte [  47:  46] O - Namespace Optimal IO Boundary (NOIOB)
     uint8_t     NVMCAP[16];             // byte [  63:  48] O - NVM Capacity (NVMCAP)
+    uint16_t    NPWG;                   // byte [  65:  64] O - Namespace Preferred Write Granularity (NPWG) <rev1.4>
+    uint16_t    NPWA;                   // byte [  67:  66] O - Namespace Preferred Write Alignment (NPWA) <rev1.4>
+    uint16_t    NPDG;                   // byte [  69:  68] O - Namespace Preferred Deallocate Granularity (NPDG) <rev1.4>
+    uint16_t    NPDA;                   // byte [  71:  70] O - Namespace Preferred Deallocate Alignment (NPDA) <rev1.4>
+    uint16_t    NOWS;                   // byte [  73:  72] O - Namespace Optimal Write Size (NOWS) <rev1.4>
 
-    uint8_t     Reserved2[40];          // byte [ 103:  64]
+    uint8_t     Reserved2[18];          // byte [  91:  74]
+
+    uint32_t    ANAGRPID;               // byte [  65:  92] O - ANA Group Identifier (ANAGRPID) <rev1.4>
+
+    uint8_t     Reserved3[3];           // byte [  98:  96]
+
+    struct {
+        uint8_t   WriteProtect : 1;         // bit [    0]
+        uint8_t   Reserved : 7;             // bit [ 7: 1]
+    } NSATTR;                           // byte [       99] O - Namespace Attributes (NSATTR) <rev1.4>
+
+    uint16_t    NVMSETID;               // byte [ 101: 100] O - NVM Set Identifier (NVMSETID) <rev1.4>
+    uint16_t    ENDGID;                 // byte [ 103: 102] O - Endurance Group Identifier (ENDGID) <rev1.4>
 
     uint8_t     NGUID[16];              // byte [ 119: 104] O - NAmespace Globally Unique Identifier (NGUID)
     uint8_t     EUI64[8];               // byte [ 127: 120] M - IEEE Extended Unique Identifier (EUI64)
@@ -98,18 +116,30 @@ typedef struct
     NVME_LBA_FORMAT LBAF[16];           // byte [ 131: 128] M - LBA Format 0 Support (LBAF0)
                                         // byte [ 192: 132] O - LBA Format Support; 1 (LBAF1) to 15 (LBAF15)
 
-    uint8_t     Reserved3[192];         // byte [ 383: 192]
+    uint8_t     Reserved4[192];         // byte [ 383: 192]
 
     uint8_t     VS[3712];               // byte [4095: 384] O - Vendor Specific (VS)
-} NVME_IDENTIFY_NAMESPACE_DATA13, * PNVME_IDENTIFY_NAMESPACE_DATA13;
+} NVME_IDENTIFY_NAMESPACE_DATA14, * PNVME_IDENTIFY_NAMESPACE_DATA14;
 
-static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSData, DWORD _dwNSID)
+static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSData, DWORD _dwNSID)
 {
     printf("[M] Namespace Size (NSZE): %llu (sectors)\n", (uint64_t)_pNSData->NSZE);
     printf("[M] Namespace Capacity (NCAP): %llu (sectors)\n", (uint64_t)_pNSData->NCAP);
     printf("[M] Namespace Utilization (NUSE): %llu (sectors)\n", (uint64_t)_pNSData->NUSE);
 
     printf("[M] Namespace Features (NSFEAT):\n");
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    {
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("\tbit [      4] 1 = Host should use NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+        else
+        {
+            printf("\tbit [      4] 0 = Does not support NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+    }
+
     if (_pNSData->NSFEAT.SkipReuseUI)
     {
         printf("\tbit [      3] 1 = NGUID and EUI64 is never reused\n");
@@ -443,8 +473,104 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA13 _pNSD
         printf("0 (No optimal IO boundary is reported)\n");
     }
 
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    {
+        printf("[O] Namespace Preferred Write Granularity (NPWG): ");
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("%d = %d sectors\n", _pNSData->NPWG, _pNSData->NPWG + 1);
+        }
+        else
+        {
+            printf("n/a = Does not support NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+
+        printf("[O] Namespace Preferred Write Alignment (NPWA): ");
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("%d = %d sectors\n", _pNSData->NPWA, _pNSData->NPWA + 1);
+        }
+        else
+        {
+            printf("n/a = Does not support NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+
+        printf("[O] Namespace Preferred Deallocate Granularity (NPDG): ");
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("%d = %d sectors\n", _pNSData->NPDG, _pNSData->NPDG + 1);
+        }
+        else
+        {
+            printf("n/a = Does not support NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+
+        printf("[O] Namespace Preferred Deallocate Alignment (NPDA): ");
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("%d = %d sectors\n", _pNSData->NPDA, _pNSData->NPDA + 1);
+        }
+        else
+        {
+            printf("n/a = Does not support NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+
+        printf("[O] Namespace Optimal Write Size (NOWS): ");
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("%d = %d sectors\n", _pNSData->NOWS, _pNSData->NOWS + 1);
+        }
+        else
+        {
+            printf("n/a = Does not support NPWG, NPWA, NPDG, NPDA, and NOWS\n");
+        }
+    }
+
     // TODO: we ignore upper 8 bytes of _pNSData->NVMCAP[8] ... when it becomes to be needed?
     printf("[O] NVM Capacity (NVMCAP): %lld (bytes)\n", (uint64_t)(_pNSData->NVMCAP));
+
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    {
+        printf("[O] ANA Group Identifier (ANAGRPID): ");
+        if (g_stController.CMIC.ANAReport)
+        {
+            printf("%d\n", _pNSData->ANAGRPID);
+        }
+        else
+        {
+            printf("n/a (Does not support Asymmetric Namespace Access Reporting)\n");
+        }
+
+        printf("[O] Namespace Attributes (NSATTR):\n");
+        if (_pNSData->NSFEAT.OptPerf)
+        {
+            printf("\tbit [      0] 1 = This namespace is write protected\n");
+        }
+        else
+        {
+            printf("\tbit [      0] 0 = This namespace is not write protected\n");
+        }
+
+        printf("[O] NVM Set Identifier (NVMSETID): ");
+        if (g_stController.CTRATT.NVMSet)
+        {
+            printf("%d\n", _pNSData->NVMSETID);
+        }
+        else
+        {
+            printf("n/a (Does not support NVM Set)\n");
+        }
+
+        printf("[O] Endurance Group Identifier (ENDGID): ");
+        if (g_stController.CTRATT.EnduranceGroups)
+        {
+            printf("%d\n", _pNSData->ENDGID);
+        }
+        else
+        {
+            printf("n/a (Does not support Endurance Group)\n");
+        }
+    }
 
     printf("[O] Namespace Globally Unique Identifier (NGUID):\n");
     printf("\tbyte [ 15: 11] %02X%02X%02X%02X%02X (Extension identifier assigned by the vendor)\n",
@@ -511,7 +637,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
         + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-        + sizeof(NVME_IDENTIFY_NAMESPACE_DATA13);
+        + sizeof(NVME_IDENTIFY_NAMESPACE_DATA14);
     buffer = malloc(bufferLength);
 
     if (buffer == NULL)
@@ -520,7 +646,6 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
         goto error_exit;
     }
 
-    // Initialize query data structure to get Identify Active Namespace ID list.
     ZeroMemory(buffer, bufferLength);
 
     query = (PSTORAGE_PROPERTY_QUERY)buffer;
@@ -535,7 +660,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     protocolData->ProtocolDataRequestValue = NVME_IDENTIFY_CNS_SPECIFIC_NAMESPACE;
     protocolData->ProtocolDataRequestSubValue = _dwNSID;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-    protocolData->ProtocolDataLength = sizeof(NVME_IDENTIFY_NAMESPACE_DATA13);
+    protocolData->ProtocolDataLength = sizeof(NVME_IDENTIFY_NAMESPACE_DATA14);
 
     // Send request down.
     iResult = iIssueDeviceIoControl(
@@ -566,7 +691,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
     if ((protocolData->ProtocolDataOffset > sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_IDENTIFY_NAMESPACE_DATA13)))
+        (protocolData->ProtocolDataLength < sizeof(NVME_IDENTIFY_NAMESPACE_DATA14)))
     {
         fprintf(stderr, "[E] NVMeIdentifyNamespace: ProtocolData Offset/Length not valid, stop.\n");
         goto error_exit;
@@ -574,7 +699,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
 
     // Identify Namespace
     printNVMeIdentifyNamespaceData(
-        (PNVME_IDENTIFY_NAMESPACE_DATA13)((PCHAR)protocolData + protocolData->ProtocolDataOffset),
+        (PNVME_IDENTIFY_NAMESPACE_DATA14)((PCHAR)protocolData + protocolData->ProtocolDataOffset),
         _dwNSID);
     iResult = 0; // succeeded
 

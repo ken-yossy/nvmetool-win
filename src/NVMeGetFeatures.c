@@ -1119,7 +1119,7 @@ static int NVMeGetFeaturesNOPPME(HANDLE _hDevice)
 
     printf("\n[I] Non-Operational Power State Config:\n");
 
-    if (g_stController.CTRATT.NOPSPMode == 0)
+    if (g_stController.CTRATT.NoopPSPermissiveModeEn == 0)
     {
         fprintf(stderr, "\n[W] This controller does not support Non-Operational Power State Permissive Mode, skip\n");
         return result;

@@ -6,7 +6,6 @@
 
 #include "NVMeUtils.h"
 #include "NVMeIdentifyController.h"
-#include "NVMeIdentifyControllerData.h"
 
 static void s_vPrintNVMeIdentifyControllerDataCMIC(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
 {
