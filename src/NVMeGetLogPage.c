@@ -56,7 +56,28 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         cCmd = cGetConsoleInput("\n# Get Log Page - SMART / Health Information (Log Identifier 02h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')
         {
-            iResult = iNVMeGetSMART(_hDevice, 1);
+            int iNSID = 0;
+            if (g_stController.LPA.SmartPagePerNamespace)
+            {
+                iNSID = iGetConsoleInputDec("\n# To get controller's log page, press 0, to get specified namespace's log page, input NSID of the namespace.\n", strCmd);
+                if (iNSID == 0)
+                {
+                    cCmd = cGetConsoleInput("\n# Get controller's log page, Press 'y' to continue\n", strCmd);
+                    iNSID = NVME_NAMESPACE_ALL;
+                }
+                else
+                {
+                    printf("\n# Get namespace's log page (NSID = %08Xh),", iNSID);
+                    cCmd = cGetConsoleInput(" Press 'y' to continue\n", strCmd);
+                }
+            }
+            else
+            {
+                printf("\n[W] This controller does not support the SMART / Health Information log page on a per namespace basis, get controller's log page\n");
+                iNSID = NVME_NAMESPACE_ALL;
+            }
+
+            iResult = iNVMeGetSMART(_hDevice, 1, iNSID);
         }
         break;
 

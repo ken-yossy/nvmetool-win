@@ -9,39 +9,49 @@
 #include "NVMeUtils.h"
 #include "NVMeIdentifyController.h"
 
+bool g_WA_bGetControllerSMARTLogWithNSIDZero;
+
 void vPrintControllerBasicData(void)
 {
-    // These fields are common among revisions...
-    {
-        char buf[21];
-        ZeroMemory(buf, 21);
-        strncpy_s(buf, _countof(buf), (const char*)(g_stController.SN), 20);
-        buf[20] = '\0';
-        printASCII("[M] SerialNumber (SN): ", (const char*)buf, true);
-    }
+    char strSN[21];
+    char strMN[41];
+    char strFR[9];
+    char strVER[16];
 
-    {
-        char buf[41];
-        ZeroMemory(buf, 41);
-        strncpy_s(buf, _countof(buf), (const char*)(g_stController.MN), 40);
-        buf[40] = '\0';
-        printASCII("[M] Model Number (MN): ", (const char*)buf, true);
-    }
+    ZeroMemory(strSN, 21);
+    strncpy_s(strSN, _countof(strSN), (const char*)(g_stController.SN), 20);
+    strSN[20] = '\0';
+    printASCII("[M] SerialNumber (SN): ", (const char*)strSN, true);
 
-    {
-        char buf[9];
-        ZeroMemory(buf, 9);
-        strncpy_s(buf, _countof(buf), (const char*)(g_stController.FR), 8);
-        buf[8] = '\0';
-        printASCII("[M] Firmware Revision (FR): ", (const char*)buf, true);
-    }
+    ZeroMemory(strMN, 41);
+    strncpy_s(strMN, _countof(strMN), (const char*)(g_stController.MN), 40);
+    strMN[40] = '\0';
+    printASCII("[M] Model Number (MN): ", (const char*)strMN, true);
 
+    ZeroMemory(strFR, 9);
+    strncpy_s(strFR, _countof(strFR), (const char*)(g_stController.FR), 8);
+    strFR[8] = '\0';
+    printASCII("[M] Firmware Revision (FR): ", (const char*)strFR, true);
+
+    ZeroMemory(strVER, 16);
+    snprintf(strVER, _countof(strVER), "0x%08x\0", (g_stController.VER));
+    printASCII("[M] Version (VER): ", (const char*)strVER, false);
+    printf(" (NVMe Revision %d.%d.%d)\n", (g_stController.VER >> 16) & 0xFFFF, (g_stController.VER >> 8) & 0xFF, g_stController.VER & 0xFF);
+
+    if ((strstr((const char*)strMN, "WDC WDS") == NULL) ||
+        (strstr((const char*)strMN, "2B0C") == NULL) ||
+        (strstr((const char*)strFR, "211070WD") == NULL))
     {
-        char buf[16];
-        ZeroMemory(buf, 16);
-        snprintf(buf, _countof(buf), "0x%08x\0", (g_stController.VER));
-        printASCII("[M] Version (VER): ", (const char*)buf, false);
-        printf(" (NVMe Revision %d.%d.%d)\n", (g_stController.VER >> 16) & 0xFFFF, (g_stController.VER >> 8) & 0xFF, g_stController.VER & 0xFF);
+        g_WA_bGetControllerSMARTLogWithNSIDZero = false;
+    }
+    else
+    {
+        /**
+        * It is unable to get controller's SMART / Health information log page by Get Log Page command
+        * with NSID = FFFFFFFFh. So, NSID = 0 is used for a workaround.
+        */
+        g_WA_bGetControllerSMARTLogWithNSIDZero = true;
+        fprintf(stderr, "[W] Workanound is enabled: WD SN550 : Cannot retrieve controller's SMART/Health information by Get Log Page command with NSID FFFFFFFFh\n");
     }
 }
 

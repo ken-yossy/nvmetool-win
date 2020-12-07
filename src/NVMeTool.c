@@ -83,15 +83,15 @@ int main(int _argc, char* _argv[])
     printf("[I] Getting controller identify data succeeded.\n\n");
     vPrintControllerBasicData();
 
-    // retrieve fundamental SMART data
-    iResult = iNVMeGetSMART(hDevice, false);
+    // retrieve controller's SMART data
+    iResult = iNVMeGetSMART(hDevice, false, NVME_NAMESPACE_ALL);
     if (iResult)
     {
-        fprintf(stderr, "[E] Getting SMART/Health information data failed, stop.\n\n");
+        fprintf(stderr, "[E] Getting controller's SMART / Health information log page failed, stop.\n\n");
         return iResult;
     }
 
-    printf("[I] Getting SMART information succeeded.\n\n");
+    printf("[I] Getting controller's SMART / Health information log page succeeded.\n\n");
 
     while (!bFinished)
     {

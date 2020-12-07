@@ -67,4 +67,4 @@ typedef struct {
 
 extern NVME_SMART_INFO_LOG g_stSMARTLog;
 
-int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint);
+int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint, int iNSID);

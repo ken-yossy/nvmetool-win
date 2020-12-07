@@ -283,7 +283,7 @@ static void s_vPrintNVMeSMARTLog(PNVME_SMART_INFO_LOG _pData)
     printf("[I] Total Time For Thermal Management Temperature 2: %d (seconds)\n", _pData->TMT2TotalTime);
 }
 
-int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
+int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint, int iNSID)
 {
     int     iResult = -1;
     PVOID   buffer = NULL;
@@ -318,7 +318,11 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint)
     protocolData->ProtocolType = ProtocolTypeNvme;
     protocolData->DataType = NVMeDataTypeLogPage;
     protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_HEALTH_INFO;
-    protocolData->ProtocolDataRequestSubValue = NVME_NAMESPACE_ALL;
+    if (iNSID == NVME_NAMESPACE_ALL)
+    {
+        if (g_WA_bGetControllerSMARTLogWithNSIDZero) iNSID = 0;
+    }
+    protocolData->ProtocolDataRequestSubValue = iNSID;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = sizeof(NVME_SMART_INFO_LOG);
 
