@@ -221,11 +221,11 @@ static void s_vPrintNVMeIdentifyControllerDataRRLS(PNVME_IDENTIFY_CONTROLLER_DAT
     {
         if ((_pstController->RRLS >> i) & 0x1)
         {
-            printf("\tbit [      %d] 1 = Read Recovery Level %d is supported\n", i, i);
+            printf("\tbit [     %2d] 1 = Read Recovery Level %2d is supported\n", i, i);
         }
         else
         {
-            printf("\tbit [      %d] 0 = Read Recovery Level %d is not supported\n", i, i);
+            printf("\tbit [     %2d] 0 = Read Recovery Level %2d is not supported\n", i, i);
         }
     }
 }
