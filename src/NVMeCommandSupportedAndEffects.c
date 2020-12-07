@@ -66,7 +66,9 @@ static const char* strAdminCommand[256] =
     "Security Receive",                                     // 82h
     "(reserved)",                                           // 83h
     "Sanitize",                                             // 84h
-    "(reserved)", "(reserved)", "(reserved)",               // 85h -- 87h
+    "(reserved)",                                           // 85h
+    "Get LBA Status",                                       // 86h <rev1.4>
+    "(reserved)",                                           // 87h
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 88h -- 8Bh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 8Ch -- 8Fh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 90h -- 93h
@@ -110,7 +112,8 @@ static const char* strNVMCommand[256] =
     "(reserved)", "(reserved)",     // 06h, 07h
     "Write Zeroes",                 // 08h
     "Dataset Management",           // 09h
-    "(reserved)", "(reserved)", "(reserved)", // 0A, 0Bh, 0Ch
+    "(reserved)", "(reserved)",     // 0A, 0Bh
+    "Verify",                       // 0Ch <rev1.4>
     "Reservation Register",         // 0Dh
     "Reservation Report",           // 0Eh
     "(reserved)", "(reserved)",     // 0Fh, 10h
