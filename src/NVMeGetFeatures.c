@@ -754,6 +754,117 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
     result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ASYNC_EVENT_CONFIG, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    { // revision 1.4 or later
+        printf("\tbit [     14] Endurance Group Event Aggregate Log Change Notices:\n");
+        if ((ulCurrentData >> 14) & 0x1)
+        {
+            printf("\t\tCurrent = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tCurrent = 0 (disabled)\n");
+        }
+        if ((ulDefaultData >> 14) & 0x1)
+        {
+            printf("\t\tDefault = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tDefault = 0 (disabled)\n");
+        }
+
+        if ((ulSavedData >> 14) & 0x1)
+        {
+            printf("\t\tSaved   = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tSaved   = 0 (disabled)\n");
+        }
+
+        printf("\tbit [     13] LBA Status Information Notices:\n");
+        if ((ulCurrentData >> 13) & 0x1)
+        {
+            printf("\t\tCurrent = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tCurrent = 0 (disabled)\n");
+        }
+        if ((ulDefaultData >> 13) & 0x1)
+        {
+            printf("\t\tDefault = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tDefault = 0 (disabled)\n");
+        }
+
+        if ((ulSavedData >> 13) & 0x1)
+        {
+            printf("\t\tSaved   = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tSaved   = 0 (disabled)\n");
+        }
+
+        printf("\tbit [     12] Predictable Latency Event Aggregate Log Change Notices:\n");
+        if ((ulCurrentData >> 12) & 0x1)
+        {
+            printf("\t\tCurrent = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tCurrent = 0 (disabled)\n");
+        }
+        if ((ulDefaultData >> 12) & 0x1)
+        {
+            printf("\t\tDefault = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tDefault = 0 (disabled)\n");
+        }
+
+        if ((ulSavedData >> 12) & 0x1)
+        {
+            printf("\t\tSaved   = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tSaved   = 0 (disabled)\n");
+        }
+
+        printf("\tbit [     11] Asymmetric Namespace Access Change Notices:\n");
+        if ((ulCurrentData >> 11) & 0x1)
+        {
+            printf("\t\tCurrent = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tCurrent = 0 (disabled)\n");
+        }
+        if ((ulDefaultData >> 11) & 0x1)
+        {
+            printf("\t\tDefault = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tDefault = 0 (disabled)\n");
+        }
+
+        if ((ulSavedData >> 11) & 0x1)
+        {
+            printf("\t\tSaved   = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tSaved   = 0 (disabled)\n");
+        }
+    }
+
     printf("\tbit [     10] Telemetry Log Notices:\n");
     if ((ulCurrentData >> 10) & 0x1)
     {
@@ -836,6 +947,35 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
     else
     {
         printf("\t\tSaved   = 0 (disabled)\n");
+    }
+
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    { // revision 1.4 or later
+        printf("\tbit [      5] SMART / Health Critical Warnings (Persistent Memory Region fail):\n");
+        if ((ulCurrentData >> 5) & 0x1)
+        {
+            printf("\t\tCurrent = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tCurrent = 0 (disabled)\n");
+        }
+        if ((ulDefaultData >> 5) & 0x1)
+        {
+            printf("\t\tDefault = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tDefault = 0 (disabled)\n");
+        }
+        if ((ulSavedData >> 5) & 0x1)
+        {
+            printf("\t\tSaved   = 1 (enabled)\n");
+        }
+        else
+        {
+            printf("\t\tSaved   = 0 (disabled)\n");
+        }
     }
 
     printf("\tbit [      4] SMART / Health Critical Warnings (Volatile memory backup device fail):\n");
