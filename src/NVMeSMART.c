@@ -89,20 +89,20 @@ static void s_vPrintNVMeSMARTLog(PNVME_SMART_INFO_LOG _pData)
 
         if (_pData->EnduranceGroupSummary.ReliabilityDegraded)
         {
-            printf("\tbit [      3] 1 = The reliability of one or more Endurance Groups has been degraded.\n");
+            printf("\tbit [      2] 1 = The reliability of one or more Endurance Groups has been degraded.\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = The reliability of all Endurance Groups has not been degraded.\n");
+            printf("\tbit [      2] 0 = The reliability of all Endurance Groups has not been degraded.\n");
         }
 
         if (_pData->EnduranceGroupSummary.AvailableSpareLow)
         {
-            printf("\tbit [      3] 1 = The available spare capacity of one or more Endurance Groups has fallen below the threshold.\n");
+            printf("\tbit [      0] 1 = The available spare capacity of one or more Endurance Groups has fallen below the threshold.\n");
         }
         else
         {
-            printf("\tbit [      3] 0 = The available spare capacity of all Endurance Groups has not fallen below the threshold.\n");
+            printf("\tbit [      0] 0 = The available spare capacity of all Endurance Groups has not fallen below the threshold.\n");
         }
     }
 
