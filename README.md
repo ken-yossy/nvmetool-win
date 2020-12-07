@@ -3,7 +3,7 @@
 ## Abstract
 This software demonstrates that issuing some NVMe commands from userland to NVMe device using Windows inbox NVMe driver (stornvme.sys)[1].
 
-Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4b[6].
+Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4[6] (only Identify Controller Data Structure).
 
 For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM command sets and associated opcodes are shown in [8], and supported features are shown in [9].
 
@@ -249,7 +249,7 @@ This software is released under the MIT License and Microsoft Public License (MS
 
 [5] Microsoft, _"IOCTL_STORAGE_MANAGE_DATA_SET_ATTRIBUTES IOCTL"_, https://docs.microsoft.com/ja-jp/windows/desktop/api/winioctl/ni-winioctl-ioctl_storage_manage_data_set_attributes, Retrieved May 14, 2019
 
-[6] NVM Express, _"NVM Express\[TM\] Base Specification"_, Revision 1.4b, Sept. 21, 2020
+[6] NVM Express, _"NVM Express\[TM\] Base Specification"_, Revision 1.4, June 10, 2019
 
 [7] Microsoft, _"NVMe Features Supported by StorNVMe"_, https://docs.microsoft.com/en-us/windows-hardware/drivers/storage/nvme-features-supported-by-stornvme, Retrieved June 25, 2020
 
