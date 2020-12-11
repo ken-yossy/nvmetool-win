@@ -29,12 +29,15 @@ typedef struct
     uint64_t            Lba;                // byte [23:16] LBA
     uint32_t            NameSpace;          // byte [27:24] Namespace
     uint8_t             VendorInfoAvailable;// byte [   28] Vendor Specific Information Available
-    uint8_t             Reserved0[3];       // byte [31:29]
-    uint64_t            CommandSpecificInfo;// byte [39:32] Command Specific Information
-    uint8_t             Reserved1[24];      // byte [63:40]
-} NVME_ERROR_INFO_LOG13, * PNVME_ERROR_INFO_LOG13;
+    uint8_t             TRTYPE;             // byte [   29] Transport Type <v1.4>
 
-static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG13 _pData, int _iLogNo)
+    uint8_t             Reserved0[2];       // byte [31:30]
+    uint64_t            CommandSpecificInfo;// byte [39:32] Command Specific Information
+    uint16_t            TRTypeSpecificInfo; // byte [41:40] Transport Type Specific Information <v1.4>
+    uint8_t             Reserved1[22];      // byte [63:42]
+} NVME_ERROR_INFO_LOG14, *PNVME_ERROR_INFO_LOG14;
+
+static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG14 _pData, int _iLogNo)
 {
     printf("[I] Error Information (%d) :\n", _iLogNo);
     if (_pData->ErrorCount == 0)
@@ -43,35 +46,70 @@ static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG13 _pData, int _iLo
         return;
     }
 
-    printf("\tbyte [ 39: 32] 0x%016llX = Command Specific Information.\n", _pData->CommandSpecificInfo);
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    {
+        printf("\tbyte [ 41: 40] 0x%04X = Transport Type Specific Information\n ", _pData->TRTypeSpecificInfo);
+    }
+
+    printf("\tbyte [ 39: 32] 0x%016llX = Command Specific Information\n", _pData->CommandSpecificInfo);
+
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    {
+        printf("\tbyte [     29] Transport Type (TRTYPE): ");
+        if (_pData->TRTYPE == 0)
+        {
+            printf("00h = The transport type is not indicated or the error is not transport related\n");
+        }
+        else if (_pData->TRTYPE == 1)
+        {
+            printf("01h = RDMA Transport (refer to the NVMe over Fabric specification)\n");
+        }
+        else if (_pData->TRTYPE == 2)
+        {
+            printf("02h = Fibre Channel Transport (refer to INCITS 540)\n");
+        }
+        else if (_pData->TRTYPE == 3)
+        {
+            printf("03h = TCP Transport (refer to the NVMe over Fabrics specification)\n");
+        }
+        else if (_pData->TRTYPE == 0xFE)
+        {
+            printf("FEh = Intra-host Transport (i.e., loopback)\n");
+        }
+        else
+        {
+            printf("%02Xh = (reserved value)\n", _pData->TRTYPE);
+        }
+    }
+
     if (_pData->VendorInfoAvailable)
     {
-        printf("\tbyte [     28] %xh = Log Page ID for additional vendor specific error information\n", _pData->VendorInfoAvailable);
+        printf("\tbyte [     28] %02Xh = Log Page ID for additional vendor specific error information\n", _pData->VendorInfoAvailable);
     }
     else
     {
-        printf("\tbyte [     28] 0h = No additional information is available.\n");
+        printf("\tbyte [     28] 00h = No additional information is available\n");
     }
 
     if (_pData->NameSpace)
     {
-        printf("\tbyte [ 27: 24] %Xh = The namespace id that the error is associated with.\n", _pData->NameSpace);
+        printf("\tbyte [ 27: 24] %Xh = The namespace id that the error is associated with\n", _pData->NameSpace);
     }
     else
     {
-        printf("\tbyte [ 27: 24] 0h = No namespace information is available.\n");
+        printf("\tbyte [ 27: 24] 0h = No namespace information is available\n");
     }
 
-    printf("\tbyte [ 23: 16] %llXh = The first LBA that experienced the error condition, if applicable.\n", _pData->Lba);
+    printf("\tbyte [ 23: 16] %llXh = The first LBA that experienced the error condition, if applicable\n", _pData->Lba);
     printf("\tbyte [ 15: 14] Parameter Error Location:\n");
     if (_pData->ParameterErrorLocation.AsUshort == 0xFFFF)
     {
-        printf("\t\tbit [ 15:  0] FFFFh = The error is not specific to a particular command.\n");
+        printf("\t\tbit [ 15:  0] FFFFh = The error is not specific to a particular command\n");
     }
     else
     {
-        printf("\t\tbit [ 10:  8] %Xh = Bit in command that contained the error.\n", _pData->ParameterErrorLocation.Bit);
-        printf("\t\tbit [  7:  0] %Xh = Byte in command that contained the error.\n", _pData->ParameterErrorLocation.Byte);
+        printf("\t\tbit [ 10:  8] %Xh = Bit in command that contained the error\n", _pData->ParameterErrorLocation.Bit);
+        printf("\t\tbit [  7:  0] %Xh = Byte in command that contained the error\n", _pData->ParameterErrorLocation.Byte);
     }
 
     PNVME_COMMAND_STATUS pStat = &(_pData->Status);
@@ -119,7 +157,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
         + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-        + sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1);
+        + sizeof(NVME_ERROR_INFO_LOG14) * (g_stController.ELPE + 1);
     buffer = malloc(bufferLength);
 
     if (buffer == NULL)
@@ -142,7 +180,7 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
     protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_ERROR_INFO;
     protocolData->ProtocolDataRequestSubValue = 0;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-    protocolData->ProtocolDataLength = sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1);
+    protocolData->ProtocolDataLength = sizeof(NVME_ERROR_INFO_LOG14) * (g_stController.ELPE + 1);
 
     // Send request down.
     iResult = iIssueDeviceIoControl(_hDevice,
@@ -170,14 +208,14 @@ int iNVMeGetErrorInformation(HANDLE _hDevice)
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_ERROR_INFO_LOG13) * (g_stController.ELPE + 1))) {
+        (protocolData->ProtocolDataLength < sizeof(NVME_ERROR_INFO_LOG14) * (g_stController.ELPE + 1))) {
         fprintf(stderr, "[E] NVMeGetErrorInformation: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
 
     {
-        PNVME_ERROR_INFO_LOG13 aLog = (PNVME_ERROR_INFO_LOG13)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
+        PNVME_ERROR_INFO_LOG14 aLog = (PNVME_ERROR_INFO_LOG14)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
         for (int i = 0; i < (g_stController.ELPE + 1); i++)
         {
             s_vPrintNVMeErrorInformation(aLog, i);
