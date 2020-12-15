@@ -277,3 +277,6 @@ extern bool g_WA_bGetControllerSMARTLogWithNSIDZero;
 
 int iNVMeIdentifyController(HANDLE _hDevice);
 void vPrintControllerBasicData(void);
+bool bIsNVMeV14OrLater(void);
+bool bIsNVMeV13OrLater(void);
+

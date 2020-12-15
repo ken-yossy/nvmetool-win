@@ -11,6 +11,22 @@
 
 bool g_WA_bGetControllerSMARTLogWithNSIDZero;
 
+bool bIsNVMeV14OrLater(void)
+{
+    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+        return true;
+
+    return false;
+}
+
+bool bIsNVMeV13OrLater(void)
+{
+    if (0x00010300 <= ((g_stController.VER) & 0xFFFFFF00))
+        return true;
+
+    return false;
+}
+
 void vPrintControllerBasicData(void)
 {
     char strSN[21];

@@ -10,7 +10,7 @@
 static void s_vPrintNVMeSMARTLog(PNVME_SMART_INFO_LOG _pData)
 {
     printf("[I] Critical Warning:\n");
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or later
         if (_pData->CriticalWarning.PMRDegraded)
         {
@@ -75,7 +75,7 @@ static void s_vPrintNVMeSMARTLog(PNVME_SMART_INFO_LOG _pData)
     printf("[I] Available Spare Threshold: %d (%%)\n", _pData->AvailableSpareThreshold);
     printf("[I] Percentage Used: %d (%%)\n", _pData->PercentageUsed);
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or later
         printf("[I] Endurance Group Critical Warning Summary:\n");
         if (_pData->EnduranceGroupSummary.ReadOnly)

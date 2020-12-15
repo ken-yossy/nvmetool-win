@@ -754,7 +754,7 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
     result = iNVMeGetFeature32(_hDevice, NVME_FEATURE_ASYNC_EVENT_CONFIG, NVME_FEATURE_VALUE_SUPPORTED_CAPABILITIES, 0, (uint32_t*)&(ulSupportedCapabilities.AsUlong));
     if (result) return result;
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or later
         printf("\tbit [     14] Endurance Group Event Aggregate Log Change Notices:\n");
         if ((ulCurrentData >> 14) & 0x1)
@@ -949,7 +949,7 @@ static int NVMeGetFeaturesAsynchronousEventConfiguration(HANDLE _hDevice)
         printf("\t\tSaved   = 0 (disabled)\n");
     }
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or later
         printf("\tbit [      5] SMART / Health Critical Warnings (Persistent Memory Region fail):\n");
         if ((ulCurrentData >> 5) & 0x1)

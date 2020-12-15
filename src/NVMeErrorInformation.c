@@ -46,14 +46,14 @@ static void s_vPrintNVMeErrorInformation(PNVME_ERROR_INFO_LOG14 _pData, int _iLo
         return;
     }
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     {
         printf("\tbyte [ 41: 40] 0x%04X = Transport Type Specific Information\n ", _pData->TRTypeSpecificInfo);
     }
 
     printf("\tbyte [ 39: 32] 0x%016llX = Command Specific Information\n", _pData->CommandSpecificInfo);
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     {
         printf("\tbyte [     29] Transport Type (TRTYPE): ");
         if (_pData->TRTYPE == 0)

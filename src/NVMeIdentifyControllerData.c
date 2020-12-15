@@ -11,7 +11,7 @@ static void s_vPrintNVMeIdentifyControllerDataCMIC(PNVME_IDENTIFY_CONTROLLER_DAT
 {
     printf("[O] Controller Multi-Path I/O and Namespace Sharing Capabilities (CMIC):\n");
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->CMIC.ANAReport)
         {
@@ -55,7 +55,7 @@ static void s_vPrintNVMeIdentifyControllerDataOAES(PNVME_IDENTIFY_CONTROLLER_DAT
 {
     printf("[M] Optional Asynchronous Events Supported (OAES):\n");
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->OAES.EnduranceGroupEventAggregateLogChange)
         {
@@ -117,7 +117,7 @@ static void s_vPrintNVMeIdentifyControllerDataCTRATT(PNVME_IDENTIFY_CONTROLLER_D
 {
     printf("[M] Controller Attributes (CTRATT):\n");
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->CTRATT.UUIDList)
         {
@@ -192,7 +192,7 @@ static void s_vPrintNVMeIdentifyControllerDataCTRATT(PNVME_IDENTIFY_CONTROLLER_D
         }
     }
 
-    if (0x00010300 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.3 or over
         if (_pstController->CTRATT.NoopPSPermissiveModeEn)
         {
@@ -271,7 +271,7 @@ static void s_vPrintNVMeIdentifyControllerDataOACS(PNVME_IDENTIFY_CONTROLLER_DAT
 {
     printf("[M] Optional Admin Command Support (OACS):\n");
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->OACS.GetLBAStatusCommand)
         {
@@ -283,7 +283,7 @@ static void s_vPrintNVMeIdentifyControllerDataOACS(PNVME_IDENTIFY_CONTROLLER_DAT
         }
     }
 
-    if (0x00010300 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.3 or over
         if (_pstController->OACS.DBConfigCommand)
         {
@@ -397,7 +397,7 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PNVME_IDENTIFY_CONTROLLER_DATA
 {
     printf("[M] Log Page Attributes (LPA):\n");
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->LPA.PersistentEventLog)
         {
@@ -409,7 +409,7 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PNVME_IDENTIFY_CONTROLLER_DATA
         }
     }
 
-    if (0x00010300 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.3 or over
         if (_pstController->LPA.TelemetrySupport)
         {
@@ -670,7 +670,7 @@ static void s_vPrintNVMeIdentifyControllerDataSANICAP(PNVME_IDENTIFY_CONTROLLER_
     if (_pstController->SANICAP.Overwrite | _pstController->SANICAP.CryptoErase | _pstController->SANICAP.BlockErase)
     {
         printf("\n");
-        if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+        if (bIsNVMeV14OrLater())
         { // revision 1.4 or over
             switch (_pstController->SANICAP.NODMMAS)
             {
@@ -928,7 +928,7 @@ static void s_vPrintNVMeIdentifyControllerDataONCS(PNVME_IDENTIFY_CONTROLLER_DAT
 {
     printf("[M] Optional NVM Command Support (ONCS):\n");
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->ONCS.Verify)
         {
@@ -940,7 +940,7 @@ static void s_vPrintNVMeIdentifyControllerDataONCS(PNVME_IDENTIFY_CONTROLLER_DAT
         }
     }
 
-    if (0x00010300 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV13OrLater())
     { // revision 1.3 or over
         if (_pstController->ONCS.Timestamp)
         {
@@ -1056,7 +1056,7 @@ static void s_vPrintNVMeIdentifyControllerDataVWC(PNVME_IDENTIFY_CONTROLLER_DATA
     printf("[M] Volatile Write Cache (VWC):\n");
     if (_pstController->VWC.Present)
     {
-        if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+        if (bIsNVMeV14OrLater())
         { // revision 1.4 or over
             switch (_pstController->VWC.FlushBehavior)
             {
@@ -1166,7 +1166,7 @@ static void s_vPrintNVMeIdentifyControllerDataSGLS(PNVME_IDENTIFY_CONTROLLER_DAT
 
     if (_pstController->SGLS.SGLSupported == 0)
     {
-        if (0x00010300 <= ((_pstController->VER) & 0xFFFFFF00))
+        if (bIsNVMeV13OrLater())
         { // revision 1.3 or over
             printf("\tbit [  1:  0] 0 = SGLs are not supported\n");
         }
@@ -1177,7 +1177,7 @@ static void s_vPrintNVMeIdentifyControllerDataSGLS(PNVME_IDENTIFY_CONTROLLER_DAT
         return;
     }
 
-    if (0x00010400 <= ((_pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->SGLS.TransactionalSGLDataBlockDescSupported)
         {
@@ -1524,18 +1524,18 @@ void vPrintNVMeIdentifyControllerData(void)
     s_vPrintNVMeIdentifyControllerDataOAES(pstController);
     s_vPrintNVMeIdentifyControllerDataCTRATT(pstController);
 
-    if (0x00010400 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         s_vPrintNVMeIdentifyControllerDataRRLS(pstController);
         s_vPrintNVMeIdentifyControllerDataCNTRLTYPE(pstController);
     }
 
-    if (0x00010300 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV13OrLater())
     { // revision 1.3 or over
         s_vPrintNVMeIdentifyControllerDataFGUID(pstController);
     }
 
-    if (0x00010400 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         s_vPrintNVMeIdentifyControllerDataCRDT(pstController);
     }
@@ -1565,7 +1565,7 @@ void vPrintNVMeIdentifyControllerData(void)
 
     s_vPrintNVMeIdentifyControllerDataRPMB(pstController);
 
-    if (0x00010300 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV13OrLater())
     { // revision 1.3 or over
         s_vPrintNVMeIdentifyControllerDataEDSTT(pstController);
         s_vPrintNVMeIdentifyControllerDataDSTO(pstController);
@@ -1574,13 +1574,13 @@ void vPrintNVMeIdentifyControllerData(void)
 
     s_vPrintNVMeIdentifyControllerDataKAS(pstController);
 
-    if (0x00010300 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV13OrLater())
     { // revision 1.3 or over
         s_vPrintNVMeIdentifyControllerDataHCTMA(pstController);
         s_vPrintNVMeIdentifyControllerDataSANICAP(pstController);
     }
 
-    if (0x00010400 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         s_vPrintNVMeIdentifyControllerDataHMMINDS(pstController);
         s_vPrintNVMeIdentifyControllerDataHMMAXD(pstController);
@@ -1606,7 +1606,7 @@ void vPrintNVMeIdentifyControllerData(void)
     s_vPrintNVMeIdentifyControllerDataAWU(pstController);
     s_vPrintNVMeIdentifyControllerDataNVSCC(pstController);
 
-    if (0x00010400 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         s_vPrintNVMeIdentifyControllerDataNWPC(pstController);
     }
@@ -1614,7 +1614,7 @@ void vPrintNVMeIdentifyControllerData(void)
     s_vPrintNVMeIdentifyControllerDataACWU(pstController);
     s_vPrintNVMeIdentifyControllerDataSGLS(pstController);
 
-    if (0x00010400 <= ((pstController->VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         s_vPrintNVMeIdentifyControllerDataMNAN(pstController);
     }

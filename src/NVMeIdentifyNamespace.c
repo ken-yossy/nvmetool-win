@@ -128,7 +128,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSD
     printf("[M] Namespace Utilization (NUSE): %llu (sectors)\n", (uint64_t)_pNSData->NUSE);
 
     printf("[M] Namespace Features (NSFEAT):\n");
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     {
         if (_pNSData->NSFEAT.OptPerf)
         {
@@ -473,7 +473,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSD
         printf("0 (No optimal IO boundary is reported)\n");
     }
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     {
         printf("[O] Namespace Preferred Write Granularity (NPWG): ");
         if (_pNSData->NSFEAT.OptPerf)
@@ -529,7 +529,7 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSD
     // TODO: we ignore upper 8 bytes of _pNSData->NVMCAP[8] ... when it becomes to be needed?
     printf("[O] NVM Capacity (NVMCAP): %lld (bytes)\n", (uint64_t)(_pNSData->NVMCAP));
 
-    if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))
+    if (bIsNVMeV14OrLater())
     {
         printf("[O] ANA Group Identifier (ANAGRPID): ");
         if (g_stController.CMIC.ANAReport)
