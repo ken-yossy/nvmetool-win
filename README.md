@@ -205,8 +205,8 @@ These commands should be issued with highest care.
 Confirmed on the following software environment:
 
 * Operating system and device driver
-  * Windows 10 Professional 64bit (Version 2004, Build 20231.1000)
-  * stornvme.sys (version 10.0.20231.1000, WinBuild 160101.0800)
+  * Windows 10 Professional 64bit (Version 2004, Build 21286.1000)
+  * stornvme.sys (version 10.0.21286.1000, WinBuild 160101.0800)
 * Developping environment
   * Microsoft Visual Studio Community 2019 (Version 16.7.6)
     * Microsoft Visual C++ 2019
