@@ -111,7 +111,14 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        06h | Device Self-test               | x    | |
 |        07h | Telemetry Host-initiated       | x    | Getting header only. see also Note 1. |
 |        08h | Telemetry Controller-initiated | x    | Getting header only. |
-| 09h -- 6Fh | _Reserved_                     |      | |
+|        09h | Endurance Group Information    |      | It is confirmed that command can be issued and received by SSD |
+|        0Ah | Predictable Latency Per NVM Set |     | |
+|        0Bh | Predictable Latency Event Aggregate | | |
+|        0Ch | Asymmetric Namespace Access    |      | |
+|        0Dh | Persistent Event Log           |      | |
+|        0Eh | LBA Status Information         |      | |
+|        0Fh | Endurance Group Event Aggregate |     | |
+| 10h -- 6Fh | _Reserved_                     |      | |
 |        70h | Discovery                      |      | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          |      | |
 |        80h | Reservation Notification       |      | Probably cannot issue [8] |
@@ -148,13 +155,21 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Fh | Keep Alive Timer                   |  /               |      |
 |        10h | Host Controlled Thermal Management | x / x            | "SV = 1" is not supported |
 |        11h | Non-operational Power State Config | x /              |      |
-| 12h -- 77h | _Reserved_                         |  /               |      |
+|        12h | Read Recovery Level Config         |  /               |      |
+|        13h | Predictable Latency Mode Config    |  /               |      |
+|        14h | Predictable Latency Mode Window    |  /               |      |
+|        15h | LBA Status Information Report Interval |  /           |      |
+|        16h | Host Behavior Support              |  /               |      |
+|        17h | Sanitize Config                    |  /               |      |
+|        18h | Endurance Group Event Configuration |  /              |      |
+| 19h -- 77h | _Reserved_                         |  /               |      |
 | 78h -- 7Fh | _Refer to the NVMe-MI spec._       |  /               |      |
 |        80h | Software Progress Marker           | x /              |      |
 |        81h | Host Identifier                    |  /               |      |
 |        82h | Reservation Notification Mask      |  /               | 1    |
 |        83h | Reservation Persistence            |  /               | 1    |
-| 84h -- BFh | _Reserved_                         |  /               |      |
+|        84h | Namespace Write Protect Config     |  /               |      |
+| 85h -- BFh | _Reserved_                         |  /               |      |
 | C0h -- FFh | _Vendor specific_                  |  /               |      |
 
 Note 1: FID 82h and 83h are seemed to be unable to issue, because commands related to Reservation are not supported according to [8].
