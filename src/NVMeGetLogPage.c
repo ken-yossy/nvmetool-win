@@ -11,6 +11,7 @@
 #include "NVMeFwSlotInformation.h"
 #include "NVMeDeviceSelftestLog.h"
 #include "NVMeGetTelemetry.h"
+#include "NVMeEnduranceGroup.h"
 #include "NVMeIdentifyController.h"
 
 int iNVMeGetLogPage(HANDLE _hDevice)
@@ -32,6 +33,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         "\n#     %02Xh = Device Self-test"
         "\n#     %02Xh = Telemetry Host-Initiated"
         "\n#     %02Xh = Telemetry Controller-Initiated"
+        "\n#     %02Xh = Endurance Group Information"
         "\n",
         NVME_LOG_PAGE_ERROR_INFO,
         NVME_LOG_PAGE_HEALTH_INFO,
@@ -39,7 +41,8 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         NVME_LOG_PAGE_COMMAND_EFFECTS,
         NVME_LOG_PAGE_DEVICE_SELF_TEST,
         NVME_LOG_PAGE_TELEMETRY_HOST_INITIATED,
-        NVME_LOG_PAGE_TELEMETRY_CTLR_INITIATED);
+        NVME_LOG_PAGE_TELEMETRY_CTLR_INITIATED,
+        NVME_LOG_PAGE_ENDURANCE_GROUP_INFORMATION);
 
     int iLId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iLId)
@@ -183,6 +186,20 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         }
     }
     break;
+
+    case NVME_LOG_PAGE_ENDURANCE_GROUP_INFORMATION:
+        if (g_stController.CTRATT.EnduranceGroups == 0)
+        {
+            fprintf(stderr, "\n[W] This controller does not support Endurance Group, skip\n");
+            break;
+        }
+
+        cCmd = cGetConsoleInput("\n# Get Log Page - Endurance Group Information (Log Identifier 09h), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iResult = iNVMeGetEnduranceGroupInformation(_hDevice);
+        }
+        break;
 
     default:
         fprintf(stderr, "\n[E] Command not implemented yet.\n");
