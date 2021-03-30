@@ -163,6 +163,7 @@
     <ClInclude Include="NVMeDeallocate.h" />
     <ClInclude Include="NVMeDeviceSelftest.h" />
     <ClInclude Include="NVMeDeviceSelftestLog.h" />
+    <ClInclude Include="NVMeEnduranceGroup.h" />
     <ClInclude Include="NVMeErrorInformation.h" />
     <ClInclude Include="NVMeFeaturesAPST.h" />
     <ClInclude Include="NVMeFeaturesHCTM.h" />
@@ -192,6 +193,7 @@
     <ClCompile Include="NVMeDeallocate.c" />
     <ClCompile Include="NVMeDeviceSelftest.c" />
     <ClCompile Include="NVMeDeviceSelftestLog.c" />
+    <ClCompile Include="NVMeEnduranceGroup.c" />
     <ClCompile Include="NVMeErrorInformation.c" />
     <ClCompile Include="NVMeFeaturesAPST.c" />
     <ClCompile Include="NVMeFeaturesHCTM.c" />
