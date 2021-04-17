@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <nvme.h>
 
+#include "NVMeIdentifyController.h"
 #include "WinFunc.h"
 
 static const char* strAdminCommand[256] =
@@ -35,8 +36,10 @@ static const char* strAdminCommand[256] =
     "NVMe-MI Send",                 // 1Dh
     "NVMe-MI Receive",              // 1Eh
     "(reserved)",                   // 1Fh
-    "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 20h -- 23h
-    "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 24h -- 27h
+    "Capacity Management",          // 20h <rev 2.0>
+    "(reserved)", "(reserved)", "(reserved)", // 21h -- 23h
+    "Lockdown",                     // 24h <rev 2.0>
+    "(reserved)", "(reserved)", "(reserved)", // 25h -- 27h
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 28h -- 2Bh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 2Ch -- 2Fh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 30h -- 33h
