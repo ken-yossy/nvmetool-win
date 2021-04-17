@@ -11,6 +11,14 @@
 
 bool g_WA_bGetControllerSMARTLogWithNSIDZero;
 
+bool bIsNVMeV20OrLater(void)
+{
+    if (0x00020000 <= ((g_stController.VER) & 0xFFFFFF00))
+        return true;
+
+    return false;
+}
+
 bool bIsNVMeV14OrLater(void)
 {
     if (0x00010400 <= ((g_stController.VER) & 0xFFFFFF00))

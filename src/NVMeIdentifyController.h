@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <windows.h>
 #include <nvme.h>
 
@@ -279,4 +280,5 @@ int iNVMeIdentifyController(HANDLE _hDevice);
 void vPrintControllerBasicData(void);
 bool bIsNVMeV14OrLater(void);
 bool bIsNVMeV13OrLater(void);
+bool bIsNVMeV20OrLater(void);
 
