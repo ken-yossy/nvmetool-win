@@ -217,12 +217,11 @@ static const char* strNVMCommand[256] =
     "(Vendor specific)", "(Vendor specific)", "(Vendor specific)", "(Vendor specific)", // FCh -- FFh
 };
 
-static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG_20 _pData)
+static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_DATA_20 _pData, const char** strCmds)
 {
-    printf("[I] Command Supported and Effect Log: Admin Command\n");
     for (int i = 0; i < 256; i++)
     {
-        NVME_COMMAND_EFFECTS_DATA_20 Data = _pData->ACS[i];
+        NVME_COMMAND_EFFECTS_DATA_20 Data = _pData[i];
         if (Data.CSUPP == 0)
         {
             continue;
@@ -230,7 +229,47 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG_20 _pData)
         else
         {
             printf("[I] Opecode = 0x%02X ", i);
-            printf(" [ %s ] Supported (bit 0: 1)\n", strAdminCommand[i]);
+            printf(" [ %s ] Supported (bit 0: 1)\n", strCmds[i]);
+        }
+
+        if (bIsNVMeV20OrLater())
+        {
+            if (Data.ScopeNVMSubsys)
+            {
+                printf("\tbit [     25] 1 = May impact the whole NVM subsystem\n");
+            }
+            if (Data.ScopeDomain)
+            {
+                printf("\tbit [     24] 1 = May impact a single Domain\n");
+            }
+            if (Data.ScopeEndGrp)
+            {
+                printf("\tbit [     23] 1 = May impact a Endurance Group\n");
+            }
+            if (Data.ScopeNVMSet)
+            {
+                printf("\tbit [     22] 1 = May impact a NVM Set\n");
+            }
+            if (Data.ScopeCtlr)
+            {
+                printf("\tbit [     21] 1 = May impact a controller\n");
+            }
+            if (Data.ScopeNS)
+            {
+                printf("\tbit [     20] 1 = May impact a namespace\n");
+            }
+        }
+
+        if (bIsNVMeV14OrLater())
+        {
+            if (Data.UUIDSupp)
+            {
+                printf("\tbit [     19] 1 = Supports selection of a UUID\n");
+            }
+            else
+            {
+                printf("\tbit [     19] 0 = Does not support selection of a UUID\n");
+            }
         }
 
         switch (Data.CSE)
@@ -287,76 +326,17 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG_20 _pData)
             printf("\tbit [      1] 0 = Does not modify logical block content in any namespace\n");
         }
     }
+}
+
+static void vPrintNVMeCSELog(PNVME_COMMAND_EFFECTS_LOG_20 _pData)
+{
+    printf("[I] Command Supported and Effect Log: Admin Command\n");
+    vPrintNVMeCSEData(_pData->ACS, strAdminCommand);
 
     printf("\n");
+
     printf("[I] Command Supported and Effect Log: NVM Command\n");
-    for (int i = 0; i < 256; i++)
-    {
-        NVME_COMMAND_EFFECTS_DATA_20 Data = _pData->IOCS[i];
-        if (Data.CSUPP == 0)
-        {
-            continue;
-        }
-        else
-        {
-            printf("[I] Opecode = 0x%02X ", i);
-            printf(" [ %s ] Supported (bit 0: 1)\n", strNVMCommand[i]);
-        }
-
-        switch (Data.CSE)
-        {
-        case 0:
-            printf("\tbit [ 18: 16] 0 = No command submission or execution restriction\n");
-            break;
-
-        case 1:
-            printf("\tbit [ 18: 16] 1 = May be submitted when there is no other outstanding command to the same namespace and another command should not be submitted to the same namespace until this command is complete\n");
-            break;
-
-        case 2:
-            printf("\tbit [ 18: 16] 2 = May be submitted when there is no other outstanding command to any namespace and another command should not be submitted to any namespace until this command is complete\n");
-            break;
-
-        default:
-            break;
-        }
-
-        if (Data.CCC)
-        {
-            printf("\tbit [      4] 1 = May change controller capabilities\n");
-        }
-        else
-        {
-            printf("\tbit [      4] 0 = Does not modify controller capabilities\n");
-        }
-
-        if (Data.NIC)
-        {
-            printf("\tbit [      3] 1 = May change the number of namespaces or capabilities for multiple namespaces\n");
-        }
-        else
-        {
-            printf("\tbit [      3] 0 = Does not modify the number of namespaces or capabilities for multiple namespaces\n");
-        }
-
-        if (Data.NCC)
-        {
-            printf("\tbit [      2] 1 = May change the capabilities of a single namespace\n");
-        }
-        else
-        {
-            printf("\tbit [      2] 0 = Does not modify any namespace capabilities for the specified namespace\n");
-        }
-
-        if (Data.LBCC)
-        {
-            printf("\tbit [      1] 1 = May modify logical block content in one or more namespaces\n");
-        }
-        else
-        {
-            printf("\tbit[       1] 0 = Does not modify logical block content in any namespace\n");
-        }
-    }
+    vPrintNVMeCSEData(_pData->IOCS, strNVMCommand);
 }
 
 int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
@@ -430,7 +410,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
         goto error_exit;
     }
 
-    vPrintNVMeCSEData((PNVME_COMMAND_EFFECTS_LOG_20)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
+    vPrintNVMeCSELog((PNVME_COMMAND_EFFECTS_LOG_20)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
     iResult = 0; // succeeded
 
 error_exit:
