@@ -5,6 +5,37 @@
 #include "NVMeIdentifyController.h"
 #include "WinFunc.h"
 
+typedef union {
+    struct {
+        //LSB
+        ULONG   CSUPP : 1;        // bit 0: Command Supported (CSUPP)
+        ULONG   LBCC : 1;         // bit 1: Logical Block Content Change (LBCC)
+        ULONG   NCC : 1;          // bit 2: Namespace Capability Change (NCC)
+        ULONG   NIC : 1;          // bit 3: Namespace Inventory Change (NIC)
+        ULONG   CCC : 1;          // bit 4: Controller Capability Change (CCC)
+        ULONG   Reserved0 : 11;   // bit 15:5
+        ULONG   CSE : 3;          // bit 18:16 Command Submission and Execution (CSE)
+        ULONG   UUIDSupp: 1;      // bit 19: UUID Selection Supported <rev 1.4>
+        ULONG   ScopeNS: 1;       // bit 20: Namespace Scope <rev 2.0>
+        ULONG   ScopeCtlr: 1;     // bit 21: Controller Scope <rev 2.0>
+        ULONG   ScopeNVMSet: 1;   // bit 22: NVM Set Scope <rev 2.0>
+        ULONG   ScopeEndGrp: 1;   // bit 23: Endurance Group Scope <rev 2.0>
+        ULONG   ScopeDomain: 1;   // bit 24: Domain Scope <rev 2.0>
+        ULONG   ScopeNVMSubsys: 1; // bit 25: NVM Subsystem Scope <rev 2.0>
+        ULONG   Reserved1 : 6;    // bit 31:26
+        //MSB
+    } DUMMYSTRUCTNAME;
+
+    ULONG AsUlong;
+
+} NVME_COMMAND_EFFECTS_DATA_20, * PNVME_COMMAND_EFFECTS_DATA_20;
+
+typedef struct {
+    NVME_COMMAND_EFFECTS_DATA_20   ACS[256];       // Admin Command Supported
+    NVME_COMMAND_EFFECTS_DATA_20   IOCS[256];      // I/O Command Supported
+    UCHAR                       Reserved[2048];
+} NVME_COMMAND_EFFECTS_LOG_20, * PNVME_COMMAND_EFFECTS_LOG_20;
+
 static const char* strAdminCommand[256] =
 {
     "Delete I/O Submission Queue",  // 00h
@@ -184,12 +215,12 @@ static const char* strNVMCommand[256] =
     "(Vendor specific)", "(Vendor specific)", "(Vendor specific)", "(Vendor specific)", // FCh -- FFh
 };
 
-static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData)
+static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG_20 _pData)
 {
     printf("[I] Command Supported and Effect Log: Admin Command\n");
     for (int i = 0; i < 256; i++)
     {
-        NVME_COMMAND_EFFECTS_DATA Data = _pData->ACS[i];
+        NVME_COMMAND_EFFECTS_DATA_20 Data = _pData->ACS[i];
         if (Data.CSUPP == 0)
         {
             continue;
@@ -259,7 +290,7 @@ static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_LOG _pData)
     printf("[I] Command Supported and Effect Log: NVM Command\n");
     for (int i = 0; i < 256; i++)
     {
-        NVME_COMMAND_EFFECTS_DATA Data = _pData->IOCS[i];
+        NVME_COMMAND_EFFECTS_DATA_20 Data = _pData->IOCS[i];
         if (Data.CSUPP == 0)
         {
             continue;
@@ -340,7 +371,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
         + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-        + sizeof(NVME_COMMAND_EFFECTS_LOG);
+        + sizeof(NVME_COMMAND_EFFECTS_LOG_20);
     buffer = malloc(bufferLength);
 
     if (buffer == NULL)
@@ -363,7 +394,7 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
     protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_COMMAND_EFFECTS;
     protocolData->ProtocolDataRequestSubValue = NVME_NAMESPACE_ALL;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-    protocolData->ProtocolDataLength = sizeof(NVME_COMMAND_EFFECTS_LOG);
+    protocolData->ProtocolDataLength = sizeof(NVME_COMMAND_EFFECTS_LOG_20);
 
     // Send request down.
     iResult = iIssueDeviceIoControl(_hDevice,
@@ -391,13 +422,13 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
     if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_COMMAND_EFFECTS_LOG))) {
+        (protocolData->ProtocolDataLength < sizeof(NVME_COMMAND_EFFECTS_LOG_20))) {
         fprintf(stderr, "[E] getNVMeCommandSupportedAndEffects: ProtocolData Offset/Length not valid.\n");
         iResult = -1; // error
         goto error_exit;
     }
 
-    vPrintNVMeCSEData((PNVME_COMMAND_EFFECTS_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
+    vPrintNVMeCSEData((PNVME_COMMAND_EFFECTS_LOG_20)((PCHAR)protocolData + protocolData->ProtocolDataOffset));
     iResult = 0; // succeeded
 
 error_exit:
