@@ -155,7 +155,9 @@ static const char* strNVMCommand[256] =
     "(reserved)", "(reserved)", "(reserved)", // 12h, 13h, 14h
     "Reservation Release",          // 15h
     "(reserved)", "(reserved)",     // 16h, 17h
-    "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 18h -- 1Bh
+    "(reserved)",                   // 18h
+    "Copy",                         // 19h <rev2.0>
+    "(reserved)", "(reserved)",     // 1Ah, 1Bh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 1Ch -- 1Fh
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 20h -- 23h
     "(reserved)", "(reserved)", "(reserved)", "(reserved)", // 24h -- 27h
