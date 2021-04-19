@@ -17,7 +17,7 @@
 
 #pragma warning(disable:6301)
 
-NVME_IDENTIFY_CONTROLLER_DATA14 g_stController;
+MY_NVME_IDENTIFY_CONTROLLER_DATA g_stController;
 NVME_SMART_INFO_LOG g_stSMARTLog;
 
 static void s_vPrintUsage(char* _strProgName)

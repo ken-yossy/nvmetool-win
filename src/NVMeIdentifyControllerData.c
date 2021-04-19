@@ -7,7 +7,7 @@
 #include "NVMeUtils.h"
 #include "NVMeIdentifyController.h"
 
-static void s_vPrintNVMeIdentifyControllerDataCMIC(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataCMIC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Controller Multi-Path I/O and Namespace Sharing Capabilities (CMIC):\n");
 
@@ -51,7 +51,7 @@ static void s_vPrintNVMeIdentifyControllerDataCMIC(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataOAES(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataOAES(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Optional Asynchronous Events Supported (OAES):\n");
 
@@ -113,7 +113,7 @@ static void s_vPrintNVMeIdentifyControllerDataOAES(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataCTRATT(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataCTRATT(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Controller Attributes (CTRATT):\n");
 
@@ -214,7 +214,7 @@ static void s_vPrintNVMeIdentifyControllerDataCTRATT(PNVME_IDENTIFY_CONTROLLER_D
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataRRLS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataRRLS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Read Recovery Levels Supports (RRLS):\n");
     for (int i = 0; i < 16; i++)
@@ -230,7 +230,7 @@ static void s_vPrintNVMeIdentifyControllerDataRRLS(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataCNTRLTYPE(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataCNTRLTYPE(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Controller Type (CNTRLTYPE): ");
     switch ( _pstController->CNTRLTYPE )
@@ -257,7 +257,7 @@ static void s_vPrintNVMeIdentifyControllerDataCNTRLTYPE(PNVME_IDENTIFY_CONTROLLE
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataCRDT(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataCRDT(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Command Retry Delay Time 1 (CDRT1): %d (%d ms)\n",
         _pstController->CRDT1, _pstController->CRDT1 * 100);
@@ -267,7 +267,7 @@ static void s_vPrintNVMeIdentifyControllerDataCRDT(PNVME_IDENTIFY_CONTROLLER_DAT
         _pstController->CRDT3, _pstController->CRDT3 * 100);
 }
 
-static void s_vPrintNVMeIdentifyControllerDataOACS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataOACS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Optional Admin Command Support (OACS):\n");
 
@@ -368,7 +368,7 @@ static void s_vPrintNVMeIdentifyControllerDataOACS(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataFRMW(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataFRMW(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Firmware Updates (FRMW):\n");
 
@@ -393,7 +393,7 @@ static void s_vPrintNVMeIdentifyControllerDataFRMW(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataLPA(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataLPA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Log Page Attributes (LPA):\n");
 
@@ -449,7 +449,7 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PNVME_IDENTIFY_CONTROLLER_DATA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataAVSCC(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataAVSCC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Admin Vendor Specific Command Configuration (AVSCC):\n");
     if (_pstController->AVSCC.CommandFormatInSpec)
@@ -462,7 +462,7 @@ static void s_vPrintNVMeIdentifyControllerDataAVSCC(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataAPSTA(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataAPSTA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Autonomous Power State Transition Attributes (APSTA):\n");
     if (_pstController->APSTA.Supported)
@@ -475,7 +475,7 @@ static void s_vPrintNVMeIdentifyControllerDataAPSTA(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataCTEMP(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataCTEMP(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Warning Composite Temperature Threshold (WCTEMP): ");
     if (_pstController->WCTEMP == 0)
@@ -498,7 +498,7 @@ static void s_vPrintNVMeIdentifyControllerDataCTEMP(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataMTFA(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataMTFA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Maximum Time for Firmware Activation (MTFA): ");
     if (_pstController->MTFA == 0)
@@ -511,7 +511,7 @@ static void s_vPrintNVMeIdentifyControllerDataMTFA(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataHMB(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataHMB(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Host Memory Buffer Preferred Size (HMPRE): ");
     if (_pstController->HMPRE == 0)
@@ -534,7 +534,7 @@ static void s_vPrintNVMeIdentifyControllerDataHMB(PNVME_IDENTIFY_CONTROLLER_DATA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataRPMB(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataRPMB(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Replay Protected Memory Block Support (RPMBS):\n");
 
@@ -560,7 +560,7 @@ static void s_vPrintNVMeIdentifyControllerDataRPMB(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataEDSTT(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataEDSTT(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Extended Device Self-test Time (EDSTT): ");
     if (_pstController->OACS.DeviceSelfTest != 0)
@@ -573,7 +573,7 @@ static void s_vPrintNVMeIdentifyControllerDataEDSTT(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataDSTO(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataDSTO(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Device Self-test Options (DSTO): ");
     if (_pstController->OACS.DeviceSelfTest != 0)
@@ -593,7 +593,7 @@ static void s_vPrintNVMeIdentifyControllerDataDSTO(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataFWUG(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataFWUG(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Firmware Update Granularity (FWUG): ");
     if (_pstController->FWUG == 0xFF)
@@ -610,7 +610,7 @@ static void s_vPrintNVMeIdentifyControllerDataFWUG(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataKAS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataKAS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Keep Alive Support (KAS): ");
     if (_pstController->KAS == 0)
@@ -623,7 +623,7 @@ static void s_vPrintNVMeIdentifyControllerDataKAS(PNVME_IDENTIFY_CONTROLLER_DATA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataHCTMA(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataHCTMA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Host Controlled Thermal Management Attributes (HCTMA):\n");
     if (_pstController->HCTMA.Supported)
@@ -664,7 +664,7 @@ static void s_vPrintNVMeIdentifyControllerDataHCTMA(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataSANICAP(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataSANICAP(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Sanitize Capabilities (SANICAP): ");
     if (_pstController->SANICAP.Overwrite | _pstController->SANICAP.CryptoErase | _pstController->SANICAP.BlockErase)
@@ -730,7 +730,7 @@ static void s_vPrintNVMeIdentifyControllerDataSANICAP(PNVME_IDENTIFY_CONTROLLER_
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataHMMINDS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataHMMINDS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Host Memory Buffer Minimum Descriptor Entry Size (HMMINDS): ");
 
@@ -744,7 +744,7 @@ static void s_vPrintNVMeIdentifyControllerDataHMMINDS(PNVME_IDENTIFY_CONTROLLER_
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataHMMAXD(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataHMMAXD(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Host Memory Maximum Descriptors Entries (HMMAXD): ");
 
@@ -758,17 +758,17 @@ static void s_vPrintNVMeIdentifyControllerDataHMMAXD(PNVME_IDENTIFY_CONTROLLER_D
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataNSETIDMAX(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataNSETIDMAX(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] NVM Set Identifier Maximum (NSETIDMAX): %d\n", _pstController->NSETIDMAX);
 }
 
-static void s_vPrintNVMeIdentifyControllerDataENDGIDMAX(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataENDGIDMAX(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Endurance Group Identifier Maximum (ENDGIDMAX): %d\n", _pstController->ENDGIDMAX);
 }
 
-static void s_vPrintNVMeIdentifyControllerDataANATT(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataANATT(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] ANA Transition Time (ANATT): ");
 
@@ -782,7 +782,7 @@ static void s_vPrintNVMeIdentifyControllerDataANATT(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataANACAP(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataANACAP(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Asymmetric Namespace Access Capabilities (ANACAP):\n");
     if (_pstController->ANACAP.NonZeroGRPIDSupport)
@@ -849,7 +849,7 @@ static void s_vPrintNVMeIdentifyControllerDataANACAP(PNVME_IDENTIFY_CONTROLLER_D
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataANAGRPMAX(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataANAGRPMAX(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] ANA Group Identifier Maximum (ANAGRPMAX): ");
 
@@ -863,7 +863,7 @@ static void s_vPrintNVMeIdentifyControllerDataANAGRPMAX(PNVME_IDENTIFY_CONTROLLE
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataNANAGRPID(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataNANAGRPID(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Number of ANA Group Identifiers (NANAGRPID): ");
 
@@ -877,7 +877,7 @@ static void s_vPrintNVMeIdentifyControllerDataNANAGRPID(PNVME_IDENTIFY_CONTROLLE
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataPELS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataPELS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Persistent Event Log Size (PELS): ");
 
@@ -891,7 +891,7 @@ static void s_vPrintNVMeIdentifyControllerDataPELS(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataSQES(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataSQES(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Submission Queue Entry Size (SQES):\n");
 
@@ -901,7 +901,7 @@ static void s_vPrintNVMeIdentifyControllerDataSQES(PNVME_IDENTIFY_CONTROLLER_DAT
         _pstController->SQES.RequiredEntrySize, 1 << _pstController->SQES.RequiredEntrySize);
 }
 
-static void s_vPrintNVMeIdentifyControllerDataCQES(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataCQES(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Completion Queue Entry Size (SQES):\n");
 
@@ -911,7 +911,7 @@ static void s_vPrintNVMeIdentifyControllerDataCQES(PNVME_IDENTIFY_CONTROLLER_DAT
         _pstController->CQES.RequiredEntrySize, 1 << _pstController->CQES.RequiredEntrySize);
 }
 
-static void s_vPrintNVMeIdentifyControllerDataMAXCMD(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataMAXCMD(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Maximum Outstanding Commands (MAXCMD): ");
     if (_pstController->MAXCMD == 0)
@@ -924,7 +924,7 @@ static void s_vPrintNVMeIdentifyControllerDataMAXCMD(PNVME_IDENTIFY_CONTROLLER_D
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataONCS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataONCS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Optional NVM Command Support (ONCS):\n");
 
@@ -1007,7 +1007,7 @@ static void s_vPrintNVMeIdentifyControllerDataONCS(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataFUSES(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataFUSES(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Fused Operation Support (FUSES):\n");
     if (_pstController->FUSES.CompareAndWrite)
@@ -1020,7 +1020,7 @@ static void s_vPrintNVMeIdentifyControllerDataFUSES(PNVME_IDENTIFY_CONTROLLER_DA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataFNA(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataFNA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Format NVM Attributes (FNA):\n");
     if (_pstController->FNA.CryptographicEraseSupported)
@@ -1051,7 +1051,7 @@ static void s_vPrintNVMeIdentifyControllerDataFNA(PNVME_IDENTIFY_CONTROLLER_DATA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataVWC(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataVWC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Volatile Write Cache (VWC):\n");
     if (_pstController->VWC.Present)
@@ -1086,7 +1086,7 @@ static void s_vPrintNVMeIdentifyControllerDataVWC(PNVME_IDENTIFY_CONTROLLER_DATA
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataNVSCC(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataNVSCC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] NVM Vendor Specific Command Configuration (NVSCC):\n");
     if (_pstController->NVSCC.CommandFormatInSpec)
@@ -1100,7 +1100,7 @@ static void s_vPrintNVMeIdentifyControllerDataNVSCC(PNVME_IDENTIFY_CONTROLLER_DA
 }
 
 
-static void s_vPrintNVMeIdentifyControllerDataAWU(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataAWU(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Atomic Write Unit Normal (AWUN): ");
     if (_pstController->AWUN == 0xFFFF)
@@ -1116,7 +1116,7 @@ static void s_vPrintNVMeIdentifyControllerDataAWU(PNVME_IDENTIFY_CONTROLLER_DATA
         _pstController->AWUPF, _pstController->AWUPF + 1);
 }
 
-static void s_vPrintNVMeIdentifyControllerDataNWPC(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataNWPC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Namespace Write Protection Capabilities (NWPC):\n");
     if (_pstController->NWPC.PermanentWriteProtectSupport)
@@ -1147,7 +1147,7 @@ static void s_vPrintNVMeIdentifyControllerDataNWPC(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataACWU(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataACWU(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Atomic Compare & Write Unit (ACWU): ");
     if (_pstController->ACWU == 0)
@@ -1160,7 +1160,7 @@ static void s_vPrintNVMeIdentifyControllerDataACWU(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataSGLS(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataSGLS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] SGL Support (SGLS):\n");
 
@@ -1255,7 +1255,7 @@ static void s_vPrintNVMeIdentifyControllerDataSGLS(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataMNAN(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataMNAN(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Maximum Number of Allowed Namespaces (MNAN): ");
 
@@ -1269,7 +1269,7 @@ static void s_vPrintNVMeIdentifyControllerDataMNAN(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataSUBNQN(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataSUBNQN(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] NVM Subsystem NVMe Qualified Name (SUBNQN): ");
     char* strConv = strConvertUTF8toMultiByte((const char*)&(_pstController->SUBNQN));
@@ -1438,7 +1438,7 @@ static void s_vPrintNVMeIdentifyControllerDataPSD(PNVME_POWER_STATE_DESC pDesc, 
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataPSDs(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataPSDs(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     int iNumPSD = _pstController->NPSS + 1;
 
@@ -1452,7 +1452,7 @@ static void s_vPrintNVMeIdentifyControllerDataPSDs(PNVME_IDENTIFY_CONTROLLER_DAT
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataFGUID(PNVME_IDENTIFY_CONTROLLER_DATA14 _pstController)
+static void s_vPrintNVMeIdentifyControllerDataFGUID(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     int iSum = 0;
     unsigned char* pId = _pstController->FGUID;
@@ -1480,7 +1480,7 @@ static void s_vPrintNVMeIdentifyControllerDataFGUID(PNVME_IDENTIFY_CONTROLLER_DA
 
 void vPrintNVMeIdentifyControllerData(void)
 {
-    PNVME_IDENTIFY_CONTROLLER_DATA14 pstController = (PNVME_IDENTIFY_CONTROLLER_DATA14)&(g_stController);
+    PMY_NVME_IDENTIFY_CONTROLLER_DATA pstController = (PMY_NVME_IDENTIFY_CONTROLLER_DATA)&(g_stController);
 
     printf("[M] PCI Vendor ID (VID): 0x%X\n",               pstController->VID);
     printf("[M] PCI Subsystem Vendor ID (SSVID): 0x%X\n",   pstController->SSVID);

@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <nvme.h>
 
-// Identify Controller data structure (upto v1.4) based on nvme.h
+// Identify Controller data structure (upto v2.0) based on nvme.h
 typedef struct {
     //
     // byte 0 : 255, Controller Capabilities and Features
@@ -41,7 +41,11 @@ typedef struct {
         uint32_t    PredictableLatencyEventAggregateLogChange : 1;  // bit [   12] <rev1.4>
         uint32_t    LBAStatusInfo : 1;                              // bit [   13] <rev1.4>
         uint32_t    EnduranceGroupEventAggregateLogChange : 1;      // bit [   14] <rev1.4>
-        uint32_t    Reserved2 : 17;                                 // bit [31:15]
+        uint32_t    NVMSubsystemShutdown : 1;                       // bit [   15] <rev2.0>
+        uint32_t    Reserved2 : 11;                                 // bit [26:16]
+        uint32_t    ZoneDesciptorChanged : 1;                       // bit [   27] <rev2.0>
+        uint32_t    Reserved3 : 3;                                  // bit [30:28]
+        uint32_t    DiscoveryLogChanged : 1;                        // bit [   31] <rev2.0>
     } OAES;                         // byte [  95:  92] M - Optional Asynchronous Events Supported (OAES)
 
     struct {
@@ -55,7 +59,13 @@ typedef struct {
         uint32_t    NamespaceGranularity : 1;   // bit [    7] <rev1.4>
         uint32_t    SQAssociation : 1;          // bit [    8] <rev1.4>
         uint32_t    UUIDList : 1;               // bit [    9] <rev1.4>
-        uint32_t    Reserved : 22;              // bit [31:10]
+        uint32_t    MDS : 1;                    // bit [   10] <rev2.0>
+        uint32_t    FixedCapMgmt : 1;           // bit [   11] <rev2.0>
+        uint32_t    VariableCapMgmt : 1;        // bit [   12] <rev2.0>
+        uint32_t    DelEndGrp : 1;              // bit [   13] <rev2.0>
+        uint32_t    DelNVMSet : 1;              // bit [   14] <rev2.0>
+        uint32_t    ExtLBAFmt : 1;              // bit [   15] <rev2.0>
+        uint32_t    Reserved : 16;              // bit [31:16]
     } CTRATT;                       // byte [  99:  96] M - Controller Attributes (CTRATT)
 
     uint16_t    RRLS;               // byte [ 101: 100] O - Read Recovery Levels Supported (RRLS) <rev1.4>
@@ -68,7 +78,24 @@ typedef struct {
     uint16_t    CRDT3;              // byte [ 133: 132] O - Command Retry Delay Time 3 (CRDT3)      <rev1.4>
 
     uint8_t     Reserved1[106];     // byte [ 239: 134]
-    uint8_t     Reserved2[16];      // byte [ 255: 240] Refer to the NVMe Management Interface Specification for definition
+    uint8_t     Reserved2[13];      // byte [ 252: 240] Refer to the NVMe Management Interface Specification for definition
+
+    struct {
+        uint32_t    NVMESD : 1;     // bit [    0]
+        uint32_t    NVMEE : 1;      // bit [    1]
+        uint32_t    Reserved : 6;   // bit [ 7: 2]
+    } NVMSR;                        // byte [      253] M - NVM Subsystem Report (NVMSR) <rev2.0>
+
+    struct {
+        uint32_t    VMCR : 7;       // bit [ 6: 0]
+        uint32_t    VMCRV : 1;      // bit [    7]
+    } VMCI;                         // byte [      254] M - VPD Write Cycle Information (VMCI) <rev2.0>
+
+    struct {
+        uint32_t    SMBUSME : 1;    // bit [    0]
+        uint32_t    PCIEME : 1;     // bit [    1]
+        uint32_t    Reserved : 6;   // bit [ 7: 2]
+    } MEC;                          // byte [      255] M - Management Endpoint Capabilities (MEC) <rev2.0>
 
     //
     // byte 256 : 511, Admin Command Set Attributes
@@ -84,7 +111,8 @@ typedef struct {
         uint16_t    VirtMgmtCommands : 1;   // bit [    7] <rev1.3>
         uint16_t    DBConfigCommand : 1;    // bit [    8] <rev1.3>
         uint16_t    GetLBAStatusCommand : 1;// bit [    9] <rev1.4>
-        uint16_t    Reserved : 6;           // bit [15:10]
+        uint16_t    Lockdown : 1;           // bit [   10] <rev2.0>
+        uint16_t    Reserved : 5;           // bit [15:11]
     } OACS;                         // byte [ 257: 256] M - Optional Admin Command Support (OACS)
 
     uint8_t ACL;                    // byte [      258] M - Abort Command Limit (ACL)
@@ -94,7 +122,8 @@ typedef struct {
         uint8_t Slot1ReadOnly : 1;          // bit [    0]
         uint8_t SlotCount : 3;              // bit [ 3: 1]
         uint8_t ActivationWithoutReset : 1; // bit [    4]
-        uint8_t Reserved : 3;               // bit [ 7: 5]
+        uint8_t MultipleUpdateDetect : 1;   // bit [    5] <rev2.0>
+        uint8_t Reserved : 2;               // bit [ 7: 6]
     } FRMW;                         // byte [      260] M - Firmware Updates (FRMW)
 
     struct {
@@ -103,7 +132,9 @@ typedef struct {
         uint8_t LogPageExtendedData : 1;    // bit [    2]
         uint8_t TelemetrySupport : 1;       // bit [    3] <rev1.3>
         uint8_t PersistentEventLog : 1;     // bit [    4] <rev1.4>
-        uint8_t Reserved : 3;               // bit [ 7: 5]
+        uint8_t CommandScope : 1;           // bit [    5] <rev2.0>
+        uint8_t HostTelemetryArea4 : 1;     // bit [    6] <rev2.0>
+        uint8_t Reserved : 1;               // bit [    7]
     } LPA;                          // byte [      261] M - Log Page Attributes (LPA)
 
     uint8_t ELPE;                   // byte [      262] M - Error Log Page Entries (ELPE)
@@ -142,7 +173,7 @@ typedef struct {
 
     struct {
         uint16_t    Supported : 1;  // bit [    0]
-        uint16_t    Reserved : 15;  // bit [15: 0]
+        uint16_t    Reserved : 15;  // bit [15: 1]
     } HCTMA;                        // byte [ 323: 322] O - Host Controlled Thermal Management Attributes (HCTMA)  <rev1.3>
 
     uint16_t    MNTMT;              // byte [ 325: 324] O - Minimum Thermal Management Temperature (MNTMT) <rev1.3>
@@ -178,7 +209,11 @@ typedef struct {
     uint32_t    NANAGRPID;          // byte [ 351: 348] O - Number of ANA Group Identifiers (NANAGRPID) <rev1.4>
     uint32_t    PELS;               // byte [ 355: 352] O - Persistent Event Log Size (PELS)            <rev1.4>
 
-    uint8_t     Reserved3[156];     // byte [ 511: 356]
+    uint16_t    DomainId;           // byte [ 357: 356] O - Domain Identifier <rev2.0>
+    uint8_t     Reserved3[10];      // byte [ 367: 358]
+    uint8_t     MEGCAP[16];         // byte [ 383: 368] O - Max Endurance Group Capacity <rev2.0>
+
+    uint8_t     Reserved4[128];     // byte [ 511: 384]
 
     //
     // byte 512 : 703, NVM Command Set Attributes
@@ -205,7 +240,8 @@ typedef struct {
         uint16_t    Reservations : 1;       // bit [    5]
         uint16_t    Timestamp : 1;          // bit [    6] <rev1.3>
         uint16_t    Verify : 1;             // bit [    7] <rev1.4>
-        uint16_t    Reserved : 8;           // bit [15: 8]
+        uint16_t    Copy : 1;               // bit [    8] <rev2.0>
+        uint16_t    Reserved : 7;           // bit [15: 9]
     } ONCS;                         // byte [ 521: 520] M - Optional NVM Command Support (ONCS)
 
     struct {
@@ -217,7 +253,8 @@ typedef struct {
         uint8_t     FormatApplyToAll : 1;           // bit [    0]
         uint8_t     SecureEraseApplyToAll : 1;      // bit [    1]
         uint8_t     CryptographicEraseSupported : 1;// bit [    2]
-        uint8_t     Reserved : 5;                   // bit [ 7: 3]
+        uint8_t     NotAcceptNAIDIsAllF : 1;        // bit [    3] <rev2.0>
+        uint8_t     Reserved : 4;                   // bit [ 7: 4]
     } FNA;                          // byte [      524] M - Format NVM Attributes (FNA)
 
     struct {
@@ -243,37 +280,60 @@ typedef struct {
 
     uint16_t    ACWU;               // byte [ 533: 532] O - Atomic Compare & Write Unit (ACWU)
 
-    uint8_t Reserved5[2];           // byte [ 535: 534]
+    struct {
+        uint16_t FormatZeroSupp : 1;    // bit [    0]
+        uint16_t Reserved : 15;         // bit [15: 1]
+    } OCFS;                        // byte [ 535: 534] M - Optional Copy Formats Supported <rev2.0>
 
     struct {
         uint32_t    SGLSupported : 2;                           // bit [ 1: 0] <rev1.3>
         uint32_t    KeyedBBDescSupported : 1;                   // bit [    2]
-        uint32_t    Reserved0 : 13;                             // bit [15: 3]
+        uint32_t    Reserved0 : 5;                              // bit [ 7: 3]
+        uint32_t    SDT : 8;                                    // bit [15: 8] <rev2.0>
         uint32_t    BitBucketDescrSupported : 1;                // bit [   16]
         uint32_t    ByteAlignedContiguousPhysicalBuffer : 1;    // bit [   17]
         uint32_t    SGLLengthLargerThanDataLength : 1;          // bit [   18]
         uint32_t    MPTRContainingSGLDescSupported : 1;         // bit [   19]
         uint32_t    OffsetByAddrFieldSupported : 1;             // bit [   20]
         uint32_t    TransactionalSGLDataBlockDescSupported : 1; // bit [   21] <rev1.4>
-        uint32_t    Reserved1 : 10;                         // bit [31:22]
+        uint32_t    Reserved1 : 10;                             // bit [31:22]
     } SGLS;                         // byte [ 539: 536] O - SGL Support (SGLS)
 
-    uint32_t    MNAN;               // byte [      540] O - Maximum Number of Allowed Namespaces (MNAN) <rev1.4>
+    uint32_t MNAN;                  // byte [ 543: 540] O - Maximum Number of Allowed Namespaces (MNAN) <rev1.4>
+    uint8_t MAXDNA[16];             // byte [ 559: 544] O - Maximum Domain Namespace Attachments (MAXDNA) <rev2.0>
+    uint32_t MAXCNA;                // byte [ 563: 560] O - Maximum I/O Controller Namespace Attachments (MAXCNA) <rev2.0>
 
-    uint8_t Reserved6[224];         // byte [ 767: 544]
+    uint8_t Reserved6[204];         // byte [ 767: 564]
 
     uint8_t SUBNQN[256];            // byte [1023: 768] M - NVM Subsystem NVMe Qualified Name (SUBNQN)
 
     uint8_t Reserved7[768];         // byte [1791:1024]
-    uint8_t Reserved8[256];         // byte [2047:1792] Refer to the NVMe over Fabrics specification
+
+    uint32_t IOCCSZ;                // byte [1795:1792] M - I/O Queue Command Capsule Supported Size (IOCCSZ) <rev2.0>
+    uint32_t IORCSZ;                // byte [1799:1796] M - I/O Queue Response Capsule Supported Size (IORCSZ) <rev2.0>
+    uint16_t ICDOFF;                // byte [1801:1800] M - In Capsule Data Offset <rev2.0>
+
+    struct {
+        uint8_t StaticCtrlModel : 1;    // bit [    0]
+        uint8_t Reserved : 7;           // bit [ 7: 1]
+    } FCATT;                        // byte [     1802] M - Fabrics Controller Attributes (FCATT) <rev2.0>
+
+    uint8_t MSDBD;                  // byte [     1803] M - Maximum SGL Data lock Descriptors (MSDBD) <rev2.0>
+
+    struct {
+        uint16_t DisconnectSupp : 1;    // bit [    0]
+        uint16_t Reserved : 15;         // bit [15: 1]
+    } OFCS;                         // byte [1805:1804] M - Optional Fabric Commands Support (OFCS) <rev2.0>
+
+    uint8_t Reserved8[242];         // byte [2047:1806]
 
     NVME_POWER_STATE_DESC   PDS[32];// byte [2079:2048] M - Power State 0 Descriptor (PSD0)
                                     // byte [3071:2080] O - Power State Descriptors from PS1 (PSD1) to PS31 (PSD31) 
 
     uint8_t VS[1024];              // byte [4095:3072] Vendor Specific
-} NVME_IDENTIFY_CONTROLLER_DATA14, * PNVME_IDENTIFY_CONTROLLER_DATA14;
+} MY_NVME_IDENTIFY_CONTROLLER_DATA, * PMY_NVME_IDENTIFY_CONTROLLER_DATA;
 
-extern NVME_IDENTIFY_CONTROLLER_DATA14 g_stController;
+extern MY_NVME_IDENTIFY_CONTROLLER_DATA g_stController;
 extern bool g_WA_bGetControllerSMARTLogWithNSIDZero;
 
 int iNVMeIdentifyController(HANDLE _hDevice);
