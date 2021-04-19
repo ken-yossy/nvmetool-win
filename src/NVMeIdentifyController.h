@@ -89,7 +89,7 @@ typedef struct {
     struct {
         uint32_t    VMCR : 7;       // bit [ 6: 0]
         uint32_t    VMCRV : 1;      // bit [    7]
-    } VMCI;                         // byte [      254] M - VPD Write Cycle Information (VMCI) <rev2.0>
+    } VWCI;                         // byte [      254] M - VPD Write Cycle Information (VMCI) <rev2.0>
 
     struct {
         uint32_t    SMBUSME : 1;    // bit [    0]
@@ -133,7 +133,7 @@ typedef struct {
         uint8_t TelemetrySupport : 1;       // bit [    3] <rev1.3>
         uint8_t PersistentEventLog : 1;     // bit [    4] <rev1.4>
         uint8_t CommandScope : 1;           // bit [    5] <rev2.0>
-        uint8_t HostTelemetryArea4 : 1;     // bit [    6] <rev2.0>
+        uint8_t TelemetryArea4 : 1;         // bit [    6] <rev2.0>
         uint8_t Reserved : 1;               // bit [    7]
     } LPA;                          // byte [      261] M - Log Page Attributes (LPA)
 
@@ -287,7 +287,7 @@ typedef struct {
 
     struct {
         uint32_t    SGLSupported : 2;                           // bit [ 1: 0] <rev1.3>
-        uint32_t    KeyedBBDescSupported : 1;                   // bit [    2]
+        uint32_t    KeyedDBDescSupported : 1;                   // bit [    2]
         uint32_t    Reserved0 : 5;                              // bit [ 7: 3]
         uint32_t    SDT : 8;                                    // bit [15: 8] <rev2.0>
         uint32_t    BitBucketDescrSupported : 1;                // bit [   16]

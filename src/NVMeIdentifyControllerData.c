@@ -55,6 +55,36 @@ static void s_vPrintNVMeIdentifyControllerDataOAES(PMY_NVME_IDENTIFY_CONTROLLER_
 {
     printf("[M] Optional Asynchronous Events Supported (OAES):\n");
 
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        if (_pstController->OAES.DiscoveryLogChanged)
+        {
+            printf("\tbit [     31] 1 = Supports Discovery Log Change Notification event\n");
+        }
+        else
+        {
+            printf("\tbit [     31] 0 = Does not support Discovery Log Change Notification event\n");
+        }
+
+        if (_pstController->OAES.ZoneDesciptorChanged)
+        {
+            printf("\tbit [     27] 1 = Supports Zone Descriptor Changed Notices event\n");
+        }
+        else
+        {
+            printf("\tbit [     27] 0 = Does not support Zone Descriptor Changed Notices event\n");
+        }
+
+        if (_pstController->OAES.NVMSubsystemShutdown)
+        {
+            printf("\tbit [     15] 1 = Supports Normal NVM Subsystem Shutdown event\n");
+        }
+        else
+        {
+            printf("\tbit [     15] 0 = Does not support Normal NVM Subsystem Shutdown event\n");
+        }
+    }
+
     if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->OAES.EnduranceGroupEventAggregateLogChange)
@@ -116,6 +146,63 @@ static void s_vPrintNVMeIdentifyControllerDataOAES(PMY_NVME_IDENTIFY_CONTROLLER_
 static void s_vPrintNVMeIdentifyControllerDataCTRATT(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Controller Attributes (CTRATT):\n");
+
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        if (_pstController->CTRATT.ExtLBAFmt)
+        {
+            printf("\tbit [     15] 1 = Supports extended PI formats\n");
+        }
+        else
+        {
+            printf("\tbit [     15] 0 = Does not support extended PI formats\n");
+        }
+        
+        if (_pstController->CTRATT.DelNVMSet)
+        {
+            printf("\tbit [     14] 1 = Supports Delete NVM Set operation\n");
+        }
+        else
+        {
+            printf("\tbit [     14] 0 = Does not support Delete NVM Set operation\n");
+        }
+
+        if (_pstController->CTRATT.DelEndGrp)
+        {
+            printf("\tbit [     13] 1 = Supports Delete Endurance Group operation\n");
+        }
+        else
+        {
+            printf("\tbit [     13] 0 = Does not support Delete Endurance Group operation\n");
+        }
+
+        if (_pstController->CTRATT.VariableCapMgmt)
+        {
+            printf("\tbit [     12] 1 = Supports Variable Capacity Management\n");
+        }
+        else
+        {
+            printf("\tbit [     12] 0 = Does not support Variable Capacity Management\n");
+        }
+
+        if (_pstController->CTRATT.FixedCapMgmt)
+        {
+            printf("\tbit [     11] 1 = Supports Fixed Capacity Management\n");
+        }
+        else
+        {
+            printf("\tbit [     11] 0 = Does not support Fixed Capacity Management\n");
+        }
+
+        if (_pstController->CTRATT.MDS)
+        {
+            printf("\tbit [     10] 1 = Supports multiple domains\n");
+        }
+        else
+        {
+            printf("\tbit [     10] 0 = Does not support multiple domains\n");
+        }
+    }
 
     if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
@@ -267,9 +354,79 @@ static void s_vPrintNVMeIdentifyControllerDataCRDT(PMY_NVME_IDENTIFY_CONTROLLER_
         _pstController->CRDT3, _pstController->CRDT3 * 100);
 }
 
+static void s_vPrintNVMeIdentifyControllerDataNVMSR(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] NVM Subsystem Report (NVMSR):\n");
+    if (_pstController->NVMSR.NVMEE)
+    {
+        printf("\tbit [      1] 1 = This NVM subsystem is part of an NVMe Enclosure\n");
+    }
+    else
+    {
+        printf("\tbit [      1] 0 = This NVM subsystem is not part of an NVMe Enclosure\n");
+    }
+
+    if (_pstController->NVMSR.NVMESD)
+    {
+        printf("\tbit [      0] 1 = This NVM subsystem is part of an NVMe Storage Device\n");
+    }
+    else
+    {
+        printf("\tbit [      0] 0 = This NVM subsystem is not part of an NVMe Storage Device\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataVWCI(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] VPD Write Cycle Information (VWCI):\n");
+    if (_pstController->VWCI.VMCRV)
+    {
+        printf("\tbit [      7] 1 = The VPD Write Cycles Remaining field is valid\n");
+        printf("\tbit [  6:  0] %d = the remaining number of times that VPD contents are able to be updated using the VPD Write command\n", _pstController->VWCI.VMCR);
+    }
+    else
+    {
+        printf("\tbit [      7] 0 = The VPD Write Cycles Remaining field is valid\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataMEC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] Management Endpoint Capabilities (MEC):\n");
+    if (_pstController->MEC.PCIEME)
+    {
+        printf("\tbit [      1] 1 = This NVM subsystem contains a Management Endpoint on a PCIe port\n");
+    }
+    else
+    {
+        printf("\tbit [      1] 0 = This NVM subsystem does not contain a Management Endpoint on a PCIe port\n");
+    }
+
+    if (_pstController->MEC.SMBUSME)
+    {
+        printf("\tbit [      0] 1 = This NVM subsystem contains a Management Endpoint on an SMBus/I2C port\n");
+    }
+    else
+    {
+        printf("\tbit [      0] 0 = This NVM subsystem does not contain a Management Endpoint on an SMBus/I2C port\n");
+    }
+}
+
 static void s_vPrintNVMeIdentifyControllerDataOACS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Optional Admin Command Support (OACS):\n");
+
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        if (_pstController->OACS.Lockdown)
+        {
+            printf("\tbit [     10] 1 = Supports Lockdown command\n");
+        }
+        else
+        {
+            printf("\tbit [     10] 0 = Does not support Lockdown command\n");
+        }
+    }
 
     if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
@@ -283,7 +440,7 @@ static void s_vPrintNVMeIdentifyControllerDataOACS(PMY_NVME_IDENTIFY_CONTROLLER_
         }
     }
 
-    if (bIsNVMeV14OrLater())
+    if (bIsNVMeV13OrLater())
     { // revision 1.3 or over
         if (_pstController->OACS.DBConfigCommand)
         {
@@ -372,6 +529,18 @@ static void s_vPrintNVMeIdentifyControllerDataFRMW(PMY_NVME_IDENTIFY_CONTROLLER_
 {
     printf("[M] Firmware Updates (FRMW):\n");
 
+    if (bIsNVMeV20OrLater())
+    {
+        if (_pstController->FRMW.MultipleUpdateDetect)
+        {
+            printf("\tbit [      5] 1 = Supports detecting overlapping firmware / boot partition image update command sequences\n");
+        }
+        else
+        {
+            printf("\tbit [      5] 0 = Does not support detecting overlapping firmware / boot partition image update command sequences\n");
+        }
+    }
+
     if (_pstController->FRMW.ActivationWithoutReset)
     {
         printf("\tbit [      4] 1 = Supports firmware activation without a reset\n");
@@ -397,6 +566,27 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PMY_NVME_IDENTIFY_CONTROLLER_D
 {
     printf("[M] Log Page Attributes (LPA):\n");
 
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        if (_pstController->LPA.TelemetryArea4)
+        {
+            printf("\tbit [      6] 1 = Supports Data Area 4 for the Telemetry Log\n");
+        }
+        else
+        {
+            printf("\tbit [      6] 0 = Does not support Data Area 4 for the Telemetry Log\n");
+        }
+
+        if (_pstController->LPA.CommandScope)
+        {
+            printf("\tbit [      5] 1 = Supports reporting the scope of commands in Commands Supported and Effects log page\n");
+        }
+        else
+        {
+            printf("\tbit [      5] 0 = Does not support returning the scope of commands in Commands Supported and Effects log page\n");
+        }
+    }
+
     if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
         if (_pstController->LPA.PersistentEventLog)
@@ -409,7 +599,7 @@ static void s_vPrintNVMeIdentifyControllerDataLPA(PMY_NVME_IDENTIFY_CONTROLLER_D
         }
     }
 
-    if (bIsNVMeV14OrLater())
+    if (bIsNVMeV13OrLater())
     { // revision 1.3 or over
         if (_pstController->LPA.TelemetrySupport)
         {
@@ -891,6 +1081,34 @@ static void s_vPrintNVMeIdentifyControllerDataPELS(PMY_NVME_IDENTIFY_CONTROLLER_
     }
 }
 
+static void s_vPrintNVMeIdentifyControllerDataDomainId(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[O] Domain Identifier: ");
+
+    if (_pstController->CTRATT.MDS)
+    {
+        printf("%d\n", _pstController->DomainId);
+    }
+    else
+    {
+        printf("0 (does not support multiple domains)\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataMEGCAP(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[O] Max Endurance Group Capacity: ");
+
+    if (_pstController->CTRATT.EnduranceGroups)
+    {
+        printf("%llu (byte)\n", (uint64_t)(_pstController->MEGCAP));
+    }
+    else
+    {
+        printf("0 (does not support Endurance Group)\n");
+    }
+}
+
 static void s_vPrintNVMeIdentifyControllerDataSQES(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Submission Queue Entry Size (SQES):\n");
@@ -927,6 +1145,18 @@ static void s_vPrintNVMeIdentifyControllerDataMAXCMD(PMY_NVME_IDENTIFY_CONTROLLE
 static void s_vPrintNVMeIdentifyControllerDataONCS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Optional NVM Command Support (ONCS):\n");
+
+    if (bIsNVMeV20OrLater())
+    {
+        if (_pstController->ONCS.Copy)
+        {
+            printf("\tbit [      8] 1 = Supports Copy command\n");
+        }
+        else
+        {
+            printf("\tbit [      8] 0 = Does not support Copy command\n");
+        }
+    }
 
     if (bIsNVMeV14OrLater())
     { // revision 1.4 or over
@@ -1023,6 +1253,19 @@ static void s_vPrintNVMeIdentifyControllerDataFUSES(PMY_NVME_IDENTIFY_CONTROLLER
 static void s_vPrintNVMeIdentifyControllerDataFNA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] Format NVM Attributes (FNA):\n");
+
+    if (bIsNVMeV20OrLater())
+    {
+        if (_pstController->FNA.NotAcceptNAIDIsAllF)
+        {
+            printf("\tbit [      3] 1 = Does not support Format NVM command with an NSID value set to FFFFFFFFh\n");
+        }
+        else
+        {
+            printf("\tbit [      3] 0 = Supports Format NVM command with an NSID value set to FFFFFFFFh\n");
+        }
+    }
+
     if (_pstController->FNA.CryptographicEraseSupported)
     {
         printf("\tbit [      2] 1 = Supports cryptographic erase operation\n");
@@ -1160,6 +1403,19 @@ static void s_vPrintNVMeIdentifyControllerDataACWU(PMY_NVME_IDENTIFY_CONTROLLER_
     }
 }
 
+static void s_vPrintNVMeIdentifyControllerDataOCFS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[O] Optional Copy Formats Supported:\n");
+    if (_pstController->OCFS.FormatZeroSupp)
+    {
+        printf("\tbit [      0] 1 = Supports Copy Format 0h\n");
+    }
+    else
+    {
+        printf("\tbit [      0] 0 = Does not support Copy Format 0h\n");
+    }
+}
+
 static void s_vPrintNVMeIdentifyControllerDataSGLS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] SGL Support (SGLS):\n");
@@ -1234,6 +1490,27 @@ static void s_vPrintNVMeIdentifyControllerDataSGLS(PMY_NVME_IDENTIFY_CONTROLLER_
         printf("\tbit [     16] 0 = Does not support SGL Bit Bucket descriptor\n");
     }
 
+    if (bIsNVMeV20OrLater())
+    {
+        if (_pstController->SGLS.SDT)
+        {
+            printf("\tbit [ 15:  8] %d = Recommended maximum number of SGL descriptors in a command\n", _pstController->SGLS.SDT);
+        }
+        else
+        {
+            printf("\tbit [ 15:  8] 0 = No recommended maximum number of SGL descriptors is reported\n");
+        }
+    }
+
+    if (_pstController->SGLS.KeyedDBDescSupported)
+    {
+        printf("\tbit [      2] 1 = Supports Keyed SGL Data Block descriptor\n");
+    }
+    else
+    {
+        printf("\tbit [      2] 0 = Does not support Keyed SGL Data Block descriptor\n");
+    }
+
     switch (_pstController->SGLS.SGLSupported)
     {
         case 0:
@@ -1269,6 +1546,34 @@ static void s_vPrintNVMeIdentifyControllerDataMNAN(PMY_NVME_IDENTIFY_CONTROLLER_
     }
 }
 
+static void s_vPrintNVMeIdentifyControllerDataMAXDNA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[O] Maximum Domain Namespace Attachments (MAXDNA): ");
+    uint64_t val = (uint64_t)(_pstController->MAXDNA);
+
+    if (val)
+    {
+        printf("%llu\n", val);
+    }
+    else
+    {
+        printf("0 (no maximum is specified)\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataMAXCNA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[O] Maximum I/O Controller Namespace Attachments (MAXCNA): ");
+    if (_pstController->MAXCNA)
+    {
+        printf("%d\n", _pstController->MAXCNA);
+    }
+    else
+    {
+        printf("0 (no maximum is specified)\n");
+    }
+}
+
 static void s_vPrintNVMeIdentifyControllerDataSUBNQN(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[M] NVM Subsystem NVMe Qualified Name (SUBNQN): ");
@@ -1281,6 +1586,63 @@ static void s_vPrintNVMeIdentifyControllerDataSUBNQN(PMY_NVME_IDENTIFY_CONTROLLE
     else
     {
         printf("(null)\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataIOCCSZ(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] I/O Queue Command Capsule Supported Size (IOCCSZ): ");
+    printf("%d (means %d bytes)\n", _pstController->IOCCSZ, _pstController->IOCCSZ * 16);
+}
+
+static void s_vPrintNVMeIdentifyControllerDataIORCSZ(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] I/O Queue Response Capsule Supported Size (IORCSZ): ");
+    printf("%d (means %d bytes)\n", _pstController->IORCSZ, _pstController->IORCSZ * 16);
+}
+
+static void s_vPrintNVMeIdentifyControllerDataICDOFF(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] In Capsule Data Offset (ICDOFF): ");
+    printf("%d (means %d bytes)\n", _pstController->ICDOFF, _pstController->ICDOFF * 16);
+}
+
+static void s_vPrintNVMeIdentifyControllerDataFCATT(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] Fabrics Controller Attributes (FCATT):\n");
+    if (_pstController->FCATT.StaticCtrlModel)
+    {
+        printf("\tbit [      0] 1 = Uses a static controller model\n");
+    }
+    else
+    {
+        printf("\tbit [      0] 0 = Uses a dynamic controller model\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataMSDBD(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] Maximum SGL Data Block Descriptors (MSDBD): ");
+    if (_pstController->MSDBD)
+    {
+        printf("%d\n", _pstController->MSDBD);
+    }
+    else
+    {
+        printf("0 (means no limit)\n");
+    }
+}
+
+static void s_vPrintNVMeIdentifyControllerDataOFCS(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[M] Optional Fabric Commands Support (OFCS):\n");
+    if (_pstController->OFCS.DisconnectSupp)
+    {
+        printf("\tbit [      0] 1 = Supports Disconnect command\n");
+    }
+    else
+    {
+        printf("\tbit [      0] 0 = Does not support Disconnect command\n");
     }
 }
 
@@ -1540,6 +1902,13 @@ void vPrintNVMeIdentifyControllerData(void)
         s_vPrintNVMeIdentifyControllerDataCRDT(pstController);
     }
 
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        s_vPrintNVMeIdentifyControllerDataNVMSR(pstController);
+        s_vPrintNVMeIdentifyControllerDataVWCI(pstController);
+        s_vPrintNVMeIdentifyControllerDataMEC(pstController);
+    }
+
     s_vPrintNVMeIdentifyControllerDataOACS(pstController);
 
     printf("[M] Abort Command Limit (ACL): %d (means %d)\n",                pstController->ACL, pstController->ACL + 1);
@@ -1593,6 +1962,12 @@ void vPrintNVMeIdentifyControllerData(void)
         s_vPrintNVMeIdentifyControllerDataPELS(pstController);
     }
 
+    if (bIsNVMeV20OrLater())
+    {
+        s_vPrintNVMeIdentifyControllerDataDomainId(pstController);
+        s_vPrintNVMeIdentifyControllerDataMEGCAP(pstController);
+    }
+
     s_vPrintNVMeIdentifyControllerDataSQES(pstController);
     s_vPrintNVMeIdentifyControllerDataCQES(pstController);
     s_vPrintNVMeIdentifyControllerDataMAXCMD(pstController);
@@ -1612,6 +1987,12 @@ void vPrintNVMeIdentifyControllerData(void)
     }
 
     s_vPrintNVMeIdentifyControllerDataACWU(pstController);
+
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        s_vPrintNVMeIdentifyControllerDataOCFS(pstController);
+    }
+
     s_vPrintNVMeIdentifyControllerDataSGLS(pstController);
 
     if (bIsNVMeV14OrLater())
@@ -1619,6 +2000,23 @@ void vPrintNVMeIdentifyControllerData(void)
         s_vPrintNVMeIdentifyControllerDataMNAN(pstController);
     }
 
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        s_vPrintNVMeIdentifyControllerDataMAXDNA(pstController);
+        s_vPrintNVMeIdentifyControllerDataMAXCNA(pstController);
+    }
+
     s_vPrintNVMeIdentifyControllerDataSUBNQN(pstController);
+
+    if (bIsNVMeV20OrLater())
+    { // revision 2.0 or later
+        s_vPrintNVMeIdentifyControllerDataIOCCSZ(pstController);
+        s_vPrintNVMeIdentifyControllerDataIORCSZ(pstController);
+        s_vPrintNVMeIdentifyControllerDataICDOFF(pstController);
+        s_vPrintNVMeIdentifyControllerDataFCATT(pstController);
+        s_vPrintNVMeIdentifyControllerDataMSDBD(pstController);
+        s_vPrintNVMeIdentifyControllerDataOFCS(pstController);
+    }
+
     s_vPrintNVMeIdentifyControllerDataPSDs(pstController);
 }
