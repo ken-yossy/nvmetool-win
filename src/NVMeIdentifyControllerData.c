@@ -1329,10 +1329,10 @@ static void s_vPrintNVMeIdentifyControllerDataVWC(PMY_NVME_IDENTIFY_CONTROLLER_D
     }
 }
 
-static void s_vPrintNVMeIdentifyControllerDataNVSCC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+static void s_vPrintNVMeIdentifyControllerDataICSVSCC(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
-    printf("[M] NVM Vendor Specific Command Configuration (NVSCC):\n");
-    if (_pstController->NVSCC.CommandFormatInSpec)
+    printf("[M] I/O Command Set Vendor Specific Command Configuration (ICSVSCC):\n");
+    if (_pstController->ICSVSCC.CommandFormatInSpec)
     {
         printf("\tbit [      0] 1 = All NVM Vendor Specific Commands use the format defined in the specification\n");
     }
@@ -1979,7 +1979,7 @@ void vPrintNVMeIdentifyControllerData(void)
     s_vPrintNVMeIdentifyControllerDataFNA(pstController);
     s_vPrintNVMeIdentifyControllerDataVWC(pstController);
     s_vPrintNVMeIdentifyControllerDataAWU(pstController);
-    s_vPrintNVMeIdentifyControllerDataNVSCC(pstController);
+    s_vPrintNVMeIdentifyControllerDataICSVSCC(pstController);
 
     if (bIsNVMeV14OrLater())
     { // revision 1.4 or over

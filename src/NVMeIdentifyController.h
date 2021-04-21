@@ -81,20 +81,20 @@ typedef struct {
     uint8_t     Reserved2[13];      // byte [ 252: 240] Refer to the NVMe Management Interface Specification for definition
 
     struct {
-        uint32_t    NVMESD : 1;     // bit [    0]
-        uint32_t    NVMEE : 1;      // bit [    1]
-        uint32_t    Reserved : 6;   // bit [ 7: 2]
+        uint8_t    NVMESD : 1;      // bit [    0]
+        uint8_t    NVMEE : 1;       // bit [    1]
+        uint8_t    Reserved : 6;    // bit [ 7: 2]
     } NVMSR;                        // byte [      253] M - NVM Subsystem Report (NVMSR) <rev2.0>
 
     struct {
-        uint32_t    VMCR : 7;       // bit [ 6: 0]
-        uint32_t    VMCRV : 1;      // bit [    7]
+        uint8_t    VMCR : 7;        // bit [ 6: 0]
+        uint8_t    VMCRV : 1;       // bit [    7]
     } VWCI;                         // byte [      254] M - VPD Write Cycle Information (VMCI) <rev2.0>
 
     struct {
-        uint32_t    SMBUSME : 1;    // bit [    0]
-        uint32_t    PCIEME : 1;     // bit [    1]
-        uint32_t    Reserved : 6;   // bit [ 7: 2]
+        uint8_t    SMBUSME : 1;     // bit [    0]
+        uint8_t    PCIEME : 1;      // bit [    1]
+        uint8_t    Reserved : 6;    // bit [ 7: 2]
     } MEC;                          // byte [      255] M - Management Endpoint Capabilities (MEC) <rev2.0>
 
     //
@@ -269,7 +269,7 @@ typedef struct {
     struct {
         uint8_t CommandFormatInSpec : 1;    // bit [    0]
         uint8_t Reserved : 7;               // bit [ 7: 0]
-    } NVSCC;                        // byte [      530] M - NVM Vendor Specific Command Configuration (NVSCC)
+    } ICSVSCC;                        // byte [      530] M - I/O Command Set Vendor Specific Command Configuration (ICSVSCC)
 
     struct {
         uint8_t NoWriteProtectSupport : 1;              // bit [    0]
