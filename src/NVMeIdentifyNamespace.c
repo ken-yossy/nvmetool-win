@@ -26,7 +26,8 @@ typedef struct
     struct {
         uint8_t   LbaFormatIndex : 4;           // bit [ 3: 0]
         uint8_t   MetadataInExtendedDataLBA : 1;// bit [    4]
-        uint8_t   Reserved : 3;                 // bit [ 7: 5]
+        uint8_t   NlbafMsb : 2;                 // bit [ 6: 5] <rev2.0>
+        uint8_t   Reserved : 1;                 // bit [    7]
     } FLBAS;                            // byte [       26] M - Formatted LBA Size (FLBAS)
 
     struct {
@@ -95,10 +96,13 @@ typedef struct
     uint16_t    NPDG;                   // byte [  69:  68] O - Namespace Preferred Deallocate Granularity (NPDG) <rev1.4>
     uint16_t    NPDA;                   // byte [  71:  70] O - Namespace Preferred Deallocate Alignment (NPDA) <rev1.4>
     uint16_t    NOWS;                   // byte [  73:  72] O - Namespace Optimal Write Size (NOWS) <rev1.4>
+    uint16_t    MSSRL;                  // byte [  75:  74] O - Maximum Single Source Range Length (MSSRL) <rev2.0>
+    uint32_t    MCL;                    // byte [  79:  76] O - Maximum Copy Length (MCL) <rev2.0>
+    uint8_t     MSRC;                   // byte [       80] O - Maximum Source Range Count (MSRC) >rev2.0>
 
-    uint8_t     Reserved2[18];          // byte [  91:  74]
+    uint8_t     Reserved2[11];          // byte [  91:  81]
 
-    uint32_t    ANAGRPID;               // byte [  65:  92] O - ANA Group Identifier (ANAGRPID) <rev1.4>
+    uint32_t    ANAGRPID;               // byte [  95:  92] O - ANA Group Identifier (ANAGRPID) <rev1.4>
 
     uint8_t     Reserved3[3];           // byte [  98:  96]
 
@@ -113,15 +117,13 @@ typedef struct
     uint8_t     NGUID[16];              // byte [ 119: 104] O - NAmespace Globally Unique Identifier (NGUID)
     uint8_t     EUI64[8];               // byte [ 127: 120] M - IEEE Extended Unique Identifier (EUI64)
 
-    NVME_LBA_FORMAT LBAF[16];           // byte [ 131: 128] M - LBA Format 0 Support (LBAF0)
-                                        // byte [ 192: 132] O - LBA Format Support; 1 (LBAF1) to 15 (LBAF15)
-
-    uint8_t     Reserved4[192];         // byte [ 383: 192]
+    NVME_LBA_FORMAT LBAF[64];           // byte [ 131: 128] M - LBA Format 0 Support (LBAF0)
+                                        // byte [ 383: 132] O - LBA Format Support; 1 (LBAF1) to 63 (LBAF63)
 
     uint8_t     VS[3712];               // byte [4095: 384] O - Vendor Specific (VS)
-} NVME_IDENTIFY_NAMESPACE_DATA14, * PNVME_IDENTIFY_NAMESPACE_DATA14;
+} MY_NVME_IDENTIFY_NAMESPACE_DATA, * PMY_NVME_IDENTIFY_NAMESPACE_DATA;
 
-static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSData, DWORD _dwNSID)
+static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNSData, DWORD _dwNSID)
 {
     printf("[M] Namespace Size (NSZE): %llu (sectors)\n", (uint64_t)_pNSData->NSZE);
     printf("[M] Namespace Capacity (NCAP): %llu (sectors)\n", (uint64_t)_pNSData->NCAP);
@@ -178,16 +180,32 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSD
 
     printf("[M] Number of LBA Formats (NLBAF): %d = Supports %d format(s)\n", _pNSData->NLBAF, _pNSData->NLBAF + 1);
 
-    printf("[M] Formatted LBA Size (FLBAS):\n");
-    if (_pNSData->FLBAS.MetadataInExtendedDataLBA)
     {
-        printf("\tbit [      4] 1 = The metadata is transferred at the end of the data LBA, creating an extended data LBA\n");
+        printf("[M] Formatted LBA Size (FLBAS):\n");
+        if (bIsNVMeV20OrLater())
+        {
+            printf("\tbit [  6:  5] %d = Most significant 2 bits of LBA format\n", _pNSData->FLBAS.NlbafMsb);
+        }
+
+        if (_pNSData->FLBAS.MetadataInExtendedDataLBA)
+        {
+            printf("\tbit [      4] 1 = The metadata is transferred at the end of the data LBA, creating an extended data LBA\n");
+        }
+        else
+        {
+            printf("\tbit [      4] 0 = All of the metadata is transferred as a separate contiguous buffer of data\n");
+        }
+
+        if (bIsNVMeV20OrLater())
+        {
+            uint32_t uiLBAF = (_pNSData->FLBAS.NlbafMsb << 4) + (_pNSData->FLBAS.LbaFormatIndex);
+            printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", _pNSData->FLBAS.LbaFormatIndex, uiLBAF, uiLBAF);
+        }
+        else
+        {
+            printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex);
+        }
     }
-    else
-    {
-        printf("\tbit [      4] 0 = All of the metadata is transferred as a separate contiguous buffer of data\n");
-    }
-    printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex);
 
     printf("[M] Metadata Capabilities (MC):\n");
     if (_pNSData->MC.MetadataInSeparateBuffer)
@@ -526,6 +544,13 @@ static void printNVMeIdentifyNamespaceData(PNVME_IDENTIFY_NAMESPACE_DATA14 _pNSD
         }
     }
 
+    if(bIsNVMeV20OrLater())
+    {
+        printf("[O] Maximum Single Source Range Length (MSSRL) = %d\n", _pNSData->MSSRL);
+        printf("[O] Maximum Copy Length (MCL) = %d (sectors)\n", _pNSData->MCL);
+        printf("[O] Maximum Source Range Count (MSRC) = %d (means %d entries)\n", _pNSData->MSRC, _pNSData->MSRC + 1);
+    }
+
     // TODO: we ignore upper 8 bytes of _pNSData->NVMCAP[8] ... when it becomes to be needed?
     printf("[O] NVM Capacity (NVMCAP): %lld (bytes)\n", (uint64_t)(_pNSData->NVMCAP));
 
@@ -637,7 +662,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
         + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-        + sizeof(NVME_IDENTIFY_NAMESPACE_DATA14);
+        + sizeof(MY_NVME_IDENTIFY_NAMESPACE_DATA);
     buffer = malloc(bufferLength);
 
     if (buffer == NULL)
@@ -660,7 +685,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     protocolData->ProtocolDataRequestValue = NVME_IDENTIFY_CNS_SPECIFIC_NAMESPACE;
     protocolData->ProtocolDataRequestSubValue = _dwNSID;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-    protocolData->ProtocolDataLength = sizeof(NVME_IDENTIFY_NAMESPACE_DATA14);
+    protocolData->ProtocolDataLength = sizeof(MY_NVME_IDENTIFY_NAMESPACE_DATA);
 
     // Send request down.
     iResult = iIssueDeviceIoControl(
@@ -691,7 +716,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
     if ((protocolData->ProtocolDataOffset > sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_IDENTIFY_NAMESPACE_DATA14)))
+        (protocolData->ProtocolDataLength < sizeof(MY_NVME_IDENTIFY_NAMESPACE_DATA)))
     {
         fprintf(stderr, "[E] NVMeIdentifyNamespace: ProtocolData Offset/Length not valid, stop.\n");
         goto error_exit;
@@ -699,7 +724,7 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
 
     // Identify Namespace
     printNVMeIdentifyNamespaceData(
-        (PNVME_IDENTIFY_NAMESPACE_DATA14)((PCHAR)protocolData + protocolData->ProtocolDataOffset),
+        (PMY_NVME_IDENTIFY_NAMESPACE_DATA)((PCHAR)protocolData + protocolData->ProtocolDataOffset),
         _dwNSID);
     iResult = 0; // succeeded
 
