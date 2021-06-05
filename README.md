@@ -7,6 +7,8 @@ Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4b[6].
 
 For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM command sets and associated opcodes are shown in [8], and supported features are shown in [9].
 
+(Some fields introduced in NVMe specifications revision 2.0[10] are supported, but I cannot test it because I don't have NVMe 2.0 compliant SSDs...)
+
 ## Command matrix
 
 Table 1. Command matrix (Admin Command Set)
@@ -36,6 +38,8 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        1Ch | Virtualization Management   |             | Not supported     |
 |        1Dh | NVMe-MI Send                |             | 2                 |
 |        1Eh | NVMe-MI Receive             |             | 2                 |
+|        20h | Capacity Management         |             | _from 2.0_        |
+|        24h | Lockdown                    |             | _from 2.0_        |
 |        7Ch | Doorbell Buffer Config      |             | Not supported     |
 |        80h | Format NVM                  | x           | Only for data drive. Need to support Format NVM command and cryptographic erase is supported along Format NVM (bit 2 of the FNA field in Identify Controller data structure) |
 |        81h | Security Send               |             |                   |
@@ -66,6 +70,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Eh | Reservation Report   |        | 1                                |
 |        11h | Reservation Acquire  |        | 1                                |
 |        15h | Reservation Release  |        | 1                                |
+|        19h | Copy                 |        | _from 2.0_                       |
 | 80h -- FFh | _Vendor Specific_    |        |                                  |
 
 Note 1: these command are stated as "Not supported" in [8]
@@ -271,3 +276,5 @@ This software is released under the MIT License and Microsoft Public License (MS
 [8] Microsoft, _"StorNVMe Command Set Support"_, https://docs.microsoft.com/en-us/windows-hardware/drivers/storage/stornvme-command-set-support, Retrieved June 25, 2020
 
 [9] Microsoft, _"NVMe Features Supported by StorNVMe"_, https://docs.microsoft.com/en-us/windows-hardware/drivers/storage/stornvme-feature-support, Retrieved June 29, 2020
+
+[10] NVM Express, _"NVM Express\[TM\] Base Specification"_, Revision 2.0, June 2, 2021
