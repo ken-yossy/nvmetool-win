@@ -15,6 +15,8 @@
 #include "NVMeSMART.h"
 #include "NVMeUtils.h"
 
+static const char strVersion[] = "2.0";
+
 #pragma warning(disable:6301)
 
 MY_NVME_IDENTIFY_CONTROLLER_DATA g_stController;
@@ -41,7 +43,7 @@ static void s_vPrintUsage(char* _strProgName)
     }
 
     // cPtr holds the last occurrence of '\'
-    printf("%s: Sample Utility tool for NVMe drive.\n\n", cPtr);
+    printf("%s: Sample Utility tool for NVMe drive (version %s)\n\n", cPtr, strVersion);
     printf("Usage:\n");
     printf("  > %s <physical-drive-no>\n\n", cPtr);
     printf("Argument:\n");
@@ -61,6 +63,7 @@ int main(int _argc, char* _argv[])
         return 0;
     }
 
+    printf("[I] nvmetool-win version %s\n\n", strVersion);
     vGetOSVersion();
 
     // Get HANDLE object for NVMe SSD
