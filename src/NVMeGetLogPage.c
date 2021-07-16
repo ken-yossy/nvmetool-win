@@ -153,20 +153,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
 
             if (cCmd == 'y')
             {
-                char cOpt = 'n';
-                if (bCreate && bCanUseGetDeviceInternalLog())
-                {
-                    cOpt = cGetConsoleInput("#\t[EXPERIMENTAL] Using IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG is supported; if you want to use it, press 'y'\n", strCmd);
-                }
-
-                if (cOpt == 'y')
-                {
-                    iResult = iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(_hDevice, bCreate);
-                }
-                else
-                {
                     iResult = iNVMeGetTelemetryHostInitiated(_hDevice, bCreate);
-                }
             }
         }
         break;

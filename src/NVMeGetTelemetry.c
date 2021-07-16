@@ -70,7 +70,7 @@ static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIA
     PrintDataBuffer(_pData->ReasonIdentifier, 128);
 }
 
-int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
+static int s_iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 {
     int     iResult = -1;
     PVOID   buffer = NULL;
@@ -78,8 +78,8 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
     ULONG   returnedLength = 0;
 
     PSTORAGE_PROPERTY_QUERY query = NULL;
-    PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT protocolData = NULL;
-    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT protocolDataDescr = NULL;
+    PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
+    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
     NVME_CDW10_GET_LOG_PAGE_V13 cdw10;
     NVME_CDW11_GET_LOG_PAGE cdw11;
     NVME_CDW12_GET_LOG_PAGE cdw12;
@@ -87,7 +87,7 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
-        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA_EXT)
+        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
         + NVME_TELEMETRY_DATA_BLOCK_SIZE; // sizeof(NVME_TELEMETRY_HOST_INITIATED_LOG)
     buffer = malloc(bufferLength);
 
@@ -100,8 +100,8 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
     ZeroMemory(buffer, bufferLength);
 
     query               = (PSTORAGE_PROPERTY_QUERY)buffer;
-    protocolDataDescr   = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT)buffer;
-    protocolData        = (PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT)query->AdditionalParameters;
+    protocolDataDescr   = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
+    protocolData        = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
 
     query->PropertyId   = StorageAdapterProtocolSpecificProperty;
     query->QueryType    = PropertyStandardQuery;
@@ -118,10 +118,10 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
     protocolData->ProtocolType  = ProtocolTypeNvme;
     protocolData->DataType      = NVMeDataTypeLogPage;
 
-    protocolData->ProtocolDataValue     = cdw10.AsUlong;
-    protocolData->ProtocolDataSubValue  = cdw11.AsUlong;
-    protocolData->ProtocolDataSubValue  = cdw12.LPOL;
-    protocolData->ProtocolDataSubValue  = cdw13.LPOU;
+    protocolData->ProtocolDataRequestValue     = cdw10.AsUlong;
+    protocolData->ProtocolDataRequestSubValue  = cdw11.AsUlong;
+    protocolData->ProtocolDataRequestSubValue2 = cdw12.LPOL;
+    protocolData->ProtocolDataRequestSubValue3 = cdw13.LPOU;
 
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = NVME_TELEMETRY_DATA_BLOCK_SIZE; // sizeof(NVME_TELEMETRY_HOST_INITIATED_LOG)
@@ -160,6 +160,123 @@ int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 
     {
         PNVME_TELEMETRY_HOST_INITIATED_LOG aLog = (PNVME_TELEMETRY_HOST_INITIATED_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
+        s_vPrintNVMeTelemetryHostInitiated(aLog);
+        iResult = 0; // succeeded
+    }
+
+error_exit:
+
+    if (buffer != NULL)
+    {
+        free(buffer);
+    }
+
+    return iResult;
+}
+
+/**
+ * from STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE union (ntddstor.h)
+ * <https://docs.microsoft.com/ja-jp/windows-hardware/drivers/ddi/ntddstor/ns-ntddstor-storage_protocol_data_subvalue_get_log_page>
+ */
+#ifndef STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE
+typedef union _STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE {
+    struct {
+        ULONG RetainAsynEvent : 1;
+        ULONG LogSpecificField : 4;
+        ULONG Reserved : 27;
+    } DUMMYSTRUCTNAME;
+    ULONG  AsUlong;
+} STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE, * PSTORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE;
+#endif
+
+static int s_iNVMeGetTelemetryHostInitiatedTEST(HANDLE _hDevice, bool _bCreate)
+{
+    int     iResult = -1;
+    PVOID   buffer = NULL;
+    ULONG   bufferLength = 0;
+    ULONG   returnedLength = 0;
+
+    PSTORAGE_PROPERTY_QUERY query = NULL;
+    PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT protocolData = NULL;
+    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT protocolDataDescr = NULL;
+    NVME_CDW12_GET_LOG_PAGE cdw12;
+    NVME_CDW13_GET_LOG_PAGE cdw13;
+    STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE u32Opt;
+
+    // Allocate buffer for use.
+    bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
+        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA_EXT)
+        + NVME_TELEMETRY_DATA_BLOCK_SIZE; // sizeof(NVME_TELEMETRY_HOST_INITIATED_LOG)
+    buffer = malloc(bufferLength);
+
+    if (buffer == NULL)
+    {
+        vPrintSystemError(GetLastError(), "malloc");
+        goto error_exit;
+    }
+
+    ZeroMemory(buffer, bufferLength);
+
+    query = (PSTORAGE_PROPERTY_QUERY)buffer;
+    protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR_EXT)buffer;
+    protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA_EXT)query->AdditionalParameters;
+
+    query->PropertyId = StorageAdapterProtocolSpecificProperty;
+    query->QueryType = PropertyStandardQuery;
+
+    //    cdw10.NUMDL     = NVME_TELEMETRY_DATA_BLOCK_SIZE >> 2; // 512 / 4 (in NVMe, DWORD is 4 byte)
+    //  where is NUMDL...?
+
+    cdw12.LPOL = 0;
+    cdw13.LPOU = 0;
+    u32Opt.RetainAsynEvent     = 1; //0; // clear asynchronous event
+    u32Opt.LogSpecificField    = (_bCreate == true) ? 1 : 0;
+    protocolData->ProtocolType = ProtocolTypeNvme;
+    protocolData->DataType     = NVMeDataTypeLogPage;
+
+    protocolData->ProtocolDataValue     = NVME_LOG_PAGE_TELEMETRY_HOST_INITIATED;
+    protocolData->ProtocolDataSubValue  = cdw12.LPOL; // This will be passed as the lower 32 bit of log page offset if controller supports
+    protocolData->ProtocolDataSubValue2 = cdw13.LPOU; // This will be passed as the higher 32 bit of log page offset if controller supports
+    protocolData->ProtocolDataSubValue3 = u32Opt.AsUlong;
+
+    protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA_EXT);
+    protocolData->ProtocolDataLength = NVME_TELEMETRY_DATA_BLOCK_SIZE; // sizeof(NVME_TELEMETRY_HOST_INITIATED_LOG)
+
+    // Send request down.
+    iResult = iIssueDeviceIoControl(_hDevice,
+        IOCTL_STORAGE_QUERY_PROPERTY,
+        buffer,
+        bufferLength,
+        buffer,
+        bufferLength,
+        &returnedLength,
+        NULL
+    );
+
+    if (iResult) goto error_exit;
+
+    printf("\n");
+
+    // Validate the returned data.
+    if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
+        (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
+        fprintf(stderr, "[E] NVMeGetTelemetryHostInitiated: Data descriptor header not valid.\n");
+        iResult = -1; // error
+        goto error_exit;
+    }
+
+    protocolData = &protocolDataDescr->ProtocolSpecificData;
+
+    if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA_EXT)) ||
+        (protocolData->ProtocolDataLength < NVME_TELEMETRY_DATA_BLOCK_SIZE)) {
+        fprintf(stderr, "[E] NVMeGetTelemetryHostInitiated: ProtocolData Offset/Length not valid.\n");
+        iResult = -1; // error
+        goto error_exit;
+    }
+
+    {
+        PNVME_TELEMETRY_HOST_INITIATED_LOG aLog = (PNVME_TELEMETRY_HOST_INITIATED_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
+        fprintf(stderr, "[I] EXPERIMENTAL\n");
         s_vPrintNVMeTelemetryHostInitiated(aLog);
         iResult = 0; // succeeded
     }
@@ -301,7 +418,7 @@ static void s_vPrintDeviceInternalStatusData(PDEVICE_INTERNAL_STATUS_DATA _pData
     PrintDataBuffer(_pData->StatusData, STATUS_DATA_HEADER_LENGTH);
 }
 
-int iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(HANDLE _hDevice)
+static int s_iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(HANDLE _hDevice)
 {
     int     iResult = -1;
     ULONG   returnedLength = 0;
@@ -353,4 +470,30 @@ error_exit:
     return iResult;
 }
 
+int iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
+{
+    int iResult = -1;
+    char cOpt = 'n';
+    char strCmd[256];
+
+    if (_bCreate && bCanUseGetDeviceInternalLog())
+    {
+        cOpt = cGetConsoleInput("#\t[EXPERIMENTAL] Using IOCTL_STORAGE_GET_DEVICE_INTERNAL_LOG may be supported; if you want to use it, press 'y'\n", strCmd);
+    }
+
+    if (cOpt == 'y')
+    {
+        iResult = s_iNVMeGetTelemetryHostInitiatedWithDeviceInternalLog(_hDevice);
+    }
+    else if (cOpt == 'e')
+    {
+        iResult = s_iNVMeGetTelemetryHostInitiatedTEST(_hDevice, _bCreate);
+    }
+    else
+    {
+        iResult = s_iNVMeGetTelemetryHostInitiated(_hDevice, _bCreate);
+    }
+
+    return iResult;
+}
 
