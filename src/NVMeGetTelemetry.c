@@ -74,16 +74,14 @@ static void s_vPrintNVMeTelemetryControllerInitiated(PNVME_TELEMETRY_HOST_INITIA
  * from STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE union (ntddstor.h)
  * <https://docs.microsoft.com/ja-jp/windows-hardware/drivers/ddi/ntddstor/ns-ntddstor-storage_protocol_data_subvalue_get_log_page>
  */
-#ifndef STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE
-typedef union _STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE {
+typedef union MY_STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE {
     struct {
         ULONG RetainAsynEvent : 1;
         ULONG LogSpecificField : 4;
         ULONG Reserved : 27;
     } DUMMYSTRUCTNAME;
     ULONG  AsUlong;
-} STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE, * PSTORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE;
-#endif
+} MY_STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE, * MY_PSTORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE;
 
 static int s_iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
 {
@@ -99,7 +97,7 @@ static int s_iNVMeGetTelemetryHostInitiated(HANDLE _hDevice, bool _bCreate)
     NVME_CDW11_GET_LOG_PAGE cdw11;
     NVME_CDW12_GET_LOG_PAGE cdw12;
     NVME_CDW13_GET_LOG_PAGE cdw13;
-    STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE u32Opt;
+    MY_STORAGE_PROTOCOL_DATA_SUBVALUE_GET_LOG_PAGE u32Opt;
 
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
