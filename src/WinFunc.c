@@ -87,11 +87,18 @@ HANDLE hIssueCreateFile(const char* _strDeviceNo)
 }
 
 static DWORD s_dwOSBuildNumber = 0;
+static DWORD s_dwOSMajorVersion = 0;
 
 bool bCanUseGetDeviceInternalLog(void)
 {
     // if osInfo.dwBuildNumber < 19041, it's before Windows 10 May 2020 Update (2004)
-    return ( s_dwOSBuildNumber < 19041 ) ? false : true;
+    if ((s_dwOSMajorVersion == 10) && (s_dwOSBuildNumber < 19041))
+    {
+        return false;
+    } else
+    {
+        return true;
+    }
 }
 
 typedef NTSTATUS (WINAPI* PRtlGetVersion)(PRTL_OSVERSIONINFOEXW _pInfo);
@@ -125,7 +132,13 @@ void vGetOSVersion(void)
          (osInfo.wProductType == VER_NT_WORKSTATION) ) // not Windows Server 2016/2019
     {
         s_dwOSBuildNumber = osInfo.dwBuildNumber;
-        printf("[I] Running on Windows %d build %d", osInfo.dwMajorVersion, s_dwOSBuildNumber);
+        s_dwOSMajorVersion = osInfo.dwMajorVersion;
+        if (22000 <= s_dwOSBuildNumber)
+        {
+            s_dwOSMajorVersion = 11; // Windows 11 !!!
+        }
+
+        printf("[I] Running on Windows %d build %d", s_dwOSMajorVersion, s_dwOSBuildNumber);
     }
 }
 

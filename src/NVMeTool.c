@@ -15,7 +15,7 @@
 #include "NVMeSMART.h"
 #include "NVMeUtils.h"
 
-static const char strVersion[] = "2.0";
+static const char strVersion[] = "2.0.1";
 
 #pragma warning(disable:6301)
 
