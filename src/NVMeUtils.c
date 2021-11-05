@@ -286,6 +286,15 @@ int eGetCommandFromConsole(void)
         }
         break;
 
+    case 'x':
+    case 'X':
+        cCmd = cGetConsoleInput("\n# [EXPERIMENTAL] Vendor Specific Command (Admin FFh), Press 'y' to continue\n", strCmd);
+        if (cCmd == 'y')
+        {
+            iMajorCmd = NVME_COMMAND_ADMIN_VENDOR_TEST;
+        }
+        break;
+
     default:
         break;
     }

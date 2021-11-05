@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\..\..\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\shared\nvme.h" />
+    <ClInclude Include="NVMeAdminVendorSpecificCommand.h" />
     <ClInclude Include="NVMeCommandSupportedAndEffects.h" />
     <ClInclude Include="NVMeDeallocate.h" />
     <ClInclude Include="NVMeDeviceSelftest.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="WinFunc.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="NVMeAdminVendorSpecificCommand.c" />
     <ClCompile Include="NVMeCommandSupportedAndEffects.c" />
     <ClCompile Include="NVMeDeallocate.c" />
     <ClCompile Include="NVMeDeviceSelftest.c" />

@@ -14,6 +14,7 @@
 #include "NVMeFormatNVM.h"
 #include "NVMeSMART.h"
 #include "NVMeUtils.h"
+#include "NVMeAdminVendorSpecificCommand.h"
 
 static const char strVersion[] = "2.0.1";
 
@@ -161,6 +162,10 @@ int main(int _argc, char* _argv[])
             {
                 fprintf(stderr, "[E] This SSD does not support Security Send / Receive commands, ignore.\n\n");
             }
+            break;
+
+        case NVME_COMMAND_ADMIN_VENDOR_TEST:
+            iResult = iNVMeAdminVendorSpecificCommand(hDevice, 0xFF);
             break;
 
         case NVME_TOOL_COMMAND_QUIT:

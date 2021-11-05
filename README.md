@@ -46,11 +46,13 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        82h | Security Receive            | x           | Getting TCG Level 0 Discovery Data for example in this tool |
 |        84h | Sanitize                    |             | 2                 |
 |        86h | Get LBA Status              |             | Not supported     |
-| C0h -- FFh | _Vendor Specific_           |             |                   |
+| C0h -- FFh | _Vendor Specific_           |             | Sample (Template) code exists |
 
 Note 1: probably cannot issue this command because only "Internal Driver Use" is written in [8]
 
 Note 2: can issue this command only in WinPE mode according to [8]
+
+Note 3: To use sample (template) code for issuing Vendor Specific Commands, you need to edit the codes as you want to do
 
 Table 2. Command matrix (NVM Command Set)
 
@@ -71,9 +73,11 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        11h | Reservation Acquire  |        | 1                                |
 |        15h | Reservation Release  |        | 1                                |
 |        19h | Copy                 |        | _from 2.0_                       |
-| 80h -- FFh | _Vendor Specific_    |        |                                  |
+| 80h -- FFh | _Vendor Specific_    |        | Sample (Template) code exists    |
 
 Note 1: these command are stated as "Not supported" in [8]
+
+Note 2: To use sample (template) code for issuing Vendor Specific Commands, you need to edit the codes as you want to do
 
 ## Controller or Namespace Structure (CNS) for Identify command
 
