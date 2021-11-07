@@ -9,6 +9,15 @@ For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM 
 
 (Some fields introduced in NVMe specifications revision 2.0[10] are supported, but I cannot test it because I don't have NVMe 2.0 compliant SSDs...)
 
+## Note for this software
+This software is a SAMPLE and DEMONSTRATION program to show how to access NVMe drive with Windows' inbox NVMe driver.
+
+It is **NOT** intended to provide versatile tool with such functions; accept arbitrary value for parameters, file input / output, non-interactive mode, support for vendor specific commands, and so on.
+
+If you need such functions, you can add them into this software.
+
+Thank you.
+
 ## Command matrix
 
 Table 1. Command matrix (Admin Command Set)
