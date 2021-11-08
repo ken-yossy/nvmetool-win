@@ -12,9 +12,9 @@ For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM 
 ## Note for this software
 This software is a SAMPLE and DEMONSTRATION program to show how to access NVMe drive with Windows' inbox NVMe driver.
 
-It is **NOT** intended to provide versatile tool with such functions; accept arbitrary value for parameters, file input / output, non-interactive mode, support for vendor specific commands, and so on.
+It is **NOT** intended to provide versatile tool with such functions like accepting arbitrary value for parameters, file input / output, non-interactive mode, support for vendor specific commands.
 
-If you need such functions, you can add them into this software.
+If you need such functions, you can create your own tool based on this software.
 
 Thank you.
 
