@@ -46,9 +46,11 @@ static void s_vPrintNVMeDeviceSelftestLog(PNVME_DEVICE_SELF_TEST_LOG _pData)
         printf("\tbyte [    1] 0x%02X = %d%% completed\n", _pData->CurrentCompletion.CompletePercent, _pData->CurrentCompletion.CompletePercent);
     }
 
-    printf("\n");
     for (int i = 0; i < 20; i++)
     {
+        if (_pData->ResultData[i].Status.Result == 0xF ) continue; // not a valid entry
+
+        printf("\n");
         printf("[I] Self-test Result Data #%d:\n", i);
         printf("\tbyte [    0] Device Self-test Status\n");
         switch (_pData->ResultData[i].Status.Result)
