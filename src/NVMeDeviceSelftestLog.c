@@ -154,7 +154,7 @@ static void s_vPrintNVMeDeviceSelftestLog(PNVME_DEVICE_SELF_TEST_LOG _pData)
             printf("\t\tbit [    3] 0 = Status Code field is invalid\n");
         }
 
-        printf("\tbyte [11: 4] 0x%llu = Power On Hours\n", _pData->ResultData[i].POH);
+        printf("\tbyte [11: 4] 0x%016llX = Power On Hours\n", _pData->ResultData[i].POH);
 
         if (_pData->ResultData[i].ValidDiagnostics.NSIDValid)
         {
