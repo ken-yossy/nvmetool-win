@@ -242,10 +242,10 @@ Confirmed on the following software environment:
     * stornvme.sys (version 10.0.21354.1, WinBuild 160101.0800)
   * Windows 11 Pro 64bit (Version 21H2, Build 22000.132)
     * stornvme.sys (version 10.0.22000.132, WinBuild 160101.0800)
-* Developping environment
-  * Microsoft Visual Studio Community 2019 (Version 16.9.4)
-    * Microsoft Visual C++ 2019
+* Developing environment
+  * Microsoft Visual Studio Community 2019 (Version 16.11.11)
     * Windows Driver Kit (10.0.20348.0)
+  * Microsoft Visual Studio Community 2022 (Version 17.1.3)
 
 ## Limitations
 Only tested with the NVMe drive directly attached to PC via PCIe.
