@@ -374,7 +374,13 @@ int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice)
     protocolData->ProtocolType = ProtocolTypeNvme;
     protocolData->DataType = NVMeDataTypeLogPage;
     protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_COMMAND_EFFECTS;
-    protocolData->ProtocolDataRequestSubValue = NVME_NAMESPACE_ALL;
+
+    // Check the following page for appropriate values for "RequestValue"s.
+    // STORAGE_PROTOCOL_NVME_DATA_TYPE enumeration (ntddstor.h)
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddstor/ne-ntddstor-_storage_protocol_nvme_data_type
+    protocolData->ProtocolDataRequestSubValue = 0; // lower 32-bit of the offset
+    protocolData->ProtocolDataRequestSubValue2 = 0; // higher 32-bit of the offset
+    // Subvalue3 and Subvalue4 are zero
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = sizeof(NVME_COMMAND_EFFECTS_LOG_20);
 

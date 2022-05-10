@@ -317,12 +317,15 @@ int iNVMeGetSMART(HANDLE _hDevice, bool _bPrint, int iNSID)
 
     protocolData->ProtocolType = ProtocolTypeNvme;
     protocolData->DataType = NVMeDataTypeLogPage;
+
+    // Check the following page for appropriate values for "RequestValue"s.
+    // STORAGE_PROTOCOL_NVME_DATA_TYPE enumeration (ntddstor.h)
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddstor/ne-ntddstor-_storage_protocol_nvme_data_type
     protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_HEALTH_INFO;
-    if (iNSID == NVME_NAMESPACE_ALL)
-    {
-        if (g_WA_bGetControllerSMARTLogWithNSIDZero) iNSID = 0;
-    }
-    protocolData->ProtocolDataRequestSubValue = iNSID;
+    protocolData->ProtocolDataRequestSubValue = 0; // lower 32-bit of the offset
+    protocolData->ProtocolDataRequestSubValue2 = 0; // higher 32-bit of the offset
+    // Subvalue3 and Subvalue4 are zero
+
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = sizeof(NVME_SMART_INFO_LOG);
 
