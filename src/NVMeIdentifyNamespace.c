@@ -126,9 +126,24 @@ typedef struct
 
 static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNSData, DWORD _dwNSID)
 {
-    printf("[M] Namespace Size (NSZE): %llu (sectors)\n", (uint64_t)_pNSData->NSZE);
-    printf("[M] Namespace Capacity (NCAP): %llu (sectors)\n", (uint64_t)_pNSData->NCAP);
-    printf("[M] Namespace Utilization (NUSE): %llu (sectors)\n", (uint64_t)_pNSData->NUSE);
+    uint32_t uiLBAF  = 0; // index of current format (index for LBAF)
+
+    {
+        if (bIsNVMeV20OrLater())
+        {
+            uiLBAF = (_pNSData->FLBAS.NlbafMsb << 4) + (_pNSData->FLBAS.LbaFormatIndex);
+        }
+        else
+        {
+            uiLBAF = _pNSData->FLBAS.LbaFormatIndex;
+        }
+
+        uint32_t uiLBADS = _pNSData->LBAF[uiLBAF].LBADS; // shift value for current sector size in byte
+
+        printf("[M] Namespace Size (NSZE): %llu (sectors), about %llu (GiB)\n", _pNSData->NSZE, (_pNSData->NSZE) >> (30 - uiLBADS));
+        printf("[M] Namespace Capacity (NCAP): %llu (sectors), about %llu (GiB)\n", _pNSData->NCAP, (_pNSData->NCAP) >> (30 - uiLBADS));
+        printf("[M] Namespace Utilization (NUSE): %llu (sectors), about %llu (GiB)\n", _pNSData->NUSE, (_pNSData->NUSE) >> (30 - uiLBADS));
+    }
 
     printf("[M] Namespace Features (NSFEAT):\n");
     if (bIsNVMeV14OrLater())
@@ -197,14 +212,14 @@ static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNS
             printf("\tbit [      4] 0 = All of the metadata is transferred as a separate contiguous buffer of data\n");
         }
 
+        // we have already parsed FLBAS at the beginning of this function
         if (bIsNVMeV20OrLater())
         {
-            uint32_t uiLBAF = (_pNSData->FLBAS.NlbafMsb << 4) + (_pNSData->FLBAS.LbaFormatIndex);
             printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", _pNSData->FLBAS.LbaFormatIndex, uiLBAF, uiLBAF);
         }
         else
         {
-            printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex, _pNSData->FLBAS.LbaFormatIndex);
+            printf("\tbit [  3:  0] %d = LBA format is no.%d (LBAF%d)\n", uiLBAF, uiLBAF, uiLBAF);
         }
     }
 
