@@ -90,7 +90,8 @@ typedef struct
     uint16_t    NABO;                   // byte [  43:  42] O - Namespace Atomic Boundary Offset (NABO)
     uint16_t    NABSPF;                 // byte [  45:  44] O - Namespace Atomic Boundary Size Power Fail (NABSPF)
     uint16_t    NOIOB;                  // byte [  47:  46] O - Namespace Optimal IO Boundary (NOIOB)
-    uint8_t     NVMCAP[16];             // byte [  63:  48] O - NVM Capacity (NVMCAP)
+    uint64_t    NVMCAP_L;               // byte [  63:  48] O - NVM Capacity (NVMCAP)
+    uint64_t    NVMCAP_H;
     uint16_t    NPWG;                   // byte [  65:  64] O - Namespace Preferred Write Granularity (NPWG) <rev1.4>
     uint16_t    NPWA;                   // byte [  67:  66] O - Namespace Preferred Write Alignment (NPWA) <rev1.4>
     uint16_t    NPDG;                   // byte [  69:  68] O - Namespace Preferred Deallocate Granularity (NPDG) <rev1.4>
@@ -551,8 +552,10 @@ static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNS
         printf("[O] Maximum Source Range Count (MSRC) = %d (means %d entries)\n", _pNSData->MSRC, _pNSData->MSRC + 1);
     }
 
-    // TODO: we ignore upper 8 bytes of _pNSData->NVMCAP[8] ... when it becomes to be needed?
-    printf("[O] NVM Capacity (NVMCAP): %lld (bytes)\n", (uint64_t)(_pNSData->NVMCAP));
+    {
+        uint64_t nvmcap_in_gib = (((_pNSData->NVMCAP_H) << 32) | ((_pNSData->NVMCAP_L) >> 32) << 2);
+        printf("[O] NVM Capacity (NVMCAP): 0x%08llX%08llX (bytes, about %llu GiB)\n", (_pNSData->NVMCAP_H), (_pNSData->NVMCAP_L), nvmcap_in_gib);
+    }
 
     if (bIsNVMeV14OrLater())
     {
