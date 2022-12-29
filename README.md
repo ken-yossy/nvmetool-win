@@ -130,7 +130,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        06h | Device Self-test               | x    | |
 |        07h | Telemetry Host-initiated       | x    | Getting header only. see also Note 1. |
 |        08h | Telemetry Controller-initiated | x    | Getting header only. |
-|        09h | Endurance Group Information    |      | It is confirmed that command can be issued and received by SSD |
+|        09h | Endurance Group Information    | x    | |
 |        0Ah | Predictable Latency Per NVM Set |     | |
 |        0Bh | Predictable Latency Event Aggregate | | |
 |        0Ch | Asymmetric Namespace Access    |      | |
