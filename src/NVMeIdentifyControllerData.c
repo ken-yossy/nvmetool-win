@@ -1097,14 +1097,25 @@ static void s_vPrintNVMeIdentifyControllerDataDomainId(PMY_NVME_IDENTIFY_CONTROL
 
 static void s_vPrintNVMeIdentifyControllerDataMEGCAP(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
-    printf("[O] Max Endurance Group Capacity: ");
+    printf("[O] Max Endurance Group Capacity (MEGCAP): ");
 
     if (_pstController->CTRATT.EnduranceGroups)
     {
-        if ( (_pstController->MEGCAP_H == 0) && (_pstController->MEGCAP_L == 0) )
-            printf("0 (This NVM subsystem does not report this value)\n" );
+        if (_pstController->MEGCAP_H == 0)
+        {
+            if (_pstController->MEGCAP_L == 0)
+            {
+                printf("0 (This NVM subsystem does not report this value)\n");
+            }
+            else
+            {
+                printf("0x%016llX (byte)\n", _pstController->MEGCAP_L);
+            }
+        }
         else
-            printf("0x%08llX%08llX (byte)\n", _pstController->MEGCAP_H, _pstController->MEGCAP_L);
+        {
+            printf("0x%016llX%016llX (byte)\n", _pstController->MEGCAP_H, _pstController->MEGCAP_L);
+        }
     }
     else
     {
