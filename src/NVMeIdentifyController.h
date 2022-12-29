@@ -211,8 +211,8 @@ typedef struct {
 
     uint16_t    DomainId;           // byte [ 357: 356] O - Domain Identifier <rev2.0>
     uint8_t     Reserved3[10];      // byte [ 367: 358]
-    uint64_t    MEGCAP_H;           // byte [ 383: 368] O - Max Endurance Group Capacity <rev2.0>
-    uint64_t    MEGCAP_L;
+    uint64_t    MEGCAP_L;           // byte [ 383: 368] O - Max Endurance Group Capacity <rev2.0>
+    uint64_t    MEGCAP_H;
 
     uint8_t     Reserved4[128];     // byte [ 511: 384]
 
