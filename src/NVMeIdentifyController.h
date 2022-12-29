@@ -301,7 +301,8 @@ typedef struct {
     } SGLS;                         // byte [ 539: 536] O - SGL Support (SGLS)
 
     uint32_t MNAN;                  // byte [ 543: 540] O - Maximum Number of Allowed Namespaces (MNAN) <rev1.4>
-    uint8_t MAXDNA[16];             // byte [ 559: 544] O - Maximum Domain Namespace Attachments (MAXDNA) <rev2.0>
+    uint64_t MAXDNA_L;              // byte [ 559: 544] O - Maximum Domain Namespace Attachments (MAXDNA) <rev2.0>
+    uint64_t MAXDNA_H;
     uint32_t MAXCNA;                // byte [ 563: 560] O - Maximum I/O Controller Namespace Attachments (MAXCNA) <rev2.0>
 
     uint8_t Reserved6[204];         // byte [ 767: 564]

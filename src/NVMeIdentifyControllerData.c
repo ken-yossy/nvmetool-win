@@ -1552,15 +1552,13 @@ static void s_vPrintNVMeIdentifyControllerDataMNAN(PMY_NVME_IDENTIFY_CONTROLLER_
 static void s_vPrintNVMeIdentifyControllerDataMAXDNA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Maximum Domain Namespace Attachments (MAXDNA): ");
-    uint64_t val = (uint64_t)(_pstController->MAXDNA);
-
-    if (val)
+    if ((_pstController->MAXDNA_H == 0) && (_pstController->MAXDNA_L == 0))
     {
-        printf("%llu\n", val);
+        printf("0 (No maximum is specified)\n");
     }
     else
     {
-        printf("0 (no maximum is specified)\n");
+        printf("0x%08llX%08llX\n", _pstController->MAXDNA_H, _pstController->MAXDNA_L);
     }
 }
 
