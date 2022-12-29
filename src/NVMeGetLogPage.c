@@ -36,6 +36,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         "\n#     %02Xh = Telemetry Host-Initiated"
         "\n#     %02Xh = Telemetry Controller-Initiated"
         "\n#     %02Xh = Endurance Group Information"
+        "\n#     %02Xh = Endurance Group Event Aggregate"
         "\n",
         NVME_LOG_PAGE_SUPPORTED_LOG_PAGES,
         NVME_LOG_PAGE_ERROR_INFO,
@@ -45,7 +46,8 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         NVME_LOG_PAGE_DEVICE_SELF_TEST,
         NVME_LOG_PAGE_TELEMETRY_HOST_INITIATED,
         NVME_LOG_PAGE_TELEMETRY_CTLR_INITIATED,
-        NVME_LOG_PAGE_ENDURANCE_GROUP_INFORMATION);
+        NVME_LOG_PAGE_ENDURANCE_GROUP_INFORMATION,
+        NVME_LOG_PAGE_ENDURANCE_GROUP_EVENT_AGGREGATE);
 
     int iLId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iLId)
@@ -203,6 +205,29 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         if (cCmd == 'y')
         {
             iResult = iNVMeGetEnduranceGroupInformation(_hDevice);
+        }
+        break;
+
+    case NVME_LOG_PAGE_ENDURANCE_GROUP_EVENT_AGGREGATE:
+        if (bIsNVMeV14OrLater())
+        {
+            if (g_stController.CTRATT.EnduranceGroups)
+            {
+                cCmd = cGetConsoleInput("\n# Get Log Page - Endurance Group Event Aggregate (Log Identifier 0Fh), Press 'y' to continue\n", strCmd);
+                if (cCmd == 'y')
+                {
+                    iResult = iNVMeGetEnduranceGroupEventAggregateLogPage(_hDevice);
+                }
+
+            }
+            else
+            {
+                fprintf(stderr, "\n[W] This controller does not support Endurance Group, skip\n");
+            }
+        }
+        else
+        {
+            printf("\n# Endurance Group is for NVMe 1.4 or later, ignored");
         }
         break;
 

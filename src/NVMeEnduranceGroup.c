@@ -5,6 +5,7 @@
 
 #include "NVMeUtils.h"
 #include "WinFunc.h"
+#include "NVMeIdentifyController.h"
 
 typedef struct {
     union {
@@ -191,3 +192,120 @@ error_exit:
 
     return iResult;
 }
+
+#define NUM_MAX_ENDURANCE_GROUP_ID  (252) // FIXME!!! to make the size of structure below 512 bytes
+
+typedef struct
+{
+    uint64_t    m_ullNumEntries;
+    uint16_t    m_ausEntry[NUM_MAX_ENDURANCE_GROUP_ID];
+} NVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG, *PNVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG;
+
+int iNVMeGetEnduranceGroupEventAggregateLogPage(HANDLE _hDevice)
+{
+
+    int     iResult = -1;
+    PVOID   buffer = NULL;
+    ULONG   bufferLength = 0;
+    ULONG   returnedLength = 0;
+
+    PSTORAGE_PROPERTY_QUERY query = NULL;
+    PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
+    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
+
+    // Allocate buffer for use.
+    bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
+        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
+        + sizeof(NVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG);
+    buffer = malloc(bufferLength);
+
+    if (buffer == NULL)
+    {
+        vPrintSystemError(GetLastError(), "malloc");
+        goto error_exit;
+    }
+
+    ZeroMemory(buffer, bufferLength);
+
+    query = (PSTORAGE_PROPERTY_QUERY)buffer;
+    protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
+    protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
+
+    query->PropertyId = StorageDeviceProtocolSpecificProperty;
+    query->QueryType = PropertyStandardQuery;
+
+    protocolData->ProtocolType = ProtocolTypeNvme;
+    protocolData->DataType = NVMeDataTypeLogPage;
+
+    // Check the following page for appropriate values for "RequestValue"s.
+    // STORAGE_PROTOCOL_NVME_DATA_TYPE enumeration (ntddstor.h)
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddstor/ne-ntddstor-_storage_protocol_nvme_data_type
+    protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_ENDURANCE_GROUP_EVENT_AGGREGATE; // 0Fh
+    protocolData->ProtocolDataRequestSubValue = 0; // lower 32-bit of the offset
+    protocolData->ProtocolDataRequestSubValue2 = 0; // higher 32-bit of the offset
+    // Subvalue3 and Subvalue4 are zero
+
+    protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
+    protocolData->ProtocolDataLength = sizeof(NVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG);
+
+    // Send request down.
+    iResult = iIssueDeviceIoControl(_hDevice,
+        IOCTL_STORAGE_QUERY_PROPERTY,
+        buffer,
+        bufferLength,
+        buffer,
+        bufferLength,
+        &returnedLength,
+        NULL
+    );
+
+    if (iResult) goto error_exit;
+
+    printf("\n");
+
+    // Validate the returned data.
+    if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
+        (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
+        fprintf(stderr, "[E] NVMeGetSupportedLogPages: Data descriptor header not valid.\n");
+        iResult = -1; // error
+        goto error_exit;
+    }
+
+    protocolData = &protocolDataDescr->ProtocolSpecificData;
+
+    if ((protocolData->ProtocolDataOffset < sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
+        (protocolData->ProtocolDataLength < sizeof(NVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG))) {
+        fprintf(stderr, "[E] NVMeGetSupportedLogPages: ProtocolData Offset/Length not valid.\n");
+        iResult = -1; // error
+        goto error_exit;
+    }
+
+    PNVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG pData = (PNVME_ENDURANCE_GROUP_EVENT_AGGREGATE_LOG)((PCHAR)protocolData + protocolData->ProtocolDataOffset);
+
+    printf("[I] Endurance Group Event Aggregate Log Page:\n");
+    printf("    byte [  7:  0] %llu = Number of Entries\n", pData->m_ullNumEntries);
+
+    if (pData->m_ullNumEntries != 0)
+    {
+        if (NUM_MAX_ENDURANCE_GROUP_ID < pData->m_ullNumEntries)
+        {
+            printf("[W] This drive has %llu valid entries, but this tool only show %d entries\n", pData->m_ullNumEntries, NUM_MAX_ENDURANCE_GROUP_ID);
+        }
+
+        for (int i = 0; ( i < pData->m_ullNumEntries ) && (i < NUM_MAX_ENDURANCE_GROUP_ID); i++)
+        {
+            printf("    byte [%3u:%3u] Entry %3u: %3u = Endurance Group ID\n", i*2+8+1, i*2+8, i, pData->m_ausEntry[ i ]);
+        }
+    }
+
+    iResult = 0; // succeeded;
+
+error_exit:
+    if (buffer != NULL)
+    {
+        free(buffer);
+    }
+
+    return iResult;
+}
+

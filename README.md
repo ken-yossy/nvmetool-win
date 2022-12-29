@@ -136,7 +136,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Ch | Asymmetric Namespace Access    |      | |
 |        0Dh | Persistent Event Log           |      | |
 |        0Eh | LBA Status Information         |      | |
-|        0Fh | Endurance Group Event Aggregate |     | |
+|        0Fh | Endurance Group Event Aggregate | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
 | 10h -- 6Fh | _Reserved_                     |      | |
 |        70h | Discovery                      |      | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          |      | |
