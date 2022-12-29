@@ -13,6 +13,7 @@
 #include "NVMeGetTelemetry.h"
 #include "NVMeEnduranceGroup.h"
 #include "NVMeIdentifyController.h"
+#include "NVMeGetSupportedLogPages.h"
 
 int iNVMeGetLogPage(HANDLE _hDevice)
 {
@@ -26,6 +27,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         1024,
         "\n# Input Log Identifier (in hex):"
         "\n#    Supported Log are:"
+        "\n#     %02Xh = Supported Log Pages (NVMe 2.0 or later)"
         "\n#     %02Xh = Error Information"
         "\n#     %02Xh = SMART / Health Information"
         "\n#     %02Xh = Firmware Slot Information"
@@ -35,6 +37,7 @@ int iNVMeGetLogPage(HANDLE _hDevice)
         "\n#     %02Xh = Telemetry Controller-Initiated"
         "\n#     %02Xh = Endurance Group Information"
         "\n",
+        NVME_LOG_PAGE_SUPPORTED_LOG_PAGES,
         NVME_LOG_PAGE_ERROR_INFO,
         NVME_LOG_PAGE_HEALTH_INFO,
         NVME_LOG_PAGE_FIRMWARE_SLOT_INFO,
@@ -47,6 +50,21 @@ int iNVMeGetLogPage(HANDLE _hDevice)
     int iLId = iGetConsoleInputHex((const char*)strPrompt, strCmd);
     switch (iLId)
     {
+    case NVME_LOG_PAGE_SUPPORTED_LOG_PAGES:
+        if (bIsNVMeV20OrLater())
+        {
+            cCmd = cGetConsoleInput("\n# Get Log Page - Supported Log Pages (Log Identifier 00h), Press 'y' to continue\n", strCmd);
+            if (cCmd == 'y')
+            {
+                iResult = iNVMeGetSupportedLogPages(_hDevice);
+            }
+        }
+        else
+        {
+            printf("\n# Supported Log Pages (Log Identifier 00h) is for NVMe 2.0 or later, ignored");
+        }
+        break;
+
     case NVME_LOG_PAGE_ERROR_INFO:
         cCmd = cGetConsoleInput("\n# Get Log Page - Error Information (Log Identifier 01h), Press 'y' to continue\n", strCmd);
         if (cCmd == 'y')

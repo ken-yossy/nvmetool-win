@@ -5,9 +5,9 @@ This software demonstrates that issuing some NVMe commands from userland to NVMe
 
 Specification that this software refered to is NVMe 1.3d[2] and NVMe 1.4b[6].
 
-For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM command sets and associated opcodes are shown in [8], and supported features are shown in [9].
+Some fields introduced in NVMe Base Specification revision 2.0[10] are supported.
 
-(Some fields introduced in NVMe specifications revision 2.0[10] are supported, but I cannot test it because I don't have NVMe 2.0 compliant SSDs...)
+For StorNVMe on Windows 10 version 1903 and later, Supported NVMe Admin and NVM command sets and associated opcodes are shown in [8], and supported features are shown in [9].
 
 ## Note for this software
 This software is a SAMPLE and DEMONSTRATION program to show how to access NVMe drive with Windows' inbox NVMe driver.
@@ -122,6 +122,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 
 |        LID | Description                    |Status| Note |
 | ---------: | :----------------------------- |:-----|:-----|
+|        00h | Supported Log Pages            | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
 |        01h | Error Information              | x    | Number of entries to be retrieved from devices depends on the value "ELPE" in Identify Controller data |
 |        02h | SMART / Health Information     | x    | CNTID = 0, NSID = 0xFFFFFFFh |
 |        03h | Firmware Slot Information      | x    | |
@@ -238,14 +239,12 @@ These commands should be issued with highest care.
 Confirmed on the following software environment:
 
 * Tested operating system and device driver (latest)
-  * Windows 10 Professional 64bit (Version Dev, Build 21354.1)
-    * stornvme.sys (version 10.0.21354.1, WinBuild 160101.0800)
-  * Windows 11 Pro 64bit (Version 21H2, Build 22000.132)
-    * stornvme.sys (version 10.0.22000.132, WinBuild 160101.0800)
+  * Windows 11 Pro 64bit (Version 22H2, Build 22621.963)
+    * stornvme.sys (version 10.0.22621.755, WinBuild 160101.0800)
 * Developing environment
-  * Microsoft Visual Studio Community 2019 (Version 16.11.11)
-    * Windows Driver Kit (10.0.20348.0)
-  * Microsoft Visual Studio Community 2022 (Version 17.1.3)
+  * Microsoft Visual Studio Community 2022 (Version 17.4.3)
+    * Windows SDK 10.0.22621.0
+    * Windows Driver Kit 10.0.22605.1
 
 ## Limitations
 Only tested with the NVMe drive directly attached to PC via PCIe.
