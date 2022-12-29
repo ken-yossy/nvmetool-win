@@ -1101,7 +1101,10 @@ static void s_vPrintNVMeIdentifyControllerDataMEGCAP(PMY_NVME_IDENTIFY_CONTROLLE
 
     if (_pstController->CTRATT.EnduranceGroups)
     {
-        printf("%llu (byte)\n", (uint64_t)(_pstController->MEGCAP));
+        if ( (_pstController->MEGCAP_H == 0) && (_pstController->MEGCAP_L == 0) )
+            printf("0 (This NVM subsystem does not report this value)\n" );
+        else
+            printf("0x%08llX%08llX (byte)\n", _pstController->MEGCAP_H, _pstController->MEGCAP_L);
     }
     else
     {
