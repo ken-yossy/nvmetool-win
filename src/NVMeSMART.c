@@ -106,108 +106,16 @@ static void s_vPrintNVMeSMARTLog(PNVME_SMART_INFO_LOG _pData)
         }
     }
 
-    uint64_t ullLow = 0;
-    uint64_t ullHigh = 0;
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->DataUnitRead), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->DataUnitRead[8])), sizeof(char) * 8);
-
-    printf("[I] Data Units Read (in unit of 512 byte x 1000): 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->DataUnitWritten), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->DataUnitWritten[8])), sizeof(char) * 8);
-
-    printf("[I] Data Units Written (in unit of 512 byte x 1000): 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->HostReadCommands), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->HostReadCommands[8])), sizeof(char) * 8);
-
-    printf("[I] Host Read Commands: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (commands)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->HostWrittenCommands), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->HostWrittenCommands[8])), sizeof(char) * 8);
-
-    printf("[I] Host Write Commands: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (commands)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->ControllerBusyTime), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->ControllerBusyTime[8])), sizeof(char) * 8);
-
-    printf("[I] Controller Busy Time: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (minutes)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->PowerCycle), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->PowerCycle[8])), sizeof(char) * 8);
-
-    printf("[I] Power Cycles: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (times)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->PowerOnHours), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->PowerOnHours[8])), sizeof(char) * 8);
-
-    printf("[I] Power On Hours: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (hours)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->UnsafeShutdowns), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->UnsafeShutdowns[8])), sizeof(char) * 8);
-
-    printf("[I] Unsafe Shutdowns: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (times)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->MediaErrors), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->MediaErrors[8])), sizeof(char) * 8);
-
-    printf("[I] Media and Data Integrity Errors: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX (times)\n", ullLow);
-
-    memcpy_s((void*)(&ullLow), sizeof(uint64_t), (const void*)(_pData->ErrorInfoLogEntryNum), sizeof(char) * 8);
-    memcpy_s((void*)(&ullHigh), sizeof(uint64_t), (const void*)(&(_pData->ErrorInfoLogEntryNum[8])), sizeof(char) * 8);
-
-    printf("[I] Number of Error Information Log Entries: 0x");
-    if (ullHigh != 0)
-    {
-        printf("%llX", ullHigh);
-    }
-    printf("%08llX\n", ullLow);
+    printf("[I] Data Units Read: 0x%016llX%016llX (x512 byte x1000)\n", _pData->DataUnitRead_H, _pData->DataUnitRead_L);
+    printf("[I] Data Units Written: 0x%016llX%016llX (x512 byte x1000)\n", _pData->DataUnitWritten_H, _pData->DataUnitWritten_L);
+    printf("[I] Host Read Commands: 0x%016llX%016llX\n", _pData->HostReadCommands_H, _pData->HostReadCommands_L);
+    printf("[I] Host Write Commands: 0x%016llX%016llX\n", _pData->HostWrittenCommands_H, _pData->HostWrittenCommands_L);
+    printf("[I] Controller Busy Time: 0x%016llX%016llX (minutes)\n", _pData->ControllerBusyTime_H, _pData->ControllerBusyTime_L);
+    printf("[I] Power Cycles: 0x%016llX%016llX (times)\n", _pData->PowerCycle_H, _pData->PowerCycle_L);
+    printf("[I] Power On Hours: 0x%016llX%016llX (hours)\n", _pData->PowerOnHours_H, _pData->PowerOnHours_L);
+    printf("[I] Unsafe Shutdowns: 0x%016llX%016llX (times)\n", _pData->UnsafeShutdowns_H, _pData->UnsafeShutdowns_L);
+    printf("[I] Media and Data Integrity Errors: 0x%016llX%016llX (counts)\n", _pData->MediaErrors_H, _pData->MediaErrors_L);
+    printf("[I] Number of Error Information Log Entries: 0x%016llX%016llX\n", _pData->ErrorInfoLogEntryNum_H, _pData->ErrorInfoLogEntryNum_L);
 
     printf("[I] Warning Composite Temperature Time: %lu (minutes) (= %lu hours)\n", _pData->WCTempTime, _pData->WCTempTime / 60);
     printf("[I] Critical Composite Temperature Time: %lu (minutes) (= %lu hours)\n", _pData->CCTempTime, _pData->CCTempTime / 60);

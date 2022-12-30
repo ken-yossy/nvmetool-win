@@ -34,16 +34,26 @@ typedef struct {
 
     uint8_t   Reserved0[25];            // byte [ 31:  7]
 
-    uint8_t   DataUnitRead[16];         // byte [ 47: 32] Data Units Read
-    uint8_t   DataUnitWritten[16];      // byte [ 63: 48] Data Units Written
-    uint8_t   HostReadCommands[16];     // byte [ 79: 64] Host Read Commands
-    uint8_t   HostWrittenCommands[16];  // byte [ 95: 80] Host Write Commands
-    uint8_t   ControllerBusyTime[16];   // byte [111: 66] Controller Busy Time
-    uint8_t   PowerCycle[16];           // byte [127:112] Power Cycles
-    uint8_t   PowerOnHours[16];         // byte [143:128] Power On Hours
-    uint8_t   UnsafeShutdowns[16];      // byte [159:144] Unsafe Shutdowns
-    uint8_t   MediaErrors[16];          // byte [175:160] Media and Data Integrity Errors
-    uint8_t   ErrorInfoLogEntryNum[16]; // byte [191:176] Number of Error Information Log Entries
+    uint64_t  DataUnitRead_L;           // byte [ 47: 32] Data Units Read
+    uint64_t  DataUnitRead_H;
+    uint64_t  DataUnitWritten_L;        // byte [ 63: 48] Data Units Written
+    uint64_t  DataUnitWritten_H;
+    uint64_t  HostReadCommands_L;       // byte [ 79: 64] Host Read Commands
+    uint64_t  HostReadCommands_H;
+    uint64_t  HostWrittenCommands_L;    // byte [ 95: 80] Host Write Commands
+    uint64_t  HostWrittenCommands_H;
+    uint64_t  ControllerBusyTime_L;     // byte [111: 66] Controller Busy Time
+    uint64_t  ControllerBusyTime_H;
+    uint64_t  PowerCycle_L;             // byte [127:112] Power Cycles
+    uint64_t  PowerCycle_H;
+    uint64_t  PowerOnHours_L;           // byte [143:128] Power On Hours
+    uint64_t  PowerOnHours_H;
+    uint64_t  UnsafeShutdowns_L;        // byte [159:144] Unsafe Shutdowns
+    uint64_t  UnsafeShutdowns_H;
+    uint64_t  MediaErrors_L;            // byte [175:160] Media and Data Integrity Errors
+    uint64_t  MediaErrors_H;
+    uint64_t  ErrorInfoLogEntryNum_L;   // byte [191:176] Number of Error Information Log Entries
+    uint64_t  ErrorInfoLogEntryNum_H;
     uint32_t  WCTempTime;               // byte [195:192] Warning Composite Temperature Time
     uint32_t  CCTempTime;               // byte [196:196] Critical Composite Temperature Time
 
