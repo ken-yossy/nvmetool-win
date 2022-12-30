@@ -1560,6 +1560,45 @@ static void s_vPrintNVMeIdentifyControllerDataMNAN(PMY_NVME_IDENTIFY_CONTROLLER_
     }
 }
 
+static void s_vPrintNVMeIdentifyControllerDataNVMCAP(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
+{
+    printf("[O] Total NVM Capacity (TNVMCAP): ");
+    if (_pstController->TNVMCAP_H == 0)
+    {
+        if (_pstController->TNVMCAP_L == 0)
+        {
+            printf("0 (byte, or not reported)\n");
+        }
+        else
+        {
+            printf("0x%016llX (byte), about %llu (GiB)\n", _pstController->TNVMCAP_L, _pstController->TNVMCAP_L >> 30);
+        }
+    }
+    else
+    {
+        uint64_t nvmcap_in_gib = (((_pstController->UNVMCAP_H) << 34) | ((_pstController->UNVMCAP_L) >> 30));
+        printf("0x%016llX%016llX (byte), about %llu (GiB)\n", _pstController->TNVMCAP_H, _pstController->TNVMCAP_L, nvmcap_in_gib);
+    }
+
+    printf("[O] Unallocated NVM Capacity (UNVMCAP): ");
+    if (_pstController->UNVMCAP_H == 0)
+    {
+        if (_pstController->UNVMCAP_L == 0)
+        {
+            printf("0 (byte, or not reported)\n");
+        }
+        else
+        {
+            printf("0x%016llX (byte), about %llu (GiB)\n", _pstController->UNVMCAP_L, _pstController->UNVMCAP_L >> 30);
+        }
+    }
+    else
+    {
+        uint64_t nvmcap_in_gib = (((_pstController->UNVMCAP_H) << 34) | ((_pstController->UNVMCAP_L) >> 30));
+        printf("0x%016llX%016llX (byte), about %llu (GiB)\n", _pstController->UNVMCAP_H, _pstController->UNVMCAP_L, nvmcap_in_gib);
+    }
+}
+
 static void s_vPrintNVMeIdentifyControllerDataMAXDNA(PMY_NVME_IDENTIFY_CONTROLLER_DATA _pstController)
 {
     printf("[O] Maximum Domain Namespace Attachments (MAXDNA): ");
@@ -1945,11 +1984,7 @@ void vPrintNVMeIdentifyControllerData(void)
     s_vPrintNVMeIdentifyControllerDataMTFA(pstController);
     s_vPrintNVMeIdentifyControllerDataHMB(pstController);
 
-    if (pstController->OACS.NamespaceCommands)
-    {
-        printf("[O] Total NVM Capacity (TNVMCAP): %llu (byte)\n",       (uint64_t)(pstController->TNVMCAP));
-        printf("[O] Unallocated NVM Capacity (UNVMCAP): %llu (byte)\n", (uint64_t)(pstController->UNVMCAP));
-    }
+    s_vPrintNVMeIdentifyControllerDataNVMCAP(pstController);
 
     s_vPrintNVMeIdentifyControllerDataRPMB(pstController);
 

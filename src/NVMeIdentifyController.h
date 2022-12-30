@@ -155,8 +155,10 @@ typedef struct {
     uint16_t    MTFA;               // byte [ 271: 270] O - Maximum Time for Firmware Activation (MTFA)
     uint32_t    HMPRE;              // byte [ 275: 272] O - Host Memory Buffer Preferred Size (HMPRE)
     uint32_t    HMMIN;              // byte [ 279: 276] O - Host Memory Buffer Minimum Size (HMMIN)
-    uint8_t     TNVMCAP[16];        // byte [ 295: 280] O - Total NVM Capacity (TNVMCAP)
-    uint8_t     UNVMCAP[16];        // byte [ 311: 296] O - Unallocated NVM Capacity (UNVMCAP)
+    uint64_t    TNVMCAP_L;          // byte [ 295: 280] O - Total NVM Capacity (TNVMCAP)
+    uint64_t    TNVMCAP_H;
+    uint64_t    UNVMCAP_L;          // byte [ 311: 296] O - Unallocated NVM Capacity (UNVMCAP)
+    uint64_t    UNVMCAP_H;
 
     struct {
         uint32_t    RPMBUnitCount : 3;          // bit [ 2: 0] Number of RPMB Units
