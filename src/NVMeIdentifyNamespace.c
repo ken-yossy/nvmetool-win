@@ -571,11 +571,11 @@ static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNS
         uint64_t nvmcap_in_gib = (((_pNSData->NVMCAP_H) << 32) | ((_pNSData->NVMCAP_L) >> 32) << 2);
         if (_pNSData->NVMCAP_H == 0)
         {
-            printf("[O] NVM Capacity (NVMCAP): 0x%016llX (bytes, about %llu GiB)\n", (_pNSData->NVMCAP_L), nvmcap_in_gib);
+            printf("[O] NVM Capacity (NVMCAP): 0x%016llX (bytes), about %llu GiB\n", (_pNSData->NVMCAP_L), nvmcap_in_gib);
         }
         else
         {
-            printf("[O] NVM Capacity (NVMCAP): 0x%016llX%016llX (bytes, about %llu GiB)\n", (_pNSData->NVMCAP_H), (_pNSData->NVMCAP_L), nvmcap_in_gib);
+            printf("[O] NVM Capacity (NVMCAP): 0x%016llX%016llX (bytes), about %llu GiB\n", (_pNSData->NVMCAP_H), (_pNSData->NVMCAP_L), nvmcap_in_gib);
         }
     }
 
