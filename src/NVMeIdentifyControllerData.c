@@ -1109,12 +1109,13 @@ static void s_vPrintNVMeIdentifyControllerDataMEGCAP(PMY_NVME_IDENTIFY_CONTROLLE
             }
             else
             {
-                printf("0x%016llX (byte)\n", _pstController->MEGCAP_L);
+                printf("0x%016llX (byte), about %llu GiB\n", _pstController->MEGCAP_L, _pstController->MEGCAP_L >> 30);
             }
         }
         else
         {
-            printf("0x%016llX%016llX (byte)\n", _pstController->MEGCAP_H, _pstController->MEGCAP_L);
+            uint64_t megcap_in_gib = (((_pstController->MEGCAP_H) << 34) | ((_pstController->MEGCAP_L) >> 30));
+            printf("0x%016llX%016llX (byte), about %llu GiB\n", _pstController->MEGCAP_H, _pstController->MEGCAP_L, megcap_in_gib);
         }
     }
     else
