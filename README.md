@@ -104,14 +104,26 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        01h | Controller                                          | x    | CNTID = 0 |
 |        02h | Active Namespace ID list                            |      | returned data seems to be the data for Identify Namespace |
 |        03h | Namespace Identification Descriptor list            |      | returned data seems to be the data for Identify Namespace |
-| 04h -- 0Fh | _Reserved_                                          |      | |
+|        04h | NVM Set list                                        |      | |
+|        05h | I/O Command Set specific Identify Namespace data structure || NSID = 1 |
+|        06h | I/O Command Set specific Identify Controller data structure || CNTID = 0 |
+|        07h | Active Namespace ID list associated with the specified I/O Command Set |||
+|        08h | I/O Command Set Independent Identify Namespace data structure || NSID = 1 |
+| 09h -- 0Fh | _Reserved_                                          |      | |
 |        10h | Allocated Namespace ID list                         |      | Probably can issue only in WinPE mode [8]            |
 |        11h | Specified allocated namespace                       |      | Probably can issue only in WinPE mode [8]            |
 |        12h | List of controllers attached to specified namespace |      | Probably can issue only in WinPE mode [8]            |
 |        13h | List of controllers exist in the NVM subsystem      |      | Probably can issue only in WinPE mode [8]            |
 |        14h | Primary Controller Capabilities                     |      | Probably cannot issue [8]                            |
 |        15h | Secondary controller list                           |      | Probably cannot issue [8]                            |
-| 16h -- 1Fh | _Reserved_                                          |      | |
+|        16h | Namespace Granularity List                          |      | |
+|        17h | UUID List                                           |      | |
+|        18h | Domain List                                         |      | |
+|        19h | Endurance Group List                                |      | |
+|        1Ah | I/O Command Set specific Allocated Namespace ID list |     | |
+|        1Bh | I/O Command Set specific Identify Namespace data structure |||
+|        1Ch | I/O Command Set data structure                      |      | |
+| 1Dh -- 1Fh | _Reserved_                                          |      | Spec says CNS "18h to 1Fh" are reserved, I think it's typo. |
 | 20h -- FFh | _Reserved_                                          |      | |
 
 ## Log Identifier (LID) for Get Log Page command
@@ -126,6 +138,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        01h | Error Information              | x    | Number of entries to be retrieved from devices depends on the value "ELPE" in Identify Controller data |
 |        02h | SMART / Health Information     | x    | CNTID = 0, NSID = 0xFFFFFFFh |
 |        03h | Firmware Slot Information      | x    | |
+|        04h | Changed Namespace List         |      | |
 |        05h | Command Supported and Effects  | x    | |
 |        06h | Device Self-test               | x    | |
 |        07h | Telemetry Host-initiated       | x    | Getting header only. see also Note 1. |
@@ -137,7 +150,14 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        0Dh | Persistent Event Log           |      | |
 |        0Eh | LBA Status Information         |      | |
 |        0Fh | Endurance Group Event Aggregate | --   | error code = 1117 (The request could not be performed because of an I/O device error.) |
-| 10h -- 6Fh | _Reserved_                     |      | |
+|        10h | Media Unit Status              |      | |
+|        11h | Supported Capacity Configuration List |||
+|        12h | Feature Identifiers Supported and Effects |||
+|        13h | NVMe-MI Commands Supported and Effects |||
+|        14h | Command and Feature Lockdown   |      | |
+|        15h | Boot Partition                 |      | |
+|        16h | Rotational Media Information   |      | |
+| 17h -- 6Fh | _Reserved_                     |      | |
 |        70h | Discovery                      |      | For NVMe over Fabrics (NVMeoF) |
 | 71h -- 7Fh | _Reserved for NVMeoF_          |      | |
 |        80h | Reservation Notification       |      | Probably cannot issue [8] |
@@ -181,8 +201,13 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        16h | Host Behavior Support              |  /               |      |
 |        17h | Sanitize Config                    |  /               |      |
 |        18h | Endurance Group Event Configuration |  /              |      |
-| 19h -- 77h | _Reserved_                         |  /               |      |
-| 78h -- 7Fh | _Refer to the NVMe-MI spec._       |  /               |      |
+|        19h | I/O Command Set Profile            | /                |      |
+|        1Ah | Spinup Control                     | /                |      |
+| 1Bh -- 77h | _Reserved_                         |  /               |      |
+| 78h -- 7Ch | _Refer to the NVMe-MI spec._       |  /               |      |
+|        7Dh | Enhanced Controller Metadata       |  /               |      |
+|        7Eh | Controller Metadata                |  /               |      |
+|        7Fh | Namespace Metadata                 |  /               |      |
 |        80h | Software Progress Marker           | x /              |      |
 |        81h | Host Identifier                    |  /               |      |
 |        82h | Reservation Notification Mask      |  /               | 1    |
