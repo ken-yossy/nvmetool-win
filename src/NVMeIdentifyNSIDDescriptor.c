@@ -19,18 +19,23 @@ static void printNVMeIdentifyNSIDDescriptor(PNVME_IDENTIFY_NSID_DESCRIPTOR _pNSD
     printf("[O] Namespace Identifier Type (NIDT): ");
     if (_pNSData->NIDT == 0x1)
     {
-        printf("01h (IEEE Extended Unique Identifier, 8 byte)\n");
+        printf("01h (IEEE Extended Unique Identifier)\n");
         iExpectedNIDL = 8;
     }
     else if (_pNSData->NIDT == 0x2)
     {
-        printf("02h (Namespace Globally Unique Identifier, 16 byte)\n");
+        printf("02h (Namespace Globally Unique Identifier)\n");
         iExpectedNIDL = 16;
     }
     else if (_pNSData->NIDT == 0x3)
     {
-        printf("03h (Namespace UUID, 16 byte)\n");
+        printf("03h (Namespace UUID)\n");
         iExpectedNIDL = 16;
+    }
+    else if (_pNSData->NIDT == 0x4)
+    {
+        printf("04h (Command Set Identifier)\n");
+        iExpectedNIDL = 1;
     }
     else
     {
@@ -50,10 +55,10 @@ static void printNVMeIdentifyNSIDDescriptor(PNVME_IDENTIFY_NSID_DESCRIPTOR _pNSD
         return;
     }
 
-    printf("[O] Namespace Identifier (NID): ");
+    printf("[O] Namespace Identifier (NID): 0x");
     for (int i = 0; i < iExpectedNIDL; i++)
     {
-        printf("%c", (unsigned char)(_pNSData->NID[i]));
+        printf("%02X", (unsigned char)(_pNSData->NID[i]));
     }
     printf("\n");
 }
@@ -94,7 +99,8 @@ int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID)
     protocolData->ProtocolType = ProtocolTypeNvme;
     protocolData->DataType = NVMeDataTypeIdentify;
     protocolData->ProtocolDataRequestValue = NVME_IDENTIFY_CNS_DESCRIPTOR_NAMESPACE;
-    protocolData->ProtocolDataRequestSubValue = _dwNSID;
+    //    protocolData->ProtocolDataRequestSubValue = _dwNSID;
+    protocolData->ProtocolDataRequestSubValue = 0;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = sizeof(NVME_IDENTIFY_NSID_DESCRIPTOR);
 

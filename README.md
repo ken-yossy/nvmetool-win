@@ -103,7 +103,7 @@ Legend for "Status" column: "x" => can issue, "--" => cannot issue, " "(_blank_)
 |        00h | Namespace                                           | x    | NSID = 1 |
 |        01h | Controller                                          | x    | CNTID = 0 |
 |        02h | Active Namespace ID list                            |      | we can't specify NSID... and seems no data is returned... |
-|        03h | Namespace Identification Descriptor list            |      | returned data seems to be the data for Identify Namespace |
+|        03h | Namespace Identification Descriptor list            | x    | |
 |        04h | NVM Set list                                        |      | |
 |        05h | I/O Command Set specific Identify Namespace data structure || NSID = 1 |
 |        06h | I/O Command Set specific Identify Controller data structure || CNTID = 0 |
