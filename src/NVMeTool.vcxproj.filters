@@ -108,6 +108,9 @@
     <ClInclude Include="NVMeGetSupportedLogPages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NVMeIdentifyIOCSNamespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NVMeCommandSupportedAndEffects.c">
@@ -201,6 +204,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NVMeGetSupportedLogPages.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NVMeIdentifyIOCSNamespace.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

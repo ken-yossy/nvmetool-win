@@ -124,6 +124,19 @@ typedef struct
     uint8_t     VS[3712];               // byte [4095: 384] O - Vendor Specific (VS)
 } MY_NVME_IDENTIFY_NAMESPACE_DATA, * PMY_NVME_IDENTIFY_NAMESPACE_DATA;
 
+static MY_NVME_IDENTIFY_NAMESPACE_DATA g_stNamespaceData;
+static bool g_bNamespaceAlreadyIdentified = false;
+
+bool bNamespaceSupportPI(uint32_t _ulNSID)
+{
+    return (g_stNamespaceData.DPS.ProtectionInfoTypeEnabled == 0) ? false : true;
+}
+
+bool bNamespaceAlreadyIdentified(uint32_t _ulNSID)
+{
+    return g_bNamespaceAlreadyIdentified;
+}
+
 static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNSData, DWORD _dwNSID)
 {
     uint32_t uiLBAF  = 0; // index of current format (index for LBAF)
@@ -673,7 +686,7 @@ static void printNVMeIdentifyNamespaceData(PMY_NVME_IDENTIFY_NAMESPACE_DATA _pNS
     }
 }
 
-int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
+int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID, bool _bPrintOrNot)
 {
     int     iResult = -1;
     PVOID   buffer = NULL;
@@ -683,6 +696,12 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
     PSTORAGE_PROPERTY_QUERY query = NULL;
     PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
     PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
+
+    if (bNamespaceAlreadyIdentified(_dwNSID))
+    {
+        printf("[I] Identify Namespace data has already retrieved.\n");
+        goto print_ns_data;
+    }
 
     // Allocate buffer for use.
     bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
@@ -747,10 +766,12 @@ int iNVMeIdentifyNamespace(HANDLE _hDevice, DWORD _dwNSID)
         goto error_exit;
     }
 
+    memcpy_s((void*)(&g_stNamespaceData), sizeof(MY_NVME_IDENTIFY_NAMESPACE_DATA), (uint8_t*)protocolData + protocolData->ProtocolDataOffset, sizeof(MY_NVME_IDENTIFY_NAMESPACE_DATA));
+    g_bNamespaceAlreadyIdentified = true;
+
     // Identify Namespace
-    printNVMeIdentifyNamespaceData(
-        (PMY_NVME_IDENTIFY_NAMESPACE_DATA)((PCHAR)protocolData + protocolData->ProtocolDataOffset),
-        _dwNSID);
+print_ns_data:
+    if( _bPrintOrNot ) printNVMeIdentifyNamespaceData(&g_stNamespaceData, _dwNSID);
     iResult = 0; // succeeded
 
 error_exit:
