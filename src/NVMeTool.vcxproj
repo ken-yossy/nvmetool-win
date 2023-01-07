@@ -180,12 +180,14 @@
     <ClInclude Include="NVMeIdentifyActiveNSIDList.h" />
     <ClInclude Include="NVMeIdentifyController.h" />
     <ClInclude Include="NVMeIdentifyControllerData.h" />
+    <ClInclude Include="NVMeIdentifyIOCSNamespace.h" />
     <ClInclude Include="NVMeIdentifyNamespace.h" />
     <ClInclude Include="NVMeIdentifyNSIDDescriptor.h" />
     <ClInclude Include="NVMeSCSIPassThrough.h" />
     <ClInclude Include="NVMeGetFeatures.h" />
     <ClInclude Include="NVMeSetFeatures.h" />
     <ClInclude Include="NVMeSMART.h" />
+    <ClInclude Include="NVMeGetSupportedLogPages.h" />
     <ClInclude Include="NVMeUtils.h" />
     <ClInclude Include="WinFunc.h" />
   </ItemGroup>
@@ -211,11 +213,13 @@
     <ClCompile Include="NVMeIdentifyActiveNSIDList.c" />
     <ClCompile Include="NVMeIdentifyController.c" />
     <ClCompile Include="NVMeIdentifyControllerData.c" />
+    <ClCompile Include="NVMeIdentifyIOCSNamespace.c" />
     <ClCompile Include="NVMeIdentifyNamespace.c" />
     <ClCompile Include="NVMeGetFeatures.c" />
     <ClCompile Include="NVMeIdentifyNSIDDescriptor.c" />
     <ClCompile Include="NVMeSetFeatures.c" />
     <ClCompile Include="NVMeSMART.c" />
+    <ClCompile Include="NVMeGetSupportedLogPages.c" />
     <ClCompile Include="NVMeTool.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
