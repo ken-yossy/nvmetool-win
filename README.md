@@ -1,5 +1,7 @@
 # nvmetool-win: Sample program of accessing NVMe device using Windows' inbox NVMe driver
 
+![build test](https://github.com/ken-yossy/nvmetool-win/actions/workflows/msbuild.yml/badge.svg)
+
 ## Abstract
 This software demonstrates that issuing some NVMe commands from userland to NVMe device using Windows inbox NVMe driver (stornvme.sys)[1].
 
