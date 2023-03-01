@@ -99,8 +99,7 @@ void vGetOSVersion(void) {
     // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_osversioninfoexw
     if ((osInfo.dwMajorVersion == 10) && (osInfo.dwMinorVersion == 0) &&
         (osInfo.wProductType ==
-         VER_NT_WORKSTATION))  // not Windows Server 2016/2019
-    {
+         VER_NT_WORKSTATION)) {  // not Windows Server 2016/2019
         s_dwOSBuildNumber = osInfo.dwBuildNumber;
         s_dwOSMajorVersion = osInfo.dwMajorVersion;
         if (22000 <= s_dwOSBuildNumber) {
