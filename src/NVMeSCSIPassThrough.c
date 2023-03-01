@@ -1,187 +1,170 @@
-#include <windows.h>
-#include <stdio.h>
-#include <ntddscsi.h>
 #include <intsafe.h>
+#include <stdio.h>
+#include <windows.h>
+
+#include <ntddscsi.h>
 
 #define _NTSCSI_USER_MODE_
 #include <scsi.h>
 
-#include "WinFunc.h"
 #include "NVMeUtils.h"
+#include "WinFunc.h"
 
 #define SPT_CDB_LENGTH 32
 #define SPT_SENSE_LENGTH 32
 #define SPTWB_DATA_LENGTH 512
 
-typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS
-{
+typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
     SCSI_PASS_THROUGH spt;
-    ULONG             Filler;      // realign buffers to double word boundary
-    UCHAR             ucSenseBuf[SPT_SENSE_LENGTH];
-    UCHAR             ucDataBuf[SPTWB_DATA_LENGTH];
+    ULONG Filler;  // realign buffers to double word boundary
+    UCHAR ucSenseBuf[SPT_SENSE_LENGTH];
+    UCHAR ucDataBuf[SPTWB_DATA_LENGTH];
 } SCSI_PASS_THROUGH_WITH_BUFFERS, *PSCSI_PASS_THROUGH_WITH_BUFFERS;
 
-typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER
-{
+typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER {
     SCSI_PASS_THROUGH_DIRECT sptd;
-    ULONG             Filler;      // realign buffer to double word boundary
-    UCHAR             ucSenseBuf[SPT_SENSE_LENGTH];
+    ULONG Filler;  // realign buffer to double word boundary
+    UCHAR ucSenseBuf[SPT_SENSE_LENGTH];
 } SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, *PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER;
 
-typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS_EX
-{
+typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS_EX {
     SCSI_PASS_THROUGH_EX spt;
-    UCHAR             ucCdbBuf[SPT_CDB_LENGTH - 1];       // cushion for spt.Cdb
-    ULONG             Filler;      // realign buffers to double word boundary
-    STOR_ADDR_BTL8    StorAddress;
-    UCHAR             ucSenseBuf[SPT_SENSE_LENGTH];
-    UCHAR             ucDataBuf[SPTWB_DATA_LENGTH];     // buffer for DataIn or DataOut
+    UCHAR ucCdbBuf[SPT_CDB_LENGTH - 1];  // cushion for spt.Cdb
+    ULONG Filler;  // realign buffers to double word boundary
+    STOR_ADDR_BTL8 StorAddress;
+    UCHAR ucSenseBuf[SPT_SENSE_LENGTH];
+    UCHAR ucDataBuf[SPTWB_DATA_LENGTH];  // buffer for DataIn or DataOut
 } SCSI_PASS_THROUGH_WITH_BUFFERS_EX, *PSCSI_PASS_THROUGH_WITH_BUFFERS_EX;
 
-typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX
-{
+typedef struct _SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX {
     SCSI_PASS_THROUGH_DIRECT_EX sptd;
-    UCHAR             ucCdbBuf[SPT_CDB_LENGTH - 1];       // cushion for sptd.Cdb
-    ULONG             Filler;      // realign buffer to double word boundary
-    STOR_ADDR_BTL8    StorAddress;
-    UCHAR             ucSenseBuf[SPT_SENSE_LENGTH];
-} SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, *PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX;
+    UCHAR ucCdbBuf[SPT_CDB_LENGTH - 1];  // cushion for sptd.Cdb
+    ULONG Filler;  // realign buffer to double word boundary
+    STOR_ADDR_BTL8 StorAddress;
+    UCHAR ucSenseBuf[SPT_SENSE_LENGTH];
+} SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX,
+    *PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX;
 
-#define CDB6GENERIC_LENGTH                   6
-#define CDB10GENERIC_LENGTH                  10
-#define CDB12GENERIC_LENGTH                  12
-#define SETBITON                             1
-#define SETBITOFF                            0
+#define CDB6GENERIC_LENGTH 6
+#define CDB10GENERIC_LENGTH 10
+#define CDB12GENERIC_LENGTH 12
+#define SETBITON 1
+#define SETBITOFF 0
 
 #define BOOLEAN_TO_STRING(_b_) ((_b_) ? "True" : "False")
 
 #if defined(_X86_)
-#define PAGE_SIZE  0x1000
+#define PAGE_SIZE 0x1000
 #define PAGE_SHIFT 12L
 #elif defined(_AMD64_)
-#define PAGE_SIZE  0x1000
+#define PAGE_SIZE 0x1000
 #define PAGE_SHIFT 12L
 #elif defined(_IA64_)
 #define PAGE_SIZE 0x2000
 #define PAGE_SHIFT 13L
 #else
 // undefined platform?
-#define PAGE_SIZE  0x1000
+#define PAGE_SIZE 0x1000
 #define PAGE_SHIFT 12L
 #endif
 
 LPCSTR BusTypeStrings[] = {
-    "Unknown",
-    "Scsi",
-    "Atapi",
-    "Ata",
-    "1394",
-    "Ssa",
-    "Fibre",
-    "Usb",
-    "RAID",
-    "Not Defined",
+    "Unknown", "Scsi",  "Atapi", "Ata",  "1394",
+    "Ssa",     "Fibre", "Usb",   "RAID", "Not Defined",
 };
 
-#define NUMBER_OF_BUS_TYPE_STRINGS (sizeof(BusTypeStrings)/sizeof(BusTypeStrings[0]))
+#define NUMBER_OF_BUS_TYPE_STRINGS \
+    (sizeof(BusTypeStrings) / sizeof(BusTypeStrings[0]))
 
-static void PrintSenseInfo(PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb)
-{
+static void PrintSenseInfo(PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb) {
     UCHAR i;
 
     fprintf(stderr, "Scsi status: %02Xh\n\n", psptwb->spt.ScsiStatus);
     if (psptwb->spt.SenseInfoLength == 0) return;
 
     fprintf(stderr, "Sense Info -- consult SCSI spec for details\n");
-    fprintf(stderr, "-------------------------------------------------------------\n");
-    for (i = 0; i < psptwb->spt.SenseInfoLength; i++)
-    {
+    fprintf(stderr,
+            "-------------------------------------------------------------\n");
+    for (i = 0; i < psptwb->spt.SenseInfoLength; i++) {
         fprintf(stderr, "%02X ", psptwb->ucSenseBuf[i]);
     }
     fprintf(stderr, "\n\n");
 }
 
-static void PrintSenseInfoEx(PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex)
-{
+static void PrintSenseInfoEx(PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex) {
     ULONG i;
 
     fprintf(stderr, "Scsi status: %02Xh\n\n", psptwb_ex->spt.ScsiStatus);
-    if (psptwb_ex->spt.SenseInfoLength == 0)
-    {
+    if (psptwb_ex->spt.SenseInfoLength == 0) {
         fprintf(stderr, "No sense information is available.\n\n");
         return;
     }
 
     fprintf(stderr, "Sense Info -- consult SCSI spec for details\n");
-    fprintf(stderr, "-------------------------------------------------------------\n");
-    for (i = 0; i < psptwb_ex->spt.SenseInfoLength; i++)
-    {
+    fprintf(stderr,
+            "-------------------------------------------------------------\n");
+    for (i = 0; i < psptwb_ex->spt.SenseInfoLength; i++) {
         fprintf(stderr, "%02X ", psptwb_ex->ucSenseBuf[i]);
     }
     fprintf(stderr, "\n\n");
 }
 
-static void PrintStatusResultsExDIn(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex, ULONG length)
-{
-    if (status)
-    {
-        vPrintSystemError( GetLastError(), "(Unknown)" );
-        return;
-    }
-
-    if (psptwb_ex->spt.ScsiStatus)
-    {
-        PrintSenseInfoEx(psptwb_ex);
-        return;
-    }
-    else
-    {
-        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
-        printf("DataOut buffer length: %Xh, DataIn buffer length: %Xh\n\n\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
-        PrintDataBuffer((PUCHAR)(psptwb_ex->ucDataBuf), length);
-    }
-}
-
-static void PrintStatusResultsExDOut(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex, ULONG length)
-{
-    if (status)
-    {
+static void PrintStatusResultsExDIn(
+    int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex,
+    ULONG length) {
+    if (status) {
         vPrintSystemError(GetLastError(), "(Unknown)");
         return;
     }
 
-    if (psptwb_ex->spt.ScsiStatus)
-    {
+    if (psptwb_ex->spt.ScsiStatus) {
         PrintSenseInfoEx(psptwb_ex);
         return;
-    }
-    else
-    {
-        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb_ex->spt.ScsiStatus, returned);
-        printf("DataOut buffer length: %Xh, DataIn buffer length: %Xh\n", psptwb_ex->spt.DataOutTransferLength, psptwb_ex->spt.DataInTransferLength);
+    } else {
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ",
+               psptwb_ex->spt.ScsiStatus, returned);
+        printf("DataOut buffer length: %Xh, DataIn buffer length: %Xh\n\n\n",
+               psptwb_ex->spt.DataOutTransferLength,
+               psptwb_ex->spt.DataInTransferLength);
+        PrintDataBuffer((PUCHAR)(psptwb_ex->ucDataBuf), length);
     }
 }
 
-static void PrintAdapterDescriptor(PSTORAGE_ADAPTER_DESCRIPTOR AdapterDescriptor)
-{
+static void PrintStatusResultsExDOut(
+    int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS_EX psptwb_ex,
+    ULONG length) {
+    if (status) {
+        vPrintSystemError(GetLastError(), "(Unknown)");
+        return;
+    }
+
+    if (psptwb_ex->spt.ScsiStatus) {
+        PrintSenseInfoEx(psptwb_ex);
+        return;
+    } else {
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ",
+               psptwb_ex->spt.ScsiStatus, returned);
+        printf("DataOut buffer length: %Xh, DataIn buffer length: %Xh\n",
+               psptwb_ex->spt.DataOutTransferLength,
+               psptwb_ex->spt.DataInTransferLength);
+    }
+}
+
+static void PrintAdapterDescriptor(
+    PSTORAGE_ADAPTER_DESCRIPTOR AdapterDescriptor) {
     ULONG trueMaximumTransferLength;
     LPCSTR busType;
 
     if (AdapterDescriptor->BusType < NUMBER_OF_BUS_TYPE_STRINGS) {
         busType = BusTypeStrings[AdapterDescriptor->BusType];
-    }
-    else
-    {
+    } else {
         busType = BusTypeStrings[NUMBER_OF_BUS_TYPE_STRINGS - 1];
     }
 
     // subtract one page, as transfers do not always start on a page boundary
-    if (AdapterDescriptor->MaximumPhysicalPages > 1)
-    {
+    if (AdapterDescriptor->MaximumPhysicalPages > 1) {
         trueMaximumTransferLength = AdapterDescriptor->MaximumPhysicalPages - 1;
-    }
-    else
-    {
+    } else {
         trueMaximumTransferLength = 1;
     }
 
@@ -189,19 +172,18 @@ static void PrintAdapterDescriptor(PSTORAGE_ADAPTER_DESCRIPTOR AdapterDescriptor
     trueMaximumTransferLength <<= PAGE_SHIFT;
 
     // take the minimum of the two
-    if (trueMaximumTransferLength > AdapterDescriptor->MaximumTransferLength)
-    {
+    if (trueMaximumTransferLength > AdapterDescriptor->MaximumTransferLength) {
         trueMaximumTransferLength = AdapterDescriptor->MaximumTransferLength;
     }
 
     // always allow at least a single page transfer
-    if (trueMaximumTransferLength < PAGE_SIZE)
-    {
+    if (trueMaximumTransferLength < PAGE_SIZE) {
         trueMaximumTransferLength = PAGE_SIZE;
     }
 
     printf("\n            ***** STORAGE ADAPTER DESCRIPTOR DATA *****");
-    printf("              Version: %08x\n"
+    printf(
+        "              Version: %08x\n"
         "            TotalSize: %08x\n"
         "MaximumTransferLength: %08x (bytes)\n"
         " MaximumPhysicalPages: %08x\n"
@@ -214,66 +196,59 @@ static void PrintAdapterDescriptor(PSTORAGE_ADAPTER_DESCRIPTOR AdapterDescriptor
         "             Bus Type: %s\n"
         "    Bus Major Version: %04x\n"
         "    Bus Minor Version: %04x\n",
-        AdapterDescriptor->Version,
-        AdapterDescriptor->Size,
+        AdapterDescriptor->Version, AdapterDescriptor->Size,
         AdapterDescriptor->MaximumTransferLength,
-        AdapterDescriptor->MaximumPhysicalPages,
-        trueMaximumTransferLength,
+        AdapterDescriptor->MaximumPhysicalPages, trueMaximumTransferLength,
         AdapterDescriptor->AlignmentMask,
         BOOLEAN_TO_STRING(AdapterDescriptor->AdapterUsesPio),
         BOOLEAN_TO_STRING(AdapterDescriptor->AdapterScansDown),
         BOOLEAN_TO_STRING(AdapterDescriptor->CommandQueueing),
-        BOOLEAN_TO_STRING(AdapterDescriptor->AcceleratedTransfer),
-        busType,
-        AdapterDescriptor->BusMajorVersion,
-        AdapterDescriptor->BusMinorVersion);
+        BOOLEAN_TO_STRING(AdapterDescriptor->AcceleratedTransfer), busType,
+        AdapterDescriptor->BusMajorVersion, AdapterDescriptor->BusMinorVersion);
 
     printf("\n\n");
 }
 
-static void PrintDeviceDescriptor(PSTORAGE_DEVICE_DESCRIPTOR DeviceDescriptor)
-{
+static void PrintDeviceDescriptor(PSTORAGE_DEVICE_DESCRIPTOR DeviceDescriptor) {
     LPCSTR vendorId = "";
     LPCSTR productId = "";
     LPCSTR productRevision = "";
     LPCSTR serialNumber = "";
     LPCSTR busType;
 
-    if ((ULONG)DeviceDescriptor->BusType < NUMBER_OF_BUS_TYPE_STRINGS)
-    {
+    if ((ULONG)DeviceDescriptor->BusType < NUMBER_OF_BUS_TYPE_STRINGS) {
         busType = BusTypeStrings[DeviceDescriptor->BusType];
-    }
-    else
-    {
+    } else {
         busType = BusTypeStrings[NUMBER_OF_BUS_TYPE_STRINGS - 1];
     }
 
-    if ((DeviceDescriptor->ProductIdOffset != 0) &&	(DeviceDescriptor->ProductIdOffset != -1))
-    {
+    if ((DeviceDescriptor->ProductIdOffset != 0) &&
+        (DeviceDescriptor->ProductIdOffset != -1)) {
         productId = (LPCSTR)(DeviceDescriptor);
         productId += (ULONG_PTR)DeviceDescriptor->ProductIdOffset;
     }
 
-    if ((DeviceDescriptor->VendorIdOffset != 0) && (DeviceDescriptor->VendorIdOffset != -1))
-    {
+    if ((DeviceDescriptor->VendorIdOffset != 0) &&
+        (DeviceDescriptor->VendorIdOffset != -1)) {
         vendorId = (LPCSTR)(DeviceDescriptor);
         vendorId += (ULONG_PTR)DeviceDescriptor->VendorIdOffset;
     }
 
-    if ((DeviceDescriptor->ProductRevisionOffset != 0) && (DeviceDescriptor->ProductRevisionOffset != -1))
-    {
+    if ((DeviceDescriptor->ProductRevisionOffset != 0) &&
+        (DeviceDescriptor->ProductRevisionOffset != -1)) {
         productRevision = (LPCSTR)(DeviceDescriptor);
         productRevision += (ULONG_PTR)DeviceDescriptor->ProductRevisionOffset;
     }
 
-    if ((DeviceDescriptor->SerialNumberOffset != 0) && (DeviceDescriptor->SerialNumberOffset != -1))
-    {
+    if ((DeviceDescriptor->SerialNumberOffset != 0) &&
+        (DeviceDescriptor->SerialNumberOffset != -1)) {
         serialNumber = (LPCSTR)(DeviceDescriptor);
         serialNumber += (ULONG_PTR)DeviceDescriptor->SerialNumberOffset;
     }
 
     printf("\n            ***** STORAGE DEVICE DESCRIPTOR DATA *****");
-    printf("              Version: %08x\n"
+    printf(
+        "              Version: %08x\n"
         "            TotalSize: %08x\n"
         "           DeviceType: %08x\n"
         "   DeviceTypeModifier: %08x\n"
@@ -285,38 +260,32 @@ static void PrintDeviceDescriptor(PSTORAGE_DEVICE_DESCRIPTOR DeviceDescriptor)
         "        Serial Number: %s\n"
         "             Bus Type: %s\n"
         "       Raw Properties: %s\n",
-        DeviceDescriptor->Version,
-        DeviceDescriptor->Size,
-        DeviceDescriptor->DeviceType,
-        DeviceDescriptor->DeviceTypeModifier,
+        DeviceDescriptor->Version, DeviceDescriptor->Size,
+        DeviceDescriptor->DeviceType, DeviceDescriptor->DeviceTypeModifier,
         BOOLEAN_TO_STRING(DeviceDescriptor->RemovableMedia),
-        BOOLEAN_TO_STRING(DeviceDescriptor->CommandQueueing),
-        vendorId,
-        productId,
-        productRevision,
-        serialNumber,
-        busType,
+        BOOLEAN_TO_STRING(DeviceDescriptor->CommandQueueing), vendorId,
+        productId, productRevision, serialNumber, busType,
         (DeviceDescriptor->RawPropertiesLength ? "Follows" : "None"));
 
-    if (DeviceDescriptor->RawPropertiesLength != 0)
-    {
-        PrintDataBuffer(DeviceDescriptor->RawDeviceProperties, DeviceDescriptor->RawPropertiesLength);
+    if (DeviceDescriptor->RawPropertiesLength != 0) {
+        PrintDataBuffer(DeviceDescriptor->RawDeviceProperties,
+                        DeviceDescriptor->RawPropertiesLength);
     }
 
     printf("\n\n");
 }
 
-static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PUCHAR SrbType)
-{
+static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask,
+                                   PUCHAR SrbType) {
     PSTORAGE_ADAPTER_DESCRIPTOR adapterDescriptor = NULL;
     PSTORAGE_DEVICE_DESCRIPTOR deviceDescriptor = NULL;
-    STORAGE_DESCRIPTOR_HEADER header = { 0 };
+    STORAGE_DESCRIPTOR_HEADER header = {0};
     int ng = 0;
     BOOL status = false;
     ULONG i;
 
-    *AlignmentMask = 0; // default to no alignment
-    *SrbType = 0; // default to SCSI_REQUEST_BLOCK
+    *AlignmentMask = 0;  // default to no alignment
+    *SrbType = 0;        // default to SCSI_REQUEST_BLOCK
 
     // Loop twice:
     //  First, get size required for storage adapter descriptor
@@ -324,18 +293,15 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
     //  Third, get size required for storage device descriptor
     //  Fourth, allocate and retrieve storage device descriptor
 
-    for (i = 0; i < 4; i++)
-    {
+    for (i = 0; i < 4; i++) {
         PVOID buffer = NULL;
         ULONG bufferSize = 0;
         ULONG returnedData;
         STORAGE_PROPERTY_QUERY query;
-        ZeroMemory((void*)(&query), sizeof(STORAGE_PROPERTY_QUERY));
+        ZeroMemory((void *)(&query), sizeof(STORAGE_PROPERTY_QUERY));
 
-        switch (i)
-        {
-        case 0:
-            {
+        switch (i) {
+            case 0: {
                 query.QueryType = PropertyStandardQuery;
                 query.PropertyId = StorageAdapterProperty;
                 bufferSize = sizeof(STORAGE_DESCRIPTOR_HEADER);
@@ -343,14 +309,13 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
                 break;
             }
 
-        case 1:
-            {
+            case 1: {
                 query.QueryType = PropertyStandardQuery;
                 query.PropertyId = StorageAdapterProperty;
                 bufferSize = header.Size;
-                if (bufferSize != 0)
-                {
-                    adapterDescriptor = (PSTORAGE_ADAPTER_DESCRIPTOR)LocalAlloc(LPTR, bufferSize);
+                if (bufferSize != 0) {
+                    adapterDescriptor = (PSTORAGE_ADAPTER_DESCRIPTOR)LocalAlloc(
+                        LPTR, bufferSize);
                     if (adapterDescriptor == NULL) {
                         goto Cleanup;
                     }
@@ -359,8 +324,7 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
                 break;
             }
 
-        case 2:
-            {
+            case 2: {
                 query.QueryType = PropertyStandardQuery;
                 query.PropertyId = StorageDeviceProperty;
                 bufferSize = sizeof(STORAGE_DESCRIPTOR_HEADER);
@@ -368,14 +332,13 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
                 break;
             }
 
-        case 3:
-            {
+            case 3: {
                 query.QueryType = PropertyStandardQuery;
                 query.PropertyId = StorageDeviceProperty;
                 bufferSize = header.Size;
-                if (bufferSize != 0)
-                {
-                    deviceDescriptor = (PSTORAGE_DEVICE_DESCRIPTOR)LocalAlloc(LPTR, bufferSize);
+                if (bufferSize != 0) {
+                    deviceDescriptor = (PSTORAGE_DEVICE_DESCRIPTOR)LocalAlloc(
+                        LPTR, bufferSize);
                     if (deviceDescriptor == NULL) {
                         goto Cleanup;
                     }
@@ -386,37 +349,23 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
         }
 
         // buffer can be NULL if the property queried DNE.
-        if (buffer != NULL)
-        {
+        if (buffer != NULL) {
             RtlZeroMemory(buffer, bufferSize);
 
             // all setup, do the ioctl
-            ng = iIssueDeviceIoControl(
-                DeviceHandle,
-                IOCTL_STORAGE_QUERY_PROPERTY,
-                &query,
-                sizeof(STORAGE_PROPERTY_QUERY),
-                buffer,
-                bufferSize,
-                &returnedData,
-                FALSE);
+            ng = iIssueDeviceIoControl(DeviceHandle,
+                                       IOCTL_STORAGE_QUERY_PROPERTY, &query,
+                                       sizeof(STORAGE_PROPERTY_QUERY), buffer,
+                                       bufferSize, &returnedData, FALSE);
 
-            if (ng)
-            {
-                if (GetLastError() == ERROR_MORE_DATA)
-                {
+            if (ng) {
+                if (GetLastError() == ERROR_MORE_DATA) {
                     // this is ok, we'll ignore it here
-                }
-                else if (GetLastError() == ERROR_INVALID_FUNCTION)
-                {
+                } else if (GetLastError() == ERROR_INVALID_FUNCTION) {
                     // this is also ok, the property DNE
-                }
-                else if (GetLastError() == ERROR_NOT_SUPPORTED)
-                {
+                } else if (GetLastError() == ERROR_NOT_SUPPORTED) {
                     // this is also ok, the property DNE
-                }
-                else
-                {
+                } else {
                     // some unexpected error -- exit out
                     goto Cleanup;
                 }
@@ -425,117 +374,106 @@ static BOOL QueryPropertyForDevice(HANDLE DeviceHandle, PULONG AlignmentMask, PU
                 RtlZeroMemory(buffer, bufferSize);
             }
         }
-    } // end i loop
+    }  // end i loop
 
     // adapterDescriptor is now allocated and full of data.
     // deviceDescriptor is now allocated and full of data.
-    if (adapterDescriptor == NULL)
-    {
-        fprintf(stderr, "   ***** No adapter descriptor supported on the device *****\n");
-    }
-    else
-    {
+    if (adapterDescriptor == NULL) {
+        fprintf(
+            stderr,
+            "   ***** No adapter descriptor supported on the device *****\n");
+    } else {
         // PrintAdapterDescriptor(adapterDescriptor);
         *AlignmentMask = adapterDescriptor->AlignmentMask;
         *SrbType = adapterDescriptor->SrbType;
         status = true;
     }
 
-    if (deviceDescriptor == NULL)
-    {
-        fprintf(stderr, "   ***** No device descriptor supported on the device  *****\n");
-    }
-    else
-    {
+    if (deviceDescriptor == NULL) {
+        fprintf(
+            stderr,
+            "   ***** No device descriptor supported on the device  *****\n");
+    } else {
         // PrintDeviceDescriptor(deviceDescriptor);
         status = true;
     }
 
 Cleanup:
 
-    if (adapterDescriptor != NULL)
-    {
+    if (adapterDescriptor != NULL) {
         LocalFree(adapterDescriptor);
     }
 
-    if (deviceDescriptor != NULL)
-    {
+    if (deviceDescriptor != NULL) {
         LocalFree(deviceDescriptor);
     }
 
     return status;
 }
 
-static void PrintStatusResultsDIn(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb, ULONG length)
-{
-    if (status)
-    {
-        vPrintSystemError( GetLastError(), "(Unknown)" );
+static void PrintStatusResultsDIn(int status, DWORD returned,
+                                  PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb,
+                                  ULONG length) {
+    if (status) {
+        vPrintSystemError(GetLastError(), "(Unknown)");
         return;
     }
 
-    if (psptwb->spt.ScsiStatus)
-    {
+    if (psptwb->spt.ScsiStatus) {
         PrintSenseInfo(psptwb);
         return;
-    }
-    else
-    {
-        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
+    } else {
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ",
+               psptwb->spt.ScsiStatus, returned);
         printf("Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
         PrintDataBuffer((PUCHAR)(psptwb->ucDataBuf), length);
     }
 }
 
-static void PrintStatusResultsDOut(int status, DWORD returned, PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb, ULONG length)
-{
-    if (status)
-    {
+static void PrintStatusResultsDOut(int status, DWORD returned,
+                                   PSCSI_PASS_THROUGH_WITH_BUFFERS psptwb,
+                                   ULONG length) {
+    if (status) {
         vPrintSystemError(GetLastError(), "(Unknown)");
         return;
     }
 
-    if (psptwb->spt.ScsiStatus)
-    {
+    if (psptwb->spt.ScsiStatus) {
         PrintSenseInfo(psptwb);
         return;
-    }
-    else
-    {
-        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ", psptwb->spt.ScsiStatus, returned);
+    } else {
+        printf("Scsi status: %02Xh (Succeeded), Bytes returned: %Xh, ",
+               psptwb->spt.ScsiStatus, returned);
         printf("Data buffer length: %Xh\n\n\n", psptwb->spt.DataTransferLength);
     }
 }
 
-static BOOL TestViaSCSIPassThrough(HANDLE _hDevice, PULONG _alignmentMask, PUCHAR _srbType)
-{
+static BOOL TestViaSCSIPassThrough(HANDLE _hDevice, PULONG _alignmentMask,
+                                   PUCHAR _srbType) {
     BOOL status = false;
     ULONG errorCode = 0;
 
     status = QueryPropertyForDevice(_hDevice, _alignmentMask, _srbType);
-    if (!status)
-    {
+    if (!status) {
         errorCode = GetLastError();
-        fprintf(stderr, "[E] Error getting device and/or adapter properties.\n");
-        vPrintSystemError( GetLastError(), "(Unknown)" );
+        fprintf(stderr,
+                "[E] Error getting device and/or adapter properties.\n");
+        vPrintSystemError(GetLastError(), "(Unknown)");
     }
 
     return status;
 }
 
-static PUCHAR AllocateAlignedBuffer(ULONG size, ULONG AlignmentMask, PUCHAR *pUnAlignedBuffer)
-{
+static PUCHAR AllocateAlignedBuffer(ULONG size, ULONG AlignmentMask,
+                                    PUCHAR *pUnAlignedBuffer) {
     PUCHAR ptr;
 
     UINT_PTR align64 = (UINT_PTR)AlignmentMask;
 
-    if (AlignmentMask == 0)
-    {
+    if (AlignmentMask == 0) {
         ptr = (PUCHAR)malloc(size);
         *pUnAlignedBuffer = ptr;
-    }
-    else
-    {
+    } else {
         ULONG totalSize;
         (void)ULongAdd(size, AlignmentMask, &totalSize);
         ptr = (PUCHAR)malloc(totalSize);
@@ -543,35 +481,33 @@ static PUCHAR AllocateAlignedBuffer(ULONG size, ULONG AlignmentMask, PUCHAR *pUn
         ptr = (PUCHAR)(((UINT_PTR)ptr + align64) & ~align64);
     }
 
-    if (ptr == NULL)
-    {
+    if (ptr == NULL) {
         vPrintSystemError(GetLastError(), "malloc");
     }
     return ptr;
 }
 
-int iWriteViaSCSIPassThrough(HANDLE _hDevice)
-{
+int iWriteViaSCSIPassThrough(HANDLE _hDevice) {
     SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
     SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX sptdwb_ex;
     int iResult = -1;
     ULONG length = 0, errorCode = 0, returned = 0, sectorSize = 512;
 
-    ULONG alignmentMask = 0; // default == no alignment requirement
-    UCHAR srbType = 0; // default == SRB_TYPE_SCSI_REQUEST_BLOCK
+    ULONG alignmentMask = 0;  // default == no alignment requirement
+    UCHAR srbType = 0;        // default == SRB_TYPE_SCSI_REQUEST_BLOCK
 
-    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false) return false;
+    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false)
+        return false;
 
-    if (srbType)
-    {
+    if (srbType) {
         PUCHAR pUnAlignedBuffer = NULL;
-        PUCHAR databuffer = (PUCHAR)AllocateAlignedBuffer(sectorSize, alignmentMask, &pUnAlignedBuffer);
+        PUCHAR databuffer = (PUCHAR)AllocateAlignedBuffer(
+            sectorSize, alignmentMask, &pUnAlignedBuffer);
         if (databuffer == NULL) return false;
 
         ZeroMemory(databuffer, 512);
 
-        for (int i = 0; i < 512 / 8; i++)
-        {
+        for (int i = 0; i < 512 / 8; i++) {
             databuffer[i * 8] = 'D';
             databuffer[i * 8 + 1] = 'E';
             databuffer[i * 8 + 2] = 'A';
@@ -583,50 +519,46 @@ int iWriteViaSCSIPassThrough(HANDLE _hDevice)
         }
 
         ZeroMemory(&sptdwb_ex, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX));
-        sptdwb_ex.sptd.Version                  = 0;
-        sptdwb_ex.sptd.Length                   = sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
-        sptdwb_ex.sptd.ScsiStatus               = 0;
-        sptdwb_ex.sptd.CdbLength                = CDB10GENERIC_LENGTH;
-        sptdwb_ex.sptd.StorAddressLength        = sizeof(STOR_ADDR_BTL8);
-        sptdwb_ex.sptd.SenseInfoLength          = SPT_SENSE_LENGTH;
-        sptdwb_ex.sptd.DataOutBuffer            = (PVOID)databuffer;
-        sptdwb_ex.sptd.DataOutTransferLength    = sectorSize;
-        sptdwb_ex.sptd.DataInTransferLength     = 0;
-        sptdwb_ex.sptd.DataDirection            = SCSI_IOCTL_DATA_OUT;
-        sptdwb_ex.sptd.TimeOutValue             = 5;
-        sptdwb_ex.sptd.StorAddressOffset        = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
-        sptdwb_ex.StorAddress.Type              = STOR_ADDRESS_TYPE_BTL8;
-        sptdwb_ex.StorAddress.Port              = 0;
-        sptdwb_ex.StorAddress.AddressLength     = STOR_ADDR_BTL8_ADDRESS_LENGTH;
-        sptdwb_ex.StorAddress.Path              = 0;
-        sptdwb_ex.StorAddress.Target            = 0;
-        sptdwb_ex.StorAddress.Lun               = 0;
-        sptdwb_ex.sptd.SenseInfoOffset          = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
-        sptdwb_ex.sptd.Cdb[0]                   = SCSIOP_WRITE;
-        sptdwb_ex.sptd.Cdb[5]                   = 0; // Starting LBA
-        sptdwb_ex.sptd.Cdb[8]                   = 1; // TRANSFER LENGTH
+        sptdwb_ex.sptd.Version = 0;
+        sptdwb_ex.sptd.Length = sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
+        sptdwb_ex.sptd.ScsiStatus = 0;
+        sptdwb_ex.sptd.CdbLength = CDB10GENERIC_LENGTH;
+        sptdwb_ex.sptd.StorAddressLength = sizeof(STOR_ADDR_BTL8);
+        sptdwb_ex.sptd.SenseInfoLength = SPT_SENSE_LENGTH;
+        sptdwb_ex.sptd.DataOutBuffer = (PVOID)databuffer;
+        sptdwb_ex.sptd.DataOutTransferLength = sectorSize;
+        sptdwb_ex.sptd.DataInTransferLength = 0;
+        sptdwb_ex.sptd.DataDirection = SCSI_IOCTL_DATA_OUT;
+        sptdwb_ex.sptd.TimeOutValue = 5;
+        sptdwb_ex.sptd.StorAddressOffset =
+            offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
+        sptdwb_ex.StorAddress.Type = STOR_ADDRESS_TYPE_BTL8;
+        sptdwb_ex.StorAddress.Port = 0;
+        sptdwb_ex.StorAddress.AddressLength = STOR_ADDR_BTL8_ADDRESS_LENGTH;
+        sptdwb_ex.StorAddress.Path = 0;
+        sptdwb_ex.StorAddress.Target = 0;
+        sptdwb_ex.StorAddress.Lun = 0;
+        sptdwb_ex.sptd.SenseInfoOffset =
+            offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
+        sptdwb_ex.sptd.Cdb[0] = SCSIOP_WRITE;
+        sptdwb_ex.sptd.Cdb[5] = 0;  // Starting LBA
+        sptdwb_ex.sptd.Cdb[8] = 1;  // TRANSFER LENGTH
 
         length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX);
         iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH_DIRECT_EX,
-            &sptdwb_ex,
-            sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX),
-            &sptdwb_ex,
-            length,
-            &returned,
-            FALSE);
+            _hDevice, IOCTL_SCSI_PASS_THROUGH_DIRECT_EX, &sptdwb_ex,
+            sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX), &sptdwb_ex, length,
+            &returned, FALSE);
 
-        PrintStatusResultsExDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataInTransferLength);
+        PrintStatusResultsExDOut(iResult, returned,
+                                 (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex,
+                                 sptdwb_ex.sptd.DataInTransferLength);
         free(pUnAlignedBuffer);
-    }
-    else
-    {
+    } else {
         UCHAR databuffer[512];
         ZeroMemory(databuffer, 512);
 
-        for (int i = 0; i < 512 / 8; i++)
-        {
+        for (int i = 0; i < 512 / 8; i++) {
             databuffer[i * 8] = 'D';
             databuffer[i * 8 + 1] = 'E';
             databuffer[i * 8 + 2] = 'A';
@@ -638,51 +570,47 @@ int iWriteViaSCSIPassThrough(HANDLE _hDevice)
         }
 
         ZeroMemory(&sptdwb, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER));
-        sptdwb.sptd.Length              = sizeof(SCSI_PASS_THROUGH_DIRECT);
-        sptdwb.sptd.PathId              = 0;
-        sptdwb.sptd.TargetId            = 0;
-        sptdwb.sptd.Lun                 = 0;
-        sptdwb.sptd.CdbLength           = CDB10GENERIC_LENGTH;
-        sptdwb.sptd.SenseInfoLength     = SPT_SENSE_LENGTH;
-        sptdwb.sptd.SenseInfoOffset     = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
-        sptdwb.sptd.DataIn              = SCSI_IOCTL_DATA_OUT;
-        sptdwb.sptd.DataTransferLength  = sectorSize;
-        sptdwb.sptd.TimeOutValue        = 5;
-        sptdwb.sptd.DataBuffer          = databuffer;
-        sptdwb.sptd.Cdb[0]              = SCSIOP_WRITE;
-        sptdwb.sptd.Cdb[5]              = 0; // Starting LBA
-        sptdwb.sptd.Cdb[8]              = 1; // TRANSFER LENGTH
+        sptdwb.sptd.Length = sizeof(SCSI_PASS_THROUGH_DIRECT);
+        sptdwb.sptd.PathId = 0;
+        sptdwb.sptd.TargetId = 0;
+        sptdwb.sptd.Lun = 0;
+        sptdwb.sptd.CdbLength = CDB10GENERIC_LENGTH;
+        sptdwb.sptd.SenseInfoLength = SPT_SENSE_LENGTH;
+        sptdwb.sptd.SenseInfoOffset =
+            offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
+        sptdwb.sptd.DataIn = SCSI_IOCTL_DATA_OUT;
+        sptdwb.sptd.DataTransferLength = sectorSize;
+        sptdwb.sptd.TimeOutValue = 5;
+        sptdwb.sptd.DataBuffer = databuffer;
+        sptdwb.sptd.Cdb[0] = SCSIOP_WRITE;
+        sptdwb.sptd.Cdb[5] = 0;  // Starting LBA
+        sptdwb.sptd.Cdb[8] = 1;  // TRANSFER LENGTH
 
         length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
         iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH_DIRECT,
-            &sptdwb,
-            length,
-            &sptdwb,
-            length,
-            &returned,
-            FALSE);
+            _hDevice, IOCTL_SCSI_PASS_THROUGH_DIRECT, &sptdwb, length, &sptdwb,
+            length, &returned, FALSE);
 
-        PrintStatusResultsDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
+        PrintStatusResultsDOut(iResult, returned,
+                               (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb,
+                               length);
     }
 
     return iResult;
 }
 
-int iReadViaSCSIPassThrough(HANDLE _hDevice)
-{
+int iReadViaSCSIPassThrough(HANDLE _hDevice) {
     SCSI_PASS_THROUGH_WITH_BUFFERS sptwb;
     SCSI_PASS_THROUGH_WITH_BUFFERS_EX sptwb_ex;
-    int     iResult = -1;
+    int iResult = -1;
     ULONG length = 0, errorCode = 0, returned = 0, sectorSize = 512;
-    ULONG alignmentMask = 0; // default == no alignment requirement
-    UCHAR srbType = 0; // default == SRB_TYPE_SCSI_REQUEST_BLOCK
+    ULONG alignmentMask = 0;  // default == no alignment requirement
+    UCHAR srbType = 0;        // default == SRB_TYPE_SCSI_REQUEST_BLOCK
 
-    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false) return false;
+    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false)
+        return false;
 
-    if ( srbType )
-    {
+    if (srbType) {
         ZeroMemory(&sptwb_ex, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX));
         sptwb_ex.spt.Version = 0;
         sptwb_ex.spt.Length = sizeof(SCSI_PASS_THROUGH_EX);
@@ -694,35 +622,31 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
         sptwb_ex.spt.DataInTransferLength = 512;
         sptwb_ex.spt.DataDirection = SCSI_IOCTL_DATA_IN;
         sptwb_ex.spt.TimeOutValue = 2;
-        sptwb_ex.spt.StorAddressOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, StorAddress);
+        sptwb_ex.spt.StorAddressOffset =
+            offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, StorAddress);
         sptwb_ex.StorAddress.Type = STOR_ADDRESS_TYPE_BTL8;
         sptwb_ex.StorAddress.Port = 0;
         sptwb_ex.StorAddress.AddressLength = STOR_ADDR_BTL8_ADDRESS_LENGTH;
         sptwb_ex.StorAddress.Path = 0;
         sptwb_ex.StorAddress.Target = 0;
         sptwb_ex.StorAddress.Lun = 0;
-        sptwb_ex.spt.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucSenseBuf);
+        sptwb_ex.spt.SenseInfoOffset =
+            offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucSenseBuf);
         sptwb_ex.spt.DataOutBufferOffset = 0;
-        sptwb_ex.spt.DataInBufferOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucDataBuf);
+        sptwb_ex.spt.DataInBufferOffset =
+            offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX, ucDataBuf);
         sptwb_ex.spt.Cdb[0] = SCSIOP_READ;
-        sptwb_ex.spt.Cdb[5] = 0; // Starting LBA
-        sptwb_ex.spt.Cdb[8] = 1; // TRANSFER LENGTH
+        sptwb_ex.spt.Cdb[5] = 0;  // Starting LBA
+        sptwb_ex.spt.Cdb[8] = 1;  // TRANSFER LENGTH
         length = sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS_EX);
 
-        iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH_EX,
-            &sptwb_ex,
-            length,
-            &sptwb_ex,
-            length,
-            &returned,
-            FALSE);
+        iResult = iIssueDeviceIoControl(_hDevice, IOCTL_SCSI_PASS_THROUGH_EX,
+                                        &sptwb_ex, length, &sptwb_ex, length,
+                                        &returned, FALSE);
 
-        PrintStatusResultsExDIn(iResult, returned, &sptwb_ex, sptwb_ex.spt.DataInTransferLength);
-    }
-    else
-    {
+        PrintStatusResultsExDIn(iResult, returned, &sptwb_ex,
+                                sptwb_ex.spt.DataInTransferLength);
+    } else {
         ZeroMemory(&sptwb, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS));
         sptwb.spt.Length = sizeof(SCSI_PASS_THROUGH);
         sptwb.spt.PathId = 0;
@@ -730,197 +654,195 @@ int iReadViaSCSIPassThrough(HANDLE _hDevice)
         sptwb.spt.Lun = 0;
         sptwb.spt.CdbLength = CDB10GENERIC_LENGTH;
         sptwb.spt.SenseInfoLength = SPT_SENSE_LENGTH;
-        sptwb.spt.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
+        sptwb.spt.SenseInfoOffset =
+            offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
         sptwb.spt.DataIn = SCSI_IOCTL_DATA_IN;
         sptwb.spt.DataTransferLength = 512;
         sptwb.spt.TimeOutValue = 5;
-        sptwb.spt.DataBufferOffset = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
+        sptwb.spt.DataBufferOffset =
+            offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
         sptwb.spt.Cdb[0] = SCSIOP_READ;
-        sptwb.spt.Cdb[5] = 0; // Starting LBA
-        sptwb.spt.Cdb[8] = 1; // TRANSFER LENGTH
+        sptwb.spt.Cdb[5] = 0;  // Starting LBA
+        sptwb.spt.Cdb[8] = 1;  // TRANSFER LENGTH
 
-        length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) + sptwb.spt.DataTransferLength;
-        iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH,
-            &sptwb,
-            sizeof(SCSI_PASS_THROUGH),
-            &sptwb,
-            length,
-            &returned,
-            FALSE);
+        length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) +
+                 sptwb.spt.DataTransferLength;
+        iResult = iIssueDeviceIoControl(_hDevice, IOCTL_SCSI_PASS_THROUGH,
+                                        &sptwb, sizeof(SCSI_PASS_THROUGH),
+                                        &sptwb, length, &returned, FALSE);
 
-        PrintStatusResultsDIn(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
+        PrintStatusResultsDIn(iResult, returned, &sptwb,
+                              sptwb.spt.DataTransferLength);
     }
     return iResult;
 }
 
-static int s_iGetLevel0DiscoveryData(HANDLE _hDevice)
-{
+static int s_iGetLevel0DiscoveryData(HANDLE _hDevice) {
     SCSI_PASS_THROUGH_WITH_BUFFERS sptwb;
     int iResult = -1;
     ULONG length = 0, returned = 0;
-    ULONG alignmentMask = 0;    // default == no alignment requirement
-    UCHAR srbType = 0;          // default == SRB_TYPE_SCSI_REQUEST_BLOCK, but not used...
+    ULONG alignmentMask = 0;  // default == no alignment requirement
+    UCHAR srbType =
+        0;  // default == SRB_TYPE_SCSI_REQUEST_BLOCK, but not used...
 
-    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false) return false;
+    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false)
+        return false;
 
     ZeroMemory(&sptwb, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS));
-    sptwb.spt.Length    = sizeof(SCSI_PASS_THROUGH);
-    sptwb.spt.PathId    = 0;
-    sptwb.spt.TargetId  = 0;
-    sptwb.spt.Lun       = 0;
+    sptwb.spt.Length = sizeof(SCSI_PASS_THROUGH);
+    sptwb.spt.PathId = 0;
+    sptwb.spt.TargetId = 0;
+    sptwb.spt.Lun = 0;
 
-    sptwb.spt.CdbLength         = CDB12GENERIC_LENGTH;
-    sptwb.spt.SenseInfoLength   = SPT_SENSE_LENGTH;
-    sptwb.spt.SenseInfoOffset   = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
-    sptwb.spt.DataIn            = SCSI_IOCTL_DATA_IN;
+    sptwb.spt.CdbLength = CDB12GENERIC_LENGTH;
+    sptwb.spt.SenseInfoLength = SPT_SENSE_LENGTH;
+    sptwb.spt.SenseInfoOffset =
+        offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
+    sptwb.spt.DataIn = SCSI_IOCTL_DATA_IN;
 
-    sptwb.spt.DataTransferLength    = SPTWB_DATA_LENGTH;
-    sptwb.spt.TimeOutValue          = 5;
-    sptwb.spt.DataBufferOffset      = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
+    sptwb.spt.DataTransferLength = SPTWB_DATA_LENGTH;
+    sptwb.spt.TimeOutValue = 5;
+    sptwb.spt.DataBufferOffset =
+        offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
 
-    sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN; // CDB[0] Opcode (A2h for "SECURITY PROTOCOL IN" command)
-    sptwb.spt.Cdb[1] = 1;       // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
-    sptwb.spt.Cdb[3] = 1;       // CDB[3:2] : Security Protocol Specific; for TCG, it seems to be ComID (0x1 for TCG Level 0 Discovery)
-    sptwb.spt.Cdb[4] = 0x80;    // CDB[4] bit 7: INC_512 = 1
-    sptwb.spt.Cdb[9] = 1;       // CDB[6:9] : Allocation Length (`1' means 1x512 byte)
+    sptwb.spt.Cdb[0] =
+        SCSIOP_SECURITY_PROTOCOL_IN;  // CDB[0] Opcode (A2h for "SECURITY
+                                      // PROTOCOL IN" command)
+    sptwb.spt.Cdb[1] =
+        1;  // CDB[1] : Protocol ID (0x1 for TCG Level 0 Discovery)
+    sptwb.spt.Cdb[3] = 1;  // CDB[3:2] : Security Protocol Specific; for TCG, it
+                           // seems to be ComID (0x1 for TCG Level 0 Discovery)
+    sptwb.spt.Cdb[4] = 0x80;  // CDB[4] bit 7: INC_512 = 1
+    sptwb.spt.Cdb[9] =
+        1;  // CDB[6:9] : Allocation Length (`1' means 1x512 byte)
 
-    length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) + sptwb.spt.DataTransferLength;
+    length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) +
+             sptwb.spt.DataTransferLength;
 
-    iResult = iIssueDeviceIoControl(
-        _hDevice,
-        IOCTL_SCSI_PASS_THROUGH,
-        &sptwb,
-        sizeof(SCSI_PASS_THROUGH),
-        &sptwb,
-        length,
-        &returned,
-        NULL);
+    iResult = iIssueDeviceIoControl(_hDevice, IOCTL_SCSI_PASS_THROUGH, &sptwb,
+                                    sizeof(SCSI_PASS_THROUGH), &sptwb, length,
+                                    &returned, NULL);
 
-    PrintStatusResultsDIn(iResult, returned, &sptwb, sptwb.spt.DataTransferLength);
+    PrintStatusResultsDIn(iResult, returned, &sptwb,
+                          sptwb.spt.DataTransferLength);
     return iResult;
 }
 
-int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice)
-{
+int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice) {
     int iResult = -1;
     char cCmd;
     char strCmd[256];
     char strPrompt[1024];
 
-    sprintf_s(strPrompt,
-        1024,
-        "\n# Select and input sub command for Security Receive command:"
-        "\n#     1 = Retrieve Level 0 Discovery data (TCG)"
-        "\n");
+    sprintf_s(strPrompt, 1024,
+              "\n# Select and input sub command for Security Receive command:"
+              "\n#     1 = Retrieve Level 0 Discovery data (TCG)"
+              "\n");
 
-    int iCmd = iGetConsoleInputHex((const char*)strPrompt, strCmd);
-    switch (iCmd)
-    {
-    case 1:
-        cCmd = cGetConsoleInput("\n# Security Receive : Retrieve Level 0 Discovery data (TCG), Press 'y' to continue\n", strCmd);
-        if (cCmd == 'y')
-        {
-            iResult = s_iGetLevel0DiscoveryData(_hDevice);
-        }
-        break;
+    int iCmd = iGetConsoleInputHex((const char *)strPrompt, strCmd);
+    switch (iCmd) {
+        case 1:
+            cCmd = cGetConsoleInput(
+                "\n# Security Receive : Retrieve Level 0 Discovery data (TCG), "
+                "Press 'y' to continue\n",
+                strCmd);
+            if (cCmd == 'y') {
+                iResult = s_iGetLevel0DiscoveryData(_hDevice);
+            }
+            break;
 
-    default:
-        fprintf(stderr, "\n[E] Command not implemented yet.\n");
-        break;
+        default:
+            fprintf(stderr, "\n[E] Command not implemented yet.\n");
+            break;
     }
 
     return iResult;
 }
 
-int iFlushViaSCSIPassThrough(HANDLE _hDevice)
-{
+int iFlushViaSCSIPassThrough(HANDLE _hDevice) {
     SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER sptdwb;
     SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX sptdwb_ex;
     int iResult = -1;
     ULONG length = 0, errorCode = 0, returned = 0;
 
-    ULONG alignmentMask = 0; // default == no alignment requirement
-    UCHAR srbType = 0; // default == SRB_TYPE_SCSI_REQUEST_BLOCK
+    ULONG alignmentMask = 0;  // default == no alignment requirement
+    UCHAR srbType = 0;        // default == SRB_TYPE_SCSI_REQUEST_BLOCK
 
-    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false) return false;
+    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false)
+        return false;
 
-    if (srbType)
-    {
+    if (srbType) {
         ZeroMemory(&sptdwb_ex, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX));
 
-        sptdwb_ex.sptd.Version                  = 0;
-        sptdwb_ex.sptd.Length                   = sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
-        sptdwb_ex.sptd.ScsiStatus               = 0;
-        sptdwb_ex.sptd.CdbLength                = CDB10GENERIC_LENGTH;
-        sptdwb_ex.sptd.StorAddressLength        = sizeof(STOR_ADDR_BTL8);
-        sptdwb_ex.sptd.SenseInfoLength          = SPT_SENSE_LENGTH;
-        sptdwb_ex.sptd.DataOutBuffer            = 0;
-        sptdwb_ex.sptd.DataOutTransferLength    = 0;
-        sptdwb_ex.sptd.DataInTransferLength     = 0;
-        sptdwb_ex.sptd.DataDirection            = SCSI_IOCTL_DATA_UNSPECIFIED; // no data-in, no data-out
-        sptdwb_ex.sptd.TimeOutValue             = 5;
-        sptdwb_ex.sptd.StorAddressOffset        = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
-        sptdwb_ex.StorAddress.Type              = STOR_ADDRESS_TYPE_BTL8;
-        sptdwb_ex.StorAddress.Port              = 0;
-        sptdwb_ex.StorAddress.AddressLength     = STOR_ADDR_BTL8_ADDRESS_LENGTH;
-        sptdwb_ex.StorAddress.Path              = 0;
-        sptdwb_ex.StorAddress.Target            = 0;
-        sptdwb_ex.StorAddress.Lun               = 0;
-        sptdwb_ex.sptd.SenseInfoOffset          = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
+        sptdwb_ex.sptd.Version = 0;
+        sptdwb_ex.sptd.Length = sizeof(SCSI_PASS_THROUGH_DIRECT_EX);
+        sptdwb_ex.sptd.ScsiStatus = 0;
+        sptdwb_ex.sptd.CdbLength = CDB10GENERIC_LENGTH;
+        sptdwb_ex.sptd.StorAddressLength = sizeof(STOR_ADDR_BTL8);
+        sptdwb_ex.sptd.SenseInfoLength = SPT_SENSE_LENGTH;
+        sptdwb_ex.sptd.DataOutBuffer = 0;
+        sptdwb_ex.sptd.DataOutTransferLength = 0;
+        sptdwb_ex.sptd.DataInTransferLength = 0;
+        sptdwb_ex.sptd.DataDirection =
+            SCSI_IOCTL_DATA_UNSPECIFIED;  // no data-in, no data-out
+        sptdwb_ex.sptd.TimeOutValue = 5;
+        sptdwb_ex.sptd.StorAddressOffset =
+            offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, StorAddress);
+        sptdwb_ex.StorAddress.Type = STOR_ADDRESS_TYPE_BTL8;
+        sptdwb_ex.StorAddress.Port = 0;
+        sptdwb_ex.StorAddress.AddressLength = STOR_ADDR_BTL8_ADDRESS_LENGTH;
+        sptdwb_ex.StorAddress.Path = 0;
+        sptdwb_ex.StorAddress.Target = 0;
+        sptdwb_ex.StorAddress.Lun = 0;
+        sptdwb_ex.sptd.SenseInfoOffset =
+            offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX, ucSenseBuf);
 
         sptdwb_ex.sptd.Cdb[0] = SCSIOP_SYNCHRONIZE_CACHE;
-        sptdwb_ex.sptd.Cdb[1] = 0x6;    // SYNC_NV (bit 2) and IMMED (bit 1) are set
-        sptdwb_ex.sptd.Cdb[5] = 0;      // logical block address
-        sptdwb_ex.sptd.Cdb[8] = 1;      // number of logical blocks
+        sptdwb_ex.sptd.Cdb[1] =
+            0x6;                    // SYNC_NV (bit 2) and IMMED (bit 1) are set
+        sptdwb_ex.sptd.Cdb[5] = 0;  // logical block address
+        sptdwb_ex.sptd.Cdb[8] = 1;  // number of logical blocks
 
         length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX);
         iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH_DIRECT_EX,
-            &sptdwb_ex,
-            sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX),
-            &sptdwb_ex,
-            length,
-            &returned,
-            FALSE);
+            _hDevice, IOCTL_SCSI_PASS_THROUGH_DIRECT_EX, &sptdwb_ex,
+            sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER_EX), &sptdwb_ex, length,
+            &returned, FALSE);
 
-        PrintStatusResultsExDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex, sptdwb_ex.sptd.DataOutTransferLength);
-    }
-    else
-    {
+        PrintStatusResultsExDOut(iResult, returned,
+                                 (PSCSI_PASS_THROUGH_WITH_BUFFERS_EX)&sptdwb_ex,
+                                 sptdwb_ex.sptd.DataOutTransferLength);
+    } else {
         ZeroMemory(&sptdwb, sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER));
 
-        sptdwb.sptd.Length              = sizeof(SCSI_PASS_THROUGH_DIRECT);
-        sptdwb.sptd.PathId              = 0;
-        sptdwb.sptd.TargetId            = 0;
-        sptdwb.sptd.Lun	                = 0;
-        sptdwb.sptd.CdbLength           = CDB10GENERIC_LENGTH;
-        sptdwb.sptd.SenseInfoLength     = SPT_SENSE_LENGTH;
-        sptdwb.sptd.SenseInfoOffset     = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
-        sptdwb.sptd.DataIn              = SCSI_IOCTL_DATA_UNSPECIFIED; // no data-in, no data-out
-        sptdwb.sptd.DataTransferLength  = 0;
-        sptdwb.sptd.TimeOutValue        = 5;
-        sptdwb.sptd.DataBuffer          = 0;
+        sptdwb.sptd.Length = sizeof(SCSI_PASS_THROUGH_DIRECT);
+        sptdwb.sptd.PathId = 0;
+        sptdwb.sptd.TargetId = 0;
+        sptdwb.sptd.Lun = 0;
+        sptdwb.sptd.CdbLength = CDB10GENERIC_LENGTH;
+        sptdwb.sptd.SenseInfoLength = SPT_SENSE_LENGTH;
+        sptdwb.sptd.SenseInfoOffset =
+            offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
+        sptdwb.sptd.DataIn =
+            SCSI_IOCTL_DATA_UNSPECIFIED;  // no data-in, no data-out
+        sptdwb.sptd.DataTransferLength = 0;
+        sptdwb.sptd.TimeOutValue = 5;
+        sptdwb.sptd.DataBuffer = 0;
 
         sptdwb_ex.sptd.Cdb[0] = SCSIOP_SYNCHRONIZE_CACHE;
-        sptdwb_ex.sptd.Cdb[1] = 0x6;    // SYNC_NV (bit 2) and IMMED (bit 1) are set
-        sptdwb_ex.sptd.Cdb[5] = 0;      // logical block address
-        sptdwb_ex.sptd.Cdb[8] = 1;      // number of logical blocks
+        sptdwb_ex.sptd.Cdb[1] =
+            0x6;                    // SYNC_NV (bit 2) and IMMED (bit 1) are set
+        sptdwb_ex.sptd.Cdb[5] = 0;  // logical block address
+        sptdwb_ex.sptd.Cdb[8] = 1;  // number of logical blocks
 
         length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
         iResult = iIssueDeviceIoControl(
-            _hDevice,
-            IOCTL_SCSI_PASS_THROUGH_DIRECT,
-            &sptdwb,
-            length,
-            &sptdwb,
-            length,
-            &returned,
-            FALSE);
+            _hDevice, IOCTL_SCSI_PASS_THROUGH_DIRECT, &sptdwb, length, &sptdwb,
+            length, &returned, FALSE);
 
-        PrintStatusResultsDOut(iResult, returned, (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb, length);
+        PrintStatusResultsDOut(iResult, returned,
+                               (PSCSI_PASS_THROUGH_WITH_BUFFERS)&sptdwb,
+                               length);
     }
 
     return iResult;
