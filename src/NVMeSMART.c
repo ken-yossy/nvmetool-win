@@ -1,6 +1,5 @@
 #include "NVMeSMART.h"
 
-//#include <nvme.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <windows.h>

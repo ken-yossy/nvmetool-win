@@ -86,7 +86,6 @@ typedef struct {
                              // Temperature 2 <rev1.3>
 
     uint8_t Reserved1[280];  // byte [511:232]
-
 } NVME_SMART_INFO_LOG, *PNVME_SMART_INFO_LOG;
 
 extern NVME_SMART_INFO_LOG g_stSMARTLog;

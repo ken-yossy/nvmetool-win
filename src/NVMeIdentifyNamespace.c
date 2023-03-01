@@ -338,8 +338,7 @@ static void printNVMeIdentifyNamespaceData(
     } else if (_pNSData->DPS.ProtectionInfoTypeEnabled == 2) {
         printf(
             "\tbit [  2:  0] 2 = Protection information is enabled, Type 2\n");
-    } else  // if (_pNSData->DPS.ProtectionInfoTypeEnabled == 3)
-    {
+    } else { // if (_pNSData->DPS.ProtectionInfoTypeEnabled == 3)
         printf(
             "\tbit [  2:  0] 3 = Protection information is enabled, Type 3\n");
     }

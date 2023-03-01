@@ -31,8 +31,7 @@ static void s_vPrintNVMeSupportedLogPages(
                     "[I]     bit [    1] 0 = Index Offset is not supported\n");
             }
 
-            if (i == 14)  // 0Dh
-            {
+            if (i == 14) { // 0Dh
                 if (_pData[i].LIDSpecific & 1) {
                     printf(
                         "[I]     bit [   16] 1 = Establish Context and Read "
