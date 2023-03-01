@@ -1,6 +1,7 @@
-#include <windows.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <windows.h>
+
 #include <nvme.h>
 
 #include "WinFunc.h"
@@ -10,79 +11,67 @@ typedef struct {
     uint8_t NIDL;
     uint8_t Reserved[2];
     uint8_t NID[4092];
-} NVME_IDENTIFY_NSID_DESCRIPTOR, * PNVME_IDENTIFY_NSID_DESCRIPTOR;
+} NVME_IDENTIFY_NSID_DESCRIPTOR, *PNVME_IDENTIFY_NSID_DESCRIPTOR;
 
-static void printNVMeIdentifyNSIDDescriptor(PNVME_IDENTIFY_NSID_DESCRIPTOR _pNSData, DWORD _dwNSID)
-{
+static void printNVMeIdentifyNSIDDescriptor(
+    PNVME_IDENTIFY_NSID_DESCRIPTOR _pNSData, DWORD _dwNSID) {
     int iExpectedNIDL = 0;
 
     printf("[O] Namespace Identifier Type (NIDT): ");
-    if (_pNSData->NIDT == 0x1)
-    {
+    if (_pNSData->NIDT == 0x1) {
         printf("01h (IEEE Extended Unique Identifier)\n");
         iExpectedNIDL = 8;
-    }
-    else if (_pNSData->NIDT == 0x2)
-    {
+    } else if (_pNSData->NIDT == 0x2) {
         printf("02h (Namespace Globally Unique Identifier)\n");
         iExpectedNIDL = 16;
-    }
-    else if (_pNSData->NIDT == 0x3)
-    {
+    } else if (_pNSData->NIDT == 0x3) {
         printf("03h (Namespace UUID)\n");
         iExpectedNIDL = 16;
-    }
-    else if (_pNSData->NIDT == 0x4)
-    {
+    } else if (_pNSData->NIDT == 0x4) {
         printf("04h (Command Set Identifier)\n");
         iExpectedNIDL = 1;
-    }
-    else
-    {
+    } else {
         printf("%02Xh (Reserved value)\n", _pNSData->NIDT);
     }
 
-    if (iExpectedNIDL == 0)
-    {
+    if (iExpectedNIDL == 0) {
         fprintf(stderr, "[W] NIDT is unknown, skip");
         return;
     }
 
     printf("[O] Namespace Identifier Length (NIDL): %02Xh\n", _pNSData->NIDL);
-    if (_pNSData->NIDL != iExpectedNIDL)
-    {
-        fprintf(stderr, "[W] NIDL is unmatched to the length indicated by NIDT, skip\n");
+    if (_pNSData->NIDL != iExpectedNIDL) {
+        fprintf(
+            stderr,
+            "[W] NIDL is unmatched to the length indicated by NIDT, skip\n");
         return;
     }
 
     printf("[O] Namespace Identifier (NID): 0x");
-    for (int i = 0; i < iExpectedNIDL; i++)
-    {
+    for (int i = 0; i < iExpectedNIDL; i++) {
         printf("%02X", (unsigned char)(_pNSData->NID[i]));
     }
     printf("\n");
 }
 
-int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID)
-{
-    int     iResult = -1;
-    PVOID   buffer = NULL;
-    ULONG   bufferLength = 0;
-    ULONG   returnedLength = 0;
+int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID) {
+    int iResult = -1;
+    PVOID buffer = NULL;
+    ULONG bufferLength = 0;
+    ULONG returnedLength = 0;
 
     PSTORAGE_PROPERTY_QUERY query = NULL;
     PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
     PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
 
     // Allocate buffer for use.
-    bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters)
-        + sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)
-        + sizeof(NVME_IDENTIFY_NSID_DESCRIPTOR);
+    bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters) +
+                   sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA) +
+                   sizeof(NVME_IDENTIFY_NSID_DESCRIPTOR);
     buffer = malloc(bufferLength);
 
-    if (buffer == NULL)
-    {
-        vPrintSystemError( GetLastError(), "malloc" );
+    if (buffer == NULL) {
+        vPrintSystemError(GetLastError(), "malloc");
         goto error_exit;
     }
 
@@ -98,23 +87,17 @@ int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID)
 
     protocolData->ProtocolType = ProtocolTypeNvme;
     protocolData->DataType = NVMeDataTypeIdentify;
-    protocolData->ProtocolDataRequestValue = NVME_IDENTIFY_CNS_DESCRIPTOR_NAMESPACE;
+    protocolData->ProtocolDataRequestValue =
+        NVME_IDENTIFY_CNS_DESCRIPTOR_NAMESPACE;
     //    protocolData->ProtocolDataRequestSubValue = _dwNSID;
     protocolData->ProtocolDataRequestSubValue = 0;
     protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
     protocolData->ProtocolDataLength = sizeof(NVME_IDENTIFY_NSID_DESCRIPTOR);
 
     // Send request down.
-    iResult = iIssueDeviceIoControl(
-        _hDevice,
-        IOCTL_STORAGE_QUERY_PROPERTY,
-        buffer,
-        bufferLength,
-        buffer,
-        bufferLength,
-        &returnedLength,
-        NULL
-    );
+    iResult = iIssueDeviceIoControl(_hDevice, IOCTL_STORAGE_QUERY_PROPERTY,
+                                    buffer, bufferLength, buffer, bufferLength,
+                                    &returnedLength, NULL);
 
     if (iResult) goto error_exit;
 
@@ -123,32 +106,37 @@ int iNVMeIdentifyNSIDDescriptor(HANDLE _hDevice, DWORD _dwNSID)
     //
     // Validate the returned data.
     //
-    if ((protocolDataDescr->Version != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
-        (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)))
-    {
-        fprintf(stderr, "[E] NVMeIdentifyNamespace: data descriptor header not valid, stop.\n");
+    if ((protocolDataDescr->Version !=
+         sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
+        (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
+        fprintf(stderr,
+                "[E] NVMeIdentifyNamespace: data descriptor header not valid, "
+                "stop.\n");
         goto error_exit;
     }
 
     protocolData = &protocolDataDescr->ProtocolSpecificData;
 
-    if ((protocolData->ProtocolDataOffset > sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-        (protocolData->ProtocolDataLength < sizeof(NVME_IDENTIFY_NSID_DESCRIPTOR)))
-    {
-        fprintf(stderr, "[E] NVMeIdentifyNamespace: ProtocolData Offset/Length not valid, stop.\n");
+    if ((protocolData->ProtocolDataOffset >
+         sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
+        (protocolData->ProtocolDataLength <
+         sizeof(NVME_IDENTIFY_NSID_DESCRIPTOR))) {
+        fprintf(stderr,
+                "[E] NVMeIdentifyNamespace: ProtocolData Offset/Length not "
+                "valid, stop.\n");
         goto error_exit;
     }
 
     // Identify Namespace
     printNVMeIdentifyNSIDDescriptor(
-        (PNVME_IDENTIFY_NSID_DESCRIPTOR)((PCHAR)protocolData + protocolData->ProtocolDataOffset),
+        (PNVME_IDENTIFY_NSID_DESCRIPTOR)((PCHAR)protocolData +
+                                         protocolData->ProtocolDataOffset),
         _dwNSID);
-    iResult = 0; // succeeded
+    iResult = 0;  // succeeded
 
 error_exit:
 
-    if (buffer != NULL)
-    {
+    if (buffer != NULL) {
         free(buffer);
     }
 

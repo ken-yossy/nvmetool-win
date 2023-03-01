@@ -27,7 +27,6 @@ typedef union {
     } DUMMYSTRUCTNAME;
 
     ULONG AsUlong;
-
 } NVME_COMMAND_EFFECTS_DATA_20, *PNVME_COMMAND_EFFECTS_DATA_20;
 
 typedef struct {
