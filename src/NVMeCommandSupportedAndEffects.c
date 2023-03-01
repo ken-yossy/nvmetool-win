@@ -6,34 +6,34 @@
 #include "WinFunc.h"
 
 typedef union {
-  struct {
-    // LSB
-    ULONG CSUPP : 1;        // bit 0: Command Supported (CSUPP)
-    ULONG LBCC : 1;         // bit 1: Logical Block Content Change (LBCC)
-    ULONG NCC : 1;          // bit 2: Namespace Capability Change (NCC)
-    ULONG NIC : 1;          // bit 3: Namespace Inventory Change (NIC)
-    ULONG CCC : 1;          // bit 4: Controller Capability Change (CCC)
-    ULONG Reserved0 : 11;   // bit 15:5
-    ULONG CSE : 3;          // bit 18:16 Command Submission and Execution (CSE)
-    ULONG UUIDSupp : 1;     // bit 19: UUID Selection Supported <rev 1.4>
-    ULONG ScopeNS : 1;      // bit 20: Namespace Scope <rev 2.0>
-    ULONG ScopeCtlr : 1;    // bit 21: Controller Scope <rev 2.0>
-    ULONG ScopeNVMSet : 1;  // bit 22: NVM Set Scope <rev 2.0>
-    ULONG ScopeEndGrp : 1;  // bit 23: Endurance Group Scope <rev 2.0>
-    ULONG ScopeDomain : 1;  // bit 24: Domain Scope <rev 2.0>
-    ULONG ScopeNVMSubsys : 1;  // bit 25: NVM Subsystem Scope <rev 2.0>
-    ULONG Reserved1 : 6;       // bit 31:26
-                               // MSB
-  } DUMMYSTRUCTNAME;
+    struct {
+        // LSB
+        ULONG CSUPP : 1;       // bit 0: Command Supported (CSUPP)
+        ULONG LBCC : 1;        // bit 1: Logical Block Content Change (LBCC)
+        ULONG NCC : 1;         // bit 2: Namespace Capability Change (NCC)
+        ULONG NIC : 1;         // bit 3: Namespace Inventory Change (NIC)
+        ULONG CCC : 1;         // bit 4: Controller Capability Change (CCC)
+        ULONG Reserved0 : 11;  // bit 15:5
+        ULONG CSE : 3;       // bit 18:16 Command Submission and Execution (CSE)
+        ULONG UUIDSupp : 1;  // bit 19: UUID Selection Supported <rev 1.4>
+        ULONG ScopeNS : 1;   // bit 20: Namespace Scope <rev 2.0>
+        ULONG ScopeCtlr : 1;       // bit 21: Controller Scope <rev 2.0>
+        ULONG ScopeNVMSet : 1;     // bit 22: NVM Set Scope <rev 2.0>
+        ULONG ScopeEndGrp : 1;     // bit 23: Endurance Group Scope <rev 2.0>
+        ULONG ScopeDomain : 1;     // bit 24: Domain Scope <rev 2.0>
+        ULONG ScopeNVMSubsys : 1;  // bit 25: NVM Subsystem Scope <rev 2.0>
+        ULONG Reserved1 : 6;       // bit 31:26
+                                   // MSB
+    } DUMMYSTRUCTNAME;
 
-  ULONG AsUlong;
+    ULONG AsUlong;
 
 } NVME_COMMAND_EFFECTS_DATA_20, *PNVME_COMMAND_EFFECTS_DATA_20;
 
 typedef struct {
-  NVME_COMMAND_EFFECTS_DATA_20 ACS[256];   // Admin Command Supported
-  NVME_COMMAND_EFFECTS_DATA_20 IOCS[256];  // I/O Command Supported
-  UCHAR Reserved[2048];
+    NVME_COMMAND_EFFECTS_DATA_20 ACS[256];   // Admin Command Supported
+    NVME_COMMAND_EFFECTS_DATA_20 IOCS[256];  // I/O Command Supported
+    UCHAR Reserved[2048];
 } NVME_COMMAND_EFFECTS_LOG_20, *PNVME_COMMAND_EFFECTS_LOG_20;
 
 static const char* strAdminCommand[256] = {
@@ -556,205 +556,222 @@ static const char* strNVMCommand[256] = {
 
 static void vPrintNVMeCSEData(PNVME_COMMAND_EFFECTS_DATA_20 _pData,
                               const char** strCmds) {
-  for (int i = 0; i < 256; i++) {
-    NVME_COMMAND_EFFECTS_DATA_20 Data = _pData[i];
-    if (Data.CSUPP == 0) {
-      continue;
-    } else {
-      printf("[I] Opecode = 0x%02X ", i);
-      printf(" [ %s ] Supported (bit 0: 1)\n", strCmds[i]);
+    for (int i = 0; i < 256; i++) {
+        NVME_COMMAND_EFFECTS_DATA_20 Data = _pData[i];
+        if (Data.CSUPP == 0) {
+            continue;
+        } else {
+            printf("[I] Opecode = 0x%02X ", i);
+            printf(" [ %s ] Supported (bit 0: 1)\n", strCmds[i]);
+        }
+
+        if (bIsNVMeV20OrLater()) {
+            if (Data.ScopeNVMSubsys) {
+                printf(
+                    "\tbit [     25] 1 = May impact the whole NVM subsystem\n");
+            }
+            if (Data.ScopeDomain) {
+                printf("\tbit [     24] 1 = May impact a single Domain\n");
+            }
+            if (Data.ScopeEndGrp) {
+                printf("\tbit [     23] 1 = May impact a Endurance Group\n");
+            }
+            if (Data.ScopeNVMSet) {
+                printf("\tbit [     22] 1 = May impact a NVM Set\n");
+            }
+            if (Data.ScopeCtlr) {
+                printf("\tbit [     21] 1 = May impact a controller\n");
+            }
+            if (Data.ScopeNS) {
+                printf("\tbit [     20] 1 = May impact a namespace\n");
+            }
+        }
+
+        if (bIsNVMeV14OrLater()) {
+            if (Data.UUIDSupp) {
+                printf("\tbit [     19] 1 = Supports selection of a UUID\n");
+            } else {
+                printf(
+                    "\tbit [     19] 0 = Does not support selection of a "
+                    "UUID\n");
+            }
+        }
+
+        switch (Data.CSE) {
+            case 0:
+                printf(
+                    "\tbit [ 18: 16] 0 = No command submission or execution "
+                    "restriction\n");
+                break;
+
+            case 1:
+                printf(
+                    "\tbit [ 18: 16] 1 = May be submitted when there is no "
+                    "other "
+                    "outstanding command to the same namespace and another "
+                    "command "
+                    "should not be submitted to the same namespace until this "
+                    "command "
+                    "is complete\n");
+                break;
+
+            case 2:
+                printf(
+                    "\tbit [ 18: 16] 2 = May be submitted when there is no "
+                    "other "
+                    "outstanding command to any namespace and another command "
+                    "should "
+                    "not be submitted to any namespace until this command is "
+                    "complete\n");
+                break;
+
+            default:
+                break;
+        }
+
+        if (Data.CCC) {
+            printf("\tbit [      4] 1 = May change controller capabilities\n");
+        } else {
+            printf(
+                "\tbit [      4] 0 = Does not modify controller "
+                "capabilities\n");
+        }
+
+        if (Data.NIC) {
+            printf(
+                "\tbit [      3] 1 = May change the number of namespaces or "
+                "capabilities for multiple namespaces\n");
+        } else {
+            printf(
+                "\tbit [      3] 0 = Does not modify the number of namespaces "
+                "or "
+                "capabilities for multiple namespaces\n");
+        }
+
+        if (Data.NCC) {
+            printf(
+                "\tbit [      2] 1 = May change the capabilities of a single "
+                "namespace\n");
+        } else {
+            printf(
+                "\tbit [      2] 0 = Does not modify any namespace "
+                "capabilities for "
+                "the specified namespace\n");
+        }
+
+        if (Data.LBCC) {
+            printf(
+                "\tbit [      1] 1 = May modify logical block content in one "
+                "or more "
+                "namespaces\n");
+        } else {
+            printf(
+                "\tbit [      1] 0 = Does not modify logical block content in "
+                "any "
+                "namespace\n");
+        }
     }
-
-    if (bIsNVMeV20OrLater()) {
-      if (Data.ScopeNVMSubsys) {
-        printf("\tbit [     25] 1 = May impact the whole NVM subsystem\n");
-      }
-      if (Data.ScopeDomain) {
-        printf("\tbit [     24] 1 = May impact a single Domain\n");
-      }
-      if (Data.ScopeEndGrp) {
-        printf("\tbit [     23] 1 = May impact a Endurance Group\n");
-      }
-      if (Data.ScopeNVMSet) {
-        printf("\tbit [     22] 1 = May impact a NVM Set\n");
-      }
-      if (Data.ScopeCtlr) {
-        printf("\tbit [     21] 1 = May impact a controller\n");
-      }
-      if (Data.ScopeNS) {
-        printf("\tbit [     20] 1 = May impact a namespace\n");
-      }
-    }
-
-    if (bIsNVMeV14OrLater()) {
-      if (Data.UUIDSupp) {
-        printf("\tbit [     19] 1 = Supports selection of a UUID\n");
-      } else {
-        printf("\tbit [     19] 0 = Does not support selection of a UUID\n");
-      }
-    }
-
-    switch (Data.CSE) {
-      case 0:
-        printf(
-            "\tbit [ 18: 16] 0 = No command submission or execution "
-            "restriction\n");
-        break;
-
-      case 1:
-        printf(
-            "\tbit [ 18: 16] 1 = May be submitted when there is no other "
-            "outstanding command to the same namespace and another command "
-            "should not be submitted to the same namespace until this command "
-            "is complete\n");
-        break;
-
-      case 2:
-        printf(
-            "\tbit [ 18: 16] 2 = May be submitted when there is no other "
-            "outstanding command to any namespace and another command should "
-            "not be submitted to any namespace until this command is "
-            "complete\n");
-        break;
-
-      default:
-        break;
-    }
-
-    if (Data.CCC) {
-      printf("\tbit [      4] 1 = May change controller capabilities\n");
-    } else {
-      printf("\tbit [      4] 0 = Does not modify controller capabilities\n");
-    }
-
-    if (Data.NIC) {
-      printf(
-          "\tbit [      3] 1 = May change the number of namespaces or "
-          "capabilities for multiple namespaces\n");
-    } else {
-      printf(
-          "\tbit [      3] 0 = Does not modify the number of namespaces or "
-          "capabilities for multiple namespaces\n");
-    }
-
-    if (Data.NCC) {
-      printf(
-          "\tbit [      2] 1 = May change the capabilities of a single "
-          "namespace\n");
-    } else {
-      printf(
-          "\tbit [      2] 0 = Does not modify any namespace capabilities for "
-          "the specified namespace\n");
-    }
-
-    if (Data.LBCC) {
-      printf(
-          "\tbit [      1] 1 = May modify logical block content in one or more "
-          "namespaces\n");
-    } else {
-      printf(
-          "\tbit [      1] 0 = Does not modify logical block content in any "
-          "namespace\n");
-    }
-  }
 }
 
 static void vPrintNVMeCSELog(PNVME_COMMAND_EFFECTS_LOG_20 _pData) {
-  printf("[I] Command Supported and Effect Log: Admin Command\n");
-  vPrintNVMeCSEData(_pData->ACS, strAdminCommand);
+    printf("[I] Command Supported and Effect Log: Admin Command\n");
+    vPrintNVMeCSEData(_pData->ACS, strAdminCommand);
 
-  printf("\n");
+    printf("\n");
 
-  printf("[I] Command Supported and Effect Log: NVM Command\n");
-  vPrintNVMeCSEData(_pData->IOCS, strNVMCommand);
+    printf("[I] Command Supported and Effect Log: NVM Command\n");
+    vPrintNVMeCSEData(_pData->IOCS, strNVMCommand);
 }
 
 int iNVMeGetCommandSupportedAndEffects(HANDLE _hDevice) {
-  int iResult = -1;
-  PVOID buffer = NULL;
-  ULONG bufferLength = 0;
-  ULONG returnedLength = 0;
+    int iResult = -1;
+    PVOID buffer = NULL;
+    ULONG bufferLength = 0;
+    ULONG returnedLength = 0;
 
-  PSTORAGE_PROPERTY_QUERY query = NULL;
-  PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
-  PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
+    PSTORAGE_PROPERTY_QUERY query = NULL;
+    PSTORAGE_PROTOCOL_SPECIFIC_DATA protocolData = NULL;
+    PSTORAGE_PROTOCOL_DATA_DESCRIPTOR protocolDataDescr = NULL;
 
-  // Allocate buffer for use.
-  bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters) +
-                 sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA) +
-                 sizeof(NVME_COMMAND_EFFECTS_LOG_20);
-  buffer = malloc(bufferLength);
+    // Allocate buffer for use.
+    bufferLength = offsetof(STORAGE_PROPERTY_QUERY, AdditionalParameters) +
+                   sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA) +
+                   sizeof(NVME_COMMAND_EFFECTS_LOG_20);
+    buffer = malloc(bufferLength);
 
-  if (buffer == NULL) {
-    vPrintSystemError(GetLastError(), "malloc");
-    goto error_exit;
-  }
+    if (buffer == NULL) {
+        vPrintSystemError(GetLastError(), "malloc");
+        goto error_exit;
+    }
 
-  ZeroMemory(buffer, bufferLength);
+    ZeroMemory(buffer, bufferLength);
 
-  query = (PSTORAGE_PROPERTY_QUERY)buffer;
-  protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
-  protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
+    query = (PSTORAGE_PROPERTY_QUERY)buffer;
+    protocolDataDescr = (PSTORAGE_PROTOCOL_DATA_DESCRIPTOR)buffer;
+    protocolData = (PSTORAGE_PROTOCOL_SPECIFIC_DATA)query->AdditionalParameters;
 
-  query->PropertyId = StorageDeviceProtocolSpecificProperty;
-  query->QueryType = PropertyStandardQuery;
+    query->PropertyId = StorageDeviceProtocolSpecificProperty;
+    query->QueryType = PropertyStandardQuery;
 
-  protocolData->ProtocolType = ProtocolTypeNvme;
-  protocolData->DataType = NVMeDataTypeLogPage;
-  protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_COMMAND_EFFECTS;
+    protocolData->ProtocolType = ProtocolTypeNvme;
+    protocolData->DataType = NVMeDataTypeLogPage;
+    protocolData->ProtocolDataRequestValue = NVME_LOG_PAGE_COMMAND_EFFECTS;
 
-  // Check the following page for appropriate values for "RequestValue"s.
-  // STORAGE_PROTOCOL_NVME_DATA_TYPE enumeration (ntddstor.h)
-  // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddstor/ne-ntddstor-_storage_protocol_nvme_data_type
-  protocolData->ProtocolDataRequestSubValue = 0;  // lower 32-bit of the offset
-  protocolData->ProtocolDataRequestSubValue2 =
-      0;  // higher 32-bit of the offset
-  // Subvalue3 and Subvalue4 are zero
-  protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
-  protocolData->ProtocolDataLength = sizeof(NVME_COMMAND_EFFECTS_LOG_20);
+    // Check the following page for appropriate values for "RequestValue"s.
+    // STORAGE_PROTOCOL_NVME_DATA_TYPE enumeration (ntddstor.h)
+    // https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddstor/ne-ntddstor-_storage_protocol_nvme_data_type
+    protocolData->ProtocolDataRequestSubValue =
+        0;  // lower 32-bit of the offset
+    protocolData->ProtocolDataRequestSubValue2 =
+        0;  // higher 32-bit of the offset
+    // Subvalue3 and Subvalue4 are zero
+    protocolData->ProtocolDataOffset = sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA);
+    protocolData->ProtocolDataLength = sizeof(NVME_COMMAND_EFFECTS_LOG_20);
 
-  // Send request down.
-  iResult = iIssueDeviceIoControl(_hDevice, IOCTL_STORAGE_QUERY_PROPERTY,
-                                  buffer, bufferLength, buffer, bufferLength,
-                                  &returnedLength, NULL);
+    // Send request down.
+    iResult = iIssueDeviceIoControl(_hDevice, IOCTL_STORAGE_QUERY_PROPERTY,
+                                    buffer, bufferLength, buffer, bufferLength,
+                                    &returnedLength, NULL);
 
-  if (iResult) goto error_exit;
+    if (iResult) goto error_exit;
 
-  printf("\n");
+    printf("\n");
 
-  // Validate the returned data.
-  if ((protocolDataDescr->Version !=
-       sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
-      (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
-    fprintf(stderr,
+    // Validate the returned data.
+    if ((protocolDataDescr->Version !=
+         sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR)) ||
+        (protocolDataDescr->Size != sizeof(STORAGE_PROTOCOL_DATA_DESCRIPTOR))) {
+        fprintf(
+            stderr,
             "[E] getNVMeCommandSupportedAndEffects: Data descriptor header not "
             "valid.\n");
-    iResult = -1;  // error
-    goto error_exit;
-  }
+        iResult = -1;  // error
+        goto error_exit;
+    }
 
-  protocolData = &protocolDataDescr->ProtocolSpecificData;
+    protocolData = &protocolDataDescr->ProtocolSpecificData;
 
-  if ((protocolData->ProtocolDataOffset <
-       sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
-      (protocolData->ProtocolDataLength <
-       sizeof(NVME_COMMAND_EFFECTS_LOG_20))) {
-    fprintf(stderr,
+    if ((protocolData->ProtocolDataOffset <
+         sizeof(STORAGE_PROTOCOL_SPECIFIC_DATA)) ||
+        (protocolData->ProtocolDataLength <
+         sizeof(NVME_COMMAND_EFFECTS_LOG_20))) {
+        fprintf(
+            stderr,
             "[E] getNVMeCommandSupportedAndEffects: ProtocolData Offset/Length "
             "not valid.\n");
-    iResult = -1;  // error
-    goto error_exit;
-  }
+        iResult = -1;  // error
+        goto error_exit;
+    }
 
-  vPrintNVMeCSELog(
-      (PNVME_COMMAND_EFFECTS_LOG_20)((PCHAR)protocolData +
-                                     protocolData->ProtocolDataOffset));
-  iResult = 0;  // succeeded
+    vPrintNVMeCSELog(
+        (PNVME_COMMAND_EFFECTS_LOG_20)((PCHAR)protocolData +
+                                       protocolData->ProtocolDataOffset));
+    iResult = 0;  // succeeded
 
 error_exit:
-  if (buffer != NULL) {
-    free(buffer);
-  }
+    if (buffer != NULL) {
+        free(buffer);
+    }
 
-  return iResult;
+    return iResult;
 }
