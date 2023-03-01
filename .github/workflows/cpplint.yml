@@ -16,8 +16,8 @@ jobs:
           fetch-depth: 0
 
       - name: Setup python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
       - name: Setup cpplint
         run: pip install cpplint
       - name: Linting
-        run: cpplint .
+        run: cpplint --recursive .
