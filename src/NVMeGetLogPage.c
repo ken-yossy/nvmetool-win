@@ -14,6 +14,10 @@
 #include "NVMeUtils.h"
 #include "WinFunc.h"
 
+#ifndef NVME_LOG_PAGE_SUPPORTED_LOG_PAGES
+#define NVME_LOG_PAGE_SUPPORTED_LOG_PAGES 0
+#endif
+
 int iNVMeGetLogPage(HANDLE _hDevice) {
     int iResult = -1;
 

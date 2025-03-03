@@ -1,9 +1,8 @@
-#include "NVMeGetSupportedLogPages.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <windows.h>
 
+#include <nvme.h>
 #include "WinFunc.h"
 
 typedef struct {
@@ -52,6 +51,10 @@ static void s_vPrintNVMeSupportedLogPages(
         }
     }
 }
+
+#ifndef NVME_LOG_PAGE_SUPPORTED_LOG_PAGES
+#define NVME_LOG_PAGE_SUPPORTED_LOG_PAGES 0
+#endif
 
 int iNVMeGetSupportedLogPages(HANDLE _hDevice) {
     int iResult = -1;
