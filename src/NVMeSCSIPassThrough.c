@@ -746,7 +746,7 @@ static void svParseSupportedSecurityProtocolList(PUCHAR _pRawData) {
     }
 }
 
-static void svPrintSupportedSecurityProtocolList( void ) {
+static void svPrintSupportedSecurityProtocolList(void) {
     printf("\n");
     printf("Number of supported security protocols: %d\n", gu8NumSupportedSecurityProtocol);
 
