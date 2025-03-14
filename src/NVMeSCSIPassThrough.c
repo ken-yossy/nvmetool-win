@@ -731,9 +731,8 @@ static int s_iGetLevel0DiscoveryData(HANDLE _hDevice) {
     return iResult;
 }
 
-static void svParseSupportedSecurityProtocolList(PUCHAR _pRawData)
-{
-    memset(gau8SupportedSecurityProtocol, 0, 256); // clear
+static void svParseSupportedSecurityProtocolList(PUCHAR _pRawData) {
+    memset(gau8SupportedSecurityProtocol, 0, 256);
 
     // byte[5:0]: reserved
     // byte[7:6]: supported security protocol list length
@@ -748,8 +747,8 @@ static void svParseSupportedSecurityProtocolList(PUCHAR _pRawData)
 }
 
 static void svPrintSupportedSecurityProtocolList( void ) {
-    printf( "\n" );
-    printf( "Number of supported security protocols: %d\n", gu8NumSupportedSecurityProtocol );
+    printf("\n");
+    printf("Number of supported security protocols: %d\n", gu8NumSupportedSecurityProtocol);
 
     for (int i = 0; i < 256; i++) {
         if (gau8SupportedSecurityProtocol[i] == 1) {
@@ -759,21 +758,21 @@ static void svPrintSupportedSecurityProtocolList( void ) {
                 printf(" * Trusted Computing Group (TCG) (%02Xh)\n", i);
             else if (i == 7)
                 printf(" * CbCS (07h)\n");
-            else if (i == 32) // 20h
+            else if (i == 32)  // 20h
                 printf(" * Tape Data Encryption (20h)\n");
-            else if (i == 33) // 21h
+            else if (i == 33)  // 21h
                 printf(" * Data Encryption Configuration (21h)\n");
-            else if (i == 64) // 40h
+            else if (i == 64)  // 40h
                 printf(" * SA Creation Capabilities (40h)\n");
-            else if (i == 65) // 41h
+            else if (i == 65)  // 41h
                 printf(" * IKEv2-SCSI (41h)\n");
-            else if (i == 236) // ECh
+            else if (i == 236)  // ECh
                 printf(" * Universal Flash Storage (UFS) (ECh)\n");
-            else if (i == 237) // EDh
+            else if (i == 237)  // EDh
                 printf(" * SDcard TrustFlash Security Systems Specification 1.1.3 (EDh)\n");
-            else if (i == 238) // EEh
+            else if (i == 238)  // EEh
                 printf(" * Authentication in Host Attachments of Transient Storage Devices (IEEE 1667) (EEh)\n");
-            else if (i == 239) // EFh
+            else if (i == 239)  // EFh
                 printf(" * ATA Device Server Password Security (EFh)\n");
             else if ((240 <= i) && (i <= 255))
                 printf(" * <vendor specific protocol> (%02Xh)\n", i);
@@ -814,7 +813,7 @@ int iGetSupportedSecurityProtocolList(HANDLE _hDevice) {
     sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN;  // CDB[0] Opcode (A2h for "SECURITY PROTOCOL IN" command)
     sptwb.spt.Cdb[1] = 0;  // CDB[1] : Protocol ID (0 for Security Protocol Information)
     sptwb.spt.Cdb[3] = 0;  // CDB[3:2] : Security Protocol Specific (0 for Security Protocol Information)
-    sptwb.spt.Cdb[4] = 0x80; // CDB[4] bit 7: INC_512 = 1
+    sptwb.spt.Cdb[4] = 0x80;  // CDB[4] bit 7: INC_512 = 1
     sptwb.spt.Cdb[9] = 1;  // CDB[6:9] : Allocation Length (`1' means 1x512 byte)
 
     length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) +
@@ -851,7 +850,7 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice) {
                 strCmd);
             if (cCmd == 'y') {
                 iResult = iGetSupportedSecurityProtocolList(_hDevice);
-                if( iResult == 0 ) svPrintSupportedSecurityProtocolList();
+                if (iResult == 0) svPrintSupportedSecurityProtocolList();
             }
             break;
 
