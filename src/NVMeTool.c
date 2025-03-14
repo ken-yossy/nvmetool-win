@@ -99,6 +99,20 @@ int main(int _argc, char* _argv[]) {
         "[I] Getting controller's SMART / Health information log page "
         "succeeded.\n\n");
 
+    if (g_stController.OACS.SecurityCommands) {
+        iResult = iGetSupportedSecurityProtocolList(hDevice);
+        if (iResult) {
+            fprintf(stderr,
+                "[E] Getting supported security protocol list "
+                "via Security Receive command failed, stop.\n\n");
+            return iResult;
+        }
+
+        printf(
+            "[I] Getting supported security protocol list "
+            "succeeded.\n\n");
+    }
+
     while (!bFinished) {
         int iMajorCmd = eGetCommandFromConsole();
         switch (iMajorCmd) {

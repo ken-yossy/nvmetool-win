@@ -14,6 +14,9 @@
 #define SPT_SENSE_LENGTH 32
 #define SPTWB_DATA_LENGTH 512
 
+static UCHAR gau8SupportedSecurityProtocol[256];
+static UCHAR gu8NumSupportedSecurityProtocol;
+
 typedef struct _SCSI_PASS_THROUGH_WITH_BUFFERS {
     SCSI_PASS_THROUGH spt;
     ULONG Filler;  // realign buffers to double word boundary
@@ -728,6 +731,105 @@ static int s_iGetLevel0DiscoveryData(HANDLE _hDevice) {
     return iResult;
 }
 
+static void svParseSupportedSecurityProtocolList(PUCHAR _pRawData)
+{
+    memset(gau8SupportedSecurityProtocol, 0, 256); // clear
+
+    // byte[5:0]: reserved
+    // byte[7:6]: supported security protocol list length
+    UCHAR ucLength = _pRawData[ 7 ];
+    ucLength |= ((_pRawData[ 6 ] << 4) & 0xF0);
+    gu8NumSupportedSecurityProtocol = ucLength;
+
+    for (int i = 0; i < ucLength; i++) {
+        UCHAR ucCode = _pRawData[ 8 + i ];
+        gau8SupportedSecurityProtocol[ ucCode ] = 1;
+    }
+}
+
+static void svPrintSupportedSecurityProtocolList( void ) {
+    printf( "\n" );
+    printf( "Number of supported security protocols: %d\n", gu8NumSupportedSecurityProtocol );
+
+    for (int i = 0; i < 256; i++) {
+        if (gau8SupportedSecurityProtocol[i] == 1) {
+            if (i == 0)
+                printf(" * Security protocol information (00h)\n");
+            else if ((1 <= i) && (i <= 6))
+                printf(" * Trusted Computing Group (TCG) (%02Xh)\n", i);
+            else if (i == 7)
+                printf(" * CbCS (07h)\n");
+            else if (i == 32) // 20h
+                printf(" * Tape Data Encryption (20h)\n");
+            else if (i == 33) // 21h
+                printf(" * Data Encryption Configuration (21h)\n");
+            else if (i == 64) // 40h
+                printf(" * SA Creation Capabilities (40h)\n");
+            else if (i == 65) // 41h
+                printf(" * IKEv2-SCSI (41h)\n");
+            else if (i == 236) // ECh
+                printf(" * Universal Flash Storage (UFS) (ECh)\n");
+            else if (i == 237) // EDh
+                printf(" * SDcard TrustFlash Security Systems Specification 1.1.3 (EDh)\n");
+            else if (i == 238) // EEh
+                printf(" * Authentication in Host Attachments of Transient Storage Devices (IEEE 1667) (EEh)\n");
+            else if (i == 239) // EFh
+                printf(" * ATA Device Server Password Security (EFh)\n");
+            else if ((240 <= i) && (i <= 255))
+                printf(" * <vendor specific protocol> (%02Xh)\n", i);
+            else
+                printf(" * <unknown protocol> (%02Xh)\n", i);
+        }
+    }
+}
+
+int iGetSupportedSecurityProtocolList(HANDLE _hDevice) {
+    SCSI_PASS_THROUGH_WITH_BUFFERS sptwb;
+    int iResult = -1;
+    ULONG length = 0, returned = 0;
+    ULONG alignmentMask = 0;  // default == no alignment requirement
+    UCHAR srbType =
+        0;  // default == SRB_TYPE_SCSI_REQUEST_BLOCK, but not used...
+
+    if (TestViaSCSIPassThrough(_hDevice, &alignmentMask, &srbType) == false)
+        return false;
+
+    ZeroMemory(&sptwb, sizeof(SCSI_PASS_THROUGH_WITH_BUFFERS));
+    sptwb.spt.Length = sizeof(SCSI_PASS_THROUGH);
+    sptwb.spt.PathId = 0;
+    sptwb.spt.TargetId = 0;
+    sptwb.spt.Lun = 0;
+
+    sptwb.spt.CdbLength = CDB12GENERIC_LENGTH;
+    sptwb.spt.SenseInfoLength = SPT_SENSE_LENGTH;
+    sptwb.spt.SenseInfoOffset =
+        offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucSenseBuf);
+    sptwb.spt.DataIn = SCSI_IOCTL_DATA_IN;
+
+    sptwb.spt.DataTransferLength = SPTWB_DATA_LENGTH;
+    sptwb.spt.TimeOutValue = 5;
+    sptwb.spt.DataBufferOffset =
+        offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf);
+
+    sptwb.spt.Cdb[0] = SCSIOP_SECURITY_PROTOCOL_IN;  // CDB[0] Opcode (A2h for "SECURITY PROTOCOL IN" command)
+    sptwb.spt.Cdb[1] = 0;  // CDB[1] : Protocol ID (0 for Security Protocol Information)
+    sptwb.spt.Cdb[3] = 0;  // CDB[3:2] : Security Protocol Specific (0 for Security Protocol Information)
+    sptwb.spt.Cdb[4] = 0x80; // CDB[4] bit 7: INC_512 = 1
+    sptwb.spt.Cdb[9] = 1;  // CDB[6:9] : Allocation Length (`1' means 1x512 byte)
+
+    length = offsetof(SCSI_PASS_THROUGH_WITH_BUFFERS, ucDataBuf) +
+        sptwb.spt.DataTransferLength;
+
+    iResult = iIssueDeviceIoControl(_hDevice, IOCTL_SCSI_PASS_THROUGH, &sptwb,
+        sizeof(SCSI_PASS_THROUGH), &sptwb, length,
+        &returned, NULL);
+
+    if (iResult == 0)
+        svParseSupportedSecurityProtocolList((PUCHAR)(sptwb.ucDataBuf));
+
+    return iResult;
+}
+
 int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice) {
     int iResult = -1;
     char cCmd;
@@ -736,18 +838,35 @@ int iSecurityReceiveViaSCSIPassThrough(HANDLE _hDevice) {
 
     sprintf_s(strPrompt, 1024,
               "\n# Select and input sub command for Security Receive command:"
-              "\n#     1 = Retrieve Level 0 Discovery data (TCG)"
+              "\n#     0 = Retrieve Supported security protocol list"
+              "\n#     1 = Retrieve TCG Level 0 Discovery data"
               "\n");
 
     int iCmd = iGetConsoleInputHex((const char *)strPrompt, strCmd);
     switch (iCmd) {
-        case 1:
+        case 0:
             cCmd = cGetConsoleInput(
-                "\n# Security Receive : Retrieve Level 0 Discovery data (TCG), "
+                "\n# Security Receive : Retrieve Supported security protocol list, "
                 "Press 'y' to continue\n",
                 strCmd);
             if (cCmd == 'y') {
-                iResult = s_iGetLevel0DiscoveryData(_hDevice);
+                iResult = iGetSupportedSecurityProtocolList(_hDevice);
+                if( iResult == 0 ) svPrintSupportedSecurityProtocolList();
+            }
+            break;
+
+        case 1:
+            cCmd = cGetConsoleInput(
+                "\n# Security Receive : Retrieve TCG Level 0 Discovery data, "
+                "Press 'y' to continue\n",
+                strCmd);
+            if (cCmd == 'y') {
+                if (gau8SupportedSecurityProtocol[1] == 1) {
+                    iResult = s_iGetLevel0DiscoveryData(_hDevice);
+                } else {
+                    fprintf(stderr,
+                        "[E] This drive does not support TCG, ignore.\n\n");
+                }
             }
             break;
 
