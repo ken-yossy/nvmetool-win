@@ -141,10 +141,11 @@ typedef struct {
     uint8_t EUI64[8];   // byte [ 127: 120] M - IEEE Extended Unique Identifier
                         // (EUI64)
 
-    NVME_LBA_FORMAT LBAF[64];  // byte [ 131: 128] M - LBA Format 0 Support
+    NVME_LBA_FORMAT LBAF[16];  // byte [ 131: 128] M - LBA Format 0 Support
                                // (LBAF0) byte [ 383: 132] O - LBA Format
-                               // Support; 1 (LBAF1) to 63 (LBAF63)
+                               // Support; 1 (LBAF1) to 15 (LBAF15)
 
+    uint8_t Reserved4[192];    // byte [ 383: 192] Reserved
     uint8_t VS[3712];  // byte [4095: 384] O - Vendor Specific (VS)
 } MY_NVME_IDENTIFY_NAMESPACE_DATA, *PMY_NVME_IDENTIFY_NAMESPACE_DATA;
 
